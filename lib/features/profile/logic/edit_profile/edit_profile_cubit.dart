@@ -10,6 +10,8 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     required String fullName,
     String? phoneNumber,
     String? country,
+    required String dob,
+    required String gender,
   }) async {
     emit(EditProfileLoading());
     final res = await repo.editProfile(

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:country_picker/country_picker.dart';
 
+import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/utils/app_notifications.dart';
 import 'package:rahhala_app/core/utils/app_validators.dart';
 
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_button.dart';
-import 'package:rahhala_app/features/auth/presentation/widgets/custom_country_dropdown.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_form_text_field.dart';
 
 import 'package:rahhala_app/features/profile/logic/edit_profile/edit_profile_cubit.dart';
@@ -24,26 +24,46 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
-  final _name = TextEditingController();
-  final _phone = TextEditingController();
-  String? _country;
+  late final TextEditingController _name;
+  late final TextEditingController _phone;
+  late final TextEditingController _dobController;
+  late final TextEditingController _genderController;
+  late final TextEditingController _countryController;
 
-  final _countries = const [
-    'Egypt',
-    'Saudi Arabia',
-    'United Arab Emirates',
-    'Kuwait',
-    'Qatar',
-    'Jordan',
-    'Lebanon',
-    'Morocco',
-  ];
+  String? _selectedGender;
+
+  @override
+  void initState() {
+    super.initState();
+    _name = TextEditingController();
+    _phone = TextEditingController();
+    _dobController = TextEditingController();
+    _genderController = TextEditingController();
+    _countryController = TextEditingController();
+  }
 
   @override
   void dispose() {
     _name.dispose();
     _phone.dispose();
+    _dobController.dispose();
+    _genderController.dispose();
+    _countryController.dispose();
     super.dispose();
+  }
+
+  Future<void> _selectDateOfBirth(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _dobController.text = '${picked.toLocal()}'.split(' ')[0];
+      });
+    }
   }
 
   @override
@@ -63,17 +83,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
             listener: (context, state) {
               if (state is EditProfileSuccess) {
                 showAppNotification(
-                    context: context,
-                    title: 'Saved',
-                    message: state.model.message);
+                  context: context,
+                  title: 'Saved',
+                  message: state.model.message,
+                );
                 Navigator.pop(context);
               } else if (state is EditProfileFailure) {
                 HapticFeedback.mediumImpact();
                 showAppNotification(
-                    context: context,
-                    title: 'Error',
-                    message: state.message,
-                    isError: true);
+                  context: context,
+                  title: 'Error',
+                  message: state.message,
+                  isError: true,
+                );
               }
             },
             builder: (context, state) {
@@ -105,25 +127,84 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         hintText: 'Enter your phone number',
                         keyboardType: TextInputType.phone,
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
+                          FilteringTextInputFormatter.digitsOnly,
                         ],
                         prefixIcon: Icons.phone_outlined,
                         validator: AppValidators.validatePhone,
-                        textInputAction: TextInputAction.done,
+                        textInputAction: TextInputAction.next,
                         autofillHints: const [AutofillHints.telephoneNumber],
                       ),
                       SizedBox(height: 12.h),
 
-                      CustomCountryDropdown(
-                        label: 'Country',
-                        hint: 'Select your country',
-                        value: _country,
-                        items: _countries,
-                        prefixIcon: Icons.public,
-                        onChanged: (v) => setState(() => _country = v),
-                        validator: (v) =>
-                            AppValidators.validateDropdown(v, 'country'),
+                      GestureDetector(
+                        onTap: () {
+                          showCountryPicker(
+                            context: context,
+                            showPhoneCode: false,
+                            onSelect: (Country country) {
+                              setState(() {
+                                _countryController.text = country.name;
+                              });
+                            },
+                          );
+                        },
+                        child: AbsorbPointer(
+                          child: CustomFormTextField(
+                            controller: _countryController,
+                            labelText: 'Country',
+                            hintText: 'Select your country',
+                            prefixIcon: Icons.public,
+                            validator: (v) =>
+                                AppValidators.validateDropdown(v, 'country'),
+                          ),
+                        ),
                       ),
+                      SizedBox(height: 12.h),
+
+                      GestureDetector(
+                        onTap: () => _selectDateOfBirth(context),
+                        child: AbsorbPointer(
+                          child: CustomFormTextField(
+                            controller: _dobController,
+                            labelText: 'Date of Birth',
+                            hintText: 'Select your birth date',
+                            prefixIcon: Icons.calendar_today_outlined,
+                            validator: (v) => v == null || v.isEmpty
+                                ? 'Please select your birth date'
+                                : null,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+
+                      // ✅ إصلاح الجزء الخاص بالـ Gender
+                      DropdownButtonFormField<String>(
+                        value: _selectedGender,
+                        onChanged: (newValue) {
+                          setState(() {
+                            _selectedGender = newValue;
+                            _genderController.text = newValue ?? '';
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Gender',
+                          hintText: 'Select your gender',
+                          prefixIcon: const Icon(Icons.transgender_outlined),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                        validator: (v) => v == null || v.isEmpty
+                            ? 'Please select your gender'
+                            : null,
+                        items: ['Male', 'Female', 'Other']
+                            .map((gender) => DropdownMenuItem<String>(
+                                  value: gender,
+                                  child: Text(gender),
+                                ))
+                            .toList(),
+                      ),
+
                       SizedBox(height: 24.h),
 
                       CustomButton(
@@ -134,7 +215,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   context.read<EditProfileCubit>().save(
                                         fullName: _name.text,
                                         phoneNumber: _phone.text,
-                                        country: _country!,
+                                        country: _countryController.text,
+                                        dob: _dobController.text,
+                                        gender: _selectedGender ?? '',
                                       );
                                 } else {
                                   HapticFeedback.selectionClick();

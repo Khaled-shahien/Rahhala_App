@@ -15,11 +15,11 @@ import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/otp_verification_page.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_button.dart';
-import 'package:rahhala_app/features/auth/presentation/widgets/custom_country_dropdown.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_form_text_field.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/or_divider.dart';
 import 'package:rahhala_app/features/auth/logic/register/register_cubit.dart';
 import 'package:rahhala_app/features/auth/logic/register/register_state.dart';
+import 'package:country_picker/country_picker.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -30,26 +30,19 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
+
+  // Controllers
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
   late final TextEditingController _passwordController;
   late final TextEditingController _confirmPasswordController;
+  late final TextEditingController
+      _countryController; // 1. إضافة كنترولر للدولة
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  String? _selectedCountry;
-
-  final List<String> _countries = const [
-    'Egypt',
-    'Saudi Arabia',
-    'United Arab Emirates',
-    'Kuwait',
-    'Qatar',
-    'Jordan',
-    'Lebanon',
-    'Morocco',
-  ];
+  Country? _selectedCountry;
 
   @override
   void initState() {
@@ -59,6 +52,7 @@ class _SignUpPageState extends State<SignUpPage> {
     _phoneController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
+    _countryController = TextEditingController(); // 2. تهيئة كنترولر الدولة
   }
 
   @override
@@ -68,6 +62,7 @@ class _SignUpPageState extends State<SignUpPage> {
     _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _countryController.dispose(); // 3. التخلص منه عند الخروج
     super.dispose();
   }
 
@@ -115,10 +110,6 @@ class _SignUpPageState extends State<SignUpPage> {
                   fullName: fullName,
                   email: email,
                 );
-
-                print('✅ Saved after Register:');
-                print('   - FullName: ${sl<TokenStorage>().fullName}');
-                print('   - Email: ${sl<TokenStorage>().email}');
 
                 showAppNotification(
                   context: context,
@@ -272,17 +263,36 @@ class _SignUpPageState extends State<SignUpPage> {
                               autofillHints: const [AutofillHints.newPassword],
                             ),
                             SizedBox(height: 20.h),
-                            CustomCountryDropdown(
-                              label: 'Country',
-                              hint: 'Select your country',
-                              value: _selectedCountry,
-                              items: _countries,
-                              prefixIcon: Icons.public,
-                              onChanged: (v) =>
-                                  setState(() => _selectedCountry = v),
-                              validator: (v) =>
-                                  AppValidators.validateDropdown(v, 'country'),
+
+                            // Country Picker Fixed Section
+                            GestureDetector(
+                              onTap: () {
+                                showCountryPicker(
+                                  context: context,
+                                  showPhoneCode: false,
+                                  onSelect: (Country country) {
+                                    setState(() {
+                                      _selectedCountry = country;
+                                      // 4. تحديث النص داخل الكنترولر عند الاختيار
+                                      _countryController.text = country.name;
+                                    });
+                                  },
+                                );
+                              },
+                              child: AbsorbPointer(
+                                child: CustomFormTextField(
+                                  labelText: 'Country',
+                                  hintText: 'Select your country',
+                                  controller:
+                                      _countryController, // 5. استخدام الكنترولر الصحيح
+                                  prefixIcon: Icons.public,
+                                  validator: (v) =>
+                                      AppValidators.validateDropdown(
+                                          v, 'country'),
+                                ),
+                              ),
                             ),
+
                             SizedBox(height: 30.h),
                             CustomButton(
                               onTap: isLoading
@@ -309,7 +319,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                                       .text,
                                               phoneNumber:
                                                   _phoneController.text,
-                                              country: _selectedCountry!,
+                                              country: _countryController
+                                                  .text, // 6. إرسال القيمة من الكنترولر لضمان صحتها
                                             );
                                       } else {
                                         HapticFeedback.selectionClick();
