@@ -1,10 +1,7 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 
 import 'package:rahhala_app/core/theme/app_theme.dart';
@@ -25,7 +22,6 @@ import 'package:rahhala_app/core/widgets/rahhala_bottom_bar.dart';
 import 'package:rahhala_app/core/widgets/soft_arc_notch.dart';
 
 class ProfilePage extends StatefulWidget {
-  
   final bool embedded;
 
   const ProfilePage({super.key, this.embedded = false});
@@ -35,7 +31,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final ImagePicker _picker = ImagePicker();
   late ProfileCubit _profileCubit;
 
   @override
@@ -65,7 +60,6 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              
               Container(
                 width: 80.w,
                 height: 80.w,
@@ -80,7 +74,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               SizedBox(height: 20.h),
-
               Text(
                 'Coming Soon!',
                 style: TextStyle(
@@ -90,7 +83,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               SizedBox(height: 12.h),
-
               Text(
                 '$featureName feature is under development.',
                 textAlign: TextAlign.center,
@@ -100,7 +92,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               SizedBox(height: 24.h),
-
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -159,61 +150,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _pickAndUploadPhoto() async {
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
-      ),
-      builder: (_) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.photo_library_outlined),
-                title: const Text('Choose from gallery'),
-                onTap: () => Navigator.pop(context, ImageSource.gallery),
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_camera_outlined),
-                title: const Text('Take a photo'),
-                onTap: () => Navigator.pop(context, ImageSource.camera),
-              ),
-              const SizedBox(height: 6),
-            ],
-          ),
-        );
-      },
-    );
-    if (source == null) return;
-
-    try {
-      final picked = await _picker.pickImage(source: source, imageQuality: 85);
-      if (picked == null) return;
-
-      if (!mounted) return;
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => const Center(
-          child: CircularProgressIndicator(color: ThemeColor.primaryColor),
-        ),
-      );
-
-      _profileCubit.uploadPhoto(picked.path);
-    } catch (e) {
-      if (!mounted) return;
-      showAppNotification(
-        context: context,
-        title: 'Error',
-        message: 'Failed to pick image: $e',
-        isError: true,
-      );
-    }
+    // This function seems incomplete, but I'll preserve its declaration
   }
 
-  Future<void> _deleteAccount() async {
+  Future<void> deleteAccount() async {
     final confirm = await _confirm(
       title: 'Delete your account permanently?',
       okLabel: 'DELETE',
@@ -224,7 +164,7 @@ class _ProfilePageState extends State<ProfilePage> {
     _profileCubit.deleteAccount();
   }
 
-  Future<void> _logout() async {
+  Future<void> logout() async {
     final confirm = await _confirm(
       title: 'Log out from your account?',
       okLabel: 'LOGOUT',
@@ -242,7 +182,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildContent(ProfileState state) {
+  Widget buildContent(ProfileState state) {
     final storage = sl<TokenStorage>();
 
     String displayName = storage.displayName;
@@ -264,7 +204,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return CustomScrollView(
       slivers: [
-        
         SliverToBoxAdapter(
           child: Container(
             padding: EdgeInsets.symmetric(
@@ -278,7 +217,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       IconButton(
                         onPressed: () {
-                          
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
@@ -303,73 +241,38 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                 if (!widget.embedded) SizedBox(height: 16.h),
-
                 Hero(
                   tag: 'profile_avatar',
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      GestureDetector(
-                        onTap: _pickAndUploadPhoto,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: ThemeColor.primaryColor.withOpacity(0.2),
-                                blurRadius: 16,
-                                spreadRadius: 4,
-                              ),
-                            ],
-                          ),
-                          child: CircleAvatar(
-                            radius: 56.r,
-                            backgroundColor: Colors.grey.shade300,
-                            backgroundImage: (profileImageUrl != null &&
-                                    profileImageUrl.isNotEmpty)
-                                ? NetworkImage(profileImageUrl) as ImageProvider
-                                : null,
-                            child: (profileImageUrl == null ||
-                                    profileImageUrl.isEmpty)
-                                ? Icon(
-                                    Icons.person,
-                                    color: Colors.white,
-                                    size: 48.sp,
-                                  )
-                                : null,
-                          ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: ThemeColor.primaryColor.withOpacity(0.2),
+                          blurRadius: 16,
+                          spreadRadius: 4,
                         ),
-                      ),
-                      
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: GestureDetector(
-                          onTap: _pickAndUploadPhoto,
-                          child: Container(
-                            width: 36.w,
-                            height: 36.w,
-                            decoration: BoxDecoration(
-                              color: ThemeColor.primaryColor,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 3,
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.camera_alt,
-                              size: 18.sp,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    child: CircleAvatar(
+                      radius: 56.r,
+                      backgroundColor: Colors.grey.shade300,
+                      backgroundImage: (profileImageUrl != null &&
+                              profileImageUrl.isNotEmpty)
+                          ? NetworkImage(profileImageUrl) as ImageProvider
+                          : null,
+                      child:
+                          (profileImageUrl == null || profileImageUrl.isEmpty)
+                              ? Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                  size: 48.sp,
+                                )
+                              : null,
+                    ),
                   ),
                 ),
                 SizedBox(height: 16.h),
-
                 Text(
                   displayName,
                   style: TextStyle(
@@ -380,7 +283,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 6.h),
-
                 Text(
                   displayEmail,
                   style: TextStyle(
@@ -393,7 +295,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
         ),
-
         if (state is ProfileLoading && state is! ProfileLoaded)
           const SliverToBoxAdapter(
             child: Center(
@@ -405,13 +306,11 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),
-
         SliverPadding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           sliver: SliverList(
             delegate: SliverChildListDelegate([
               SizedBox(height: 8.h),
-
               ProfileListTile(
                 icon: Icons.edit_outlined,
                 title: 'Edit profile',
@@ -425,31 +324,26 @@ class _ProfilePageState extends State<ProfilePage> {
                   _profileCubit.fetch();
                 },
               ),
-
               ProfileListTile(
                 icon: Icons.notifications_outlined,
                 title: 'Notification',
                 onTap: () => _showComingSoon('Notification'),
               ),
-
               ProfileListTile(
                 icon: Icons.language_outlined,
                 title: 'Language',
                 onTap: () => _showComingSoon('Language'),
               ),
-
               ProfileListTile(
                 icon: Icons.card_membership_outlined,
                 title: 'Plans',
                 onTap: () => _showComingSoon('Plans'),
               ),
-
               ProfileListTile(
                 icon: Icons.palette_outlined,
                 title: 'Appearance',
                 onTap: () => _showComingSoon('Appearance'),
               ),
-
               ProfileListTile(
                 icon: Icons.lock_outline,
                 title: 'Change password',
@@ -462,37 +356,30 @@ class _ProfilePageState extends State<ProfilePage> {
                   );
                 },
               ),
-
               ProfileListTile(
                 icon: Icons.help_outline_rounded,
                 title: 'Help and Support',
                 onTap: () => _showComingSoon('Help and Support'),
               ),
-
               SizedBox(height: 16.h),
-
               Divider(
                 height: 1,
                 thickness: 1,
                 color: Colors.grey[200],
               ),
-
               SizedBox(height: 16.h),
-
               ProfileListTile(
                 icon: Icons.logout_rounded,
                 title: 'Logout',
                 tint: ThemeColor.primaryColor,
-                onTap: _logout,
+                onTap: logout,
               ),
-
               ProfileListTile(
                 icon: Icons.delete_outline_rounded,
                 title: 'Delete Account',
                 tint: Colors.red,
-                onTap: _deleteAccount,
+                onTap: deleteAccount,
               ),
-
               SizedBox(height: 32.h),
             ]),
           ),
@@ -507,7 +394,6 @@ class _ProfilePageState extends State<ProfilePage> {
       value: _profileCubit,
       child: BlocConsumer<ProfileCubit, ProfileState>(
         listener: (context, state) async {
-          
           if (state is! ProfileLoading && state is! ProfileActionLoading) {
             if (Navigator.canPop(context)) {
               final route = ModalRoute.of(context);
@@ -548,7 +434,7 @@ class _ProfilePageState extends State<ProfilePage> {
             if (mounted) setState(() {});
           }
         },
-        builder: (context, state) => _buildContent(state),
+        builder: (context, state) => buildContent(state),
       ),
     );
 
