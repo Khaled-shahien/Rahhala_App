@@ -18,6 +18,8 @@ class EditProfileCubit extends Cubit<EditProfileState> {
       fullName: fullName,
       phoneNumber: phoneNumber,
       country: country,
+      dateOfBirth: dob, // Added dateOfBirth parameter
+      gender: gender, // Added gender parameter
     );
     res.fold(
       (f) => emit(EditProfileFailure(f.message)),

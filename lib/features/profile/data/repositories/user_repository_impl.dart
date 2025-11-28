@@ -77,6 +77,8 @@ class UserRepoImpl implements UserRepo {
     required String fullName,
     String? phoneNumber,
     String? country,
+    String? dateOfBirth, // Added dateOfBirth parameter
+    String? gender, // Added gender parameter
   }) async {
     try {
       final res = await api.put(
@@ -85,6 +87,9 @@ class UserRepoImpl implements UserRepo {
           'fullName': fullName,
           if (phoneNumber != null) 'phoneNumber': phoneNumber,
           if (country != null) 'country': country,
+          if (dateOfBirth != null)
+            'dateOfBirth': dateOfBirth, // Added dateOfBirth
+          if (gender != null) 'gender': gender, // Added gender
         },
       );
       return Right(SuccessMessageModel.fromJson(_ensureMap(res)));
@@ -110,7 +115,6 @@ class UserRepoImpl implements UserRepo {
     required String confirmPassword,
   }) async {
     try {
-      
       final res = await api.put(
         EndPoints.changePassword,
         data: {

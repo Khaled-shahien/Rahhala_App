@@ -127,6 +127,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
             (details.countryName?.trim().isNotEmpty ?? false)) {
           _countryController.text = details.countryName!.trim();
         }
+        // إصلاح: تحميل تاريخ الميلاد
+        if (_dobController.text.trim().isEmpty &&
+            (details.dateOfBirth?.trim().isNotEmpty ?? false)) {
+          _dobController.text = details.dateOfBirth!.trim();
+        }
+        // إصلاح: تحميل الجنس وتحديثه في المتغيرات
+        if (_genderController.text.trim().isEmpty &&
+            (details.gender?.trim().isNotEmpty ?? false)) {
+          setState(() {
+            _selectedGender = details.gender!.trim();
+            _genderController.text = details.gender!.trim();
+          });
+        }
         if (details.profileImageUrl != null &&
             details.profileImageUrl!.trim().isNotEmpty) {
           setState(() {
@@ -142,13 +155,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
       builder: (_) {
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              SizedBox(height: 12.h),
+              Container(
+                width: 45.w,
+                height: 6.h,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(3.r),
+                ),
+              ),
+              SizedBox(height: 16.h),
               ListTile(
                 leading: const Icon(Icons.photo_library_outlined),
                 title: const Text('Choose from gallery'),
@@ -159,7 +182,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 title: const Text('Take a photo'),
                 onTap: () => Navigator.pop(context, ImageSource.camera),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 12.h),
             ],
           ),
         );
@@ -167,8 +190,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
     if (source == null) return;
 
-    final picked =
-        await _picker.pickImage(source: source, imageQuality: 85);
+    final picked = await _picker.pickImage(source: source, imageQuality: 85);
     if (picked == null) return;
     if (!mounted) return;
 
@@ -234,33 +256,33 @@ class _EditProfilePageState extends State<EditProfilePage> {
         return Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(height: 8.h),
+              SizedBox(height: 12.h),
               Container(
-                width: 40.w,
-                height: 4.h,
+                width: 45.w,
+                height: 6.h,
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2.r),
+                  borderRadius: BorderRadius.circular(3.r),
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(20.w),
+                padding: EdgeInsets.all(24.w),
                 child: Column(
                   children: [
                     Text(
                       'Select Gender',
                       style: TextStyle(
-                        fontSize: 20.sp,
+                        fontSize: 22.sp,
                         fontWeight: FontWeight.bold,
                         color: ThemeColor.charcoalColor,
                       ),
                     ),
-                    SizedBox(height: 20.h),
+                    SizedBox(height: 24.h),
                     ...[
                       {'icon': Icons.male, 'label': 'Male'},
                       {'icon': Icons.female, 'label': 'Female'},
@@ -277,7 +299,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             Navigator.of(context).pop();
                           },
                         )),
-                    SizedBox(height: 12.h),
+                    SizedBox(height: 16.h),
                   ],
                 ),
               ),
@@ -295,42 +317,42 @@ class _EditProfilePageState extends State<EditProfilePage> {
     required VoidCallback onTap,
   }) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
+      margin: EdgeInsets.only(bottom: 16.h),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(14.r),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+          padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 18.h),
           decoration: BoxDecoration(
             color: isSelected
-                ? ThemeColor.charcoalColor.withOpacity(0.08)
+                ? ThemeColor.charcoalColor.withOpacity(0.1)
                 : Colors.grey[50],
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(14.r),
             border: Border.all(
               color: isSelected ? ThemeColor.charcoalColor : Colors.grey[200]!,
-              width: isSelected ? 2 : 1,
+              width: isSelected ? 2.5 : 1.5,
             ),
           ),
           child: Row(
             children: [
               Container(
-                padding: EdgeInsets.all(10.w),
+                padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
                   color:
                       isSelected ? ThemeColor.charcoalColor : Colors.grey[300],
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(
                   icon,
                   color: isSelected ? Colors.white : Colors.grey[600],
-                  size: 22.sp,
+                  size: 24.sp,
                 ),
               ),
-              SizedBox(width: 16.w),
+              SizedBox(width: 18.w),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 17.sp,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   color:
                       isSelected ? ThemeColor.charcoalColor : Colors.grey[700],
@@ -341,7 +363,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 Icon(
                   Icons.check_circle,
                   color: ThemeColor.charcoalColor,
-                  size: 22.sp,
+                  size: 24.sp,
                 ),
             ],
           ),
@@ -378,16 +400,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
               final isLoading = state is EditProfileLoading;
               return Column(
                 children: [
-                  // Custom App Bar
+                  // Custom App Bar with improved styling
                   Container(
                     padding:
-                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.03),
-                          blurRadius: 10,
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 12,
                           offset: const Offset(0, 2),
                         ),
                       ],
@@ -399,23 +421,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           icon: Icon(
                             Icons.arrow_back_ios_new_rounded,
                             color: ThemeColor.charcoalColor,
-                            size: 20.sp,
+                            size: 22.sp,
                           ),
                           style: IconButton.styleFrom(
                             backgroundColor: Colors.grey[100],
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.r),
+                              borderRadius: BorderRadius.circular(12.r),
                             ),
                           ),
                         ),
-                        SizedBox(width: 12.w),
+                        SizedBox(width: 16.w),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Edit Profile',
                               style: TextStyle(
-                                fontSize: 20.sp,
+                                fontSize: 22.sp,
                                 fontWeight: FontWeight.bold,
                                 color: ThemeColor.charcoalColor,
                               ),
@@ -423,8 +445,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             Text(
                               'Update your personal information',
                               style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 13.sp,
                                 color: Colors.grey[600],
+                                height: 1.4,
                               ),
                             ),
                           ],
@@ -433,17 +456,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                   ),
 
-                  // Form Content
+                  // Form Content with improved styling
                   Expanded(
                     child: SingleChildScrollView(
-                      padding: EdgeInsets.all(20.w),
+                      padding: EdgeInsets.all(24.w),
                       child: Form(
                         key: _formKey,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // Profile Avatar Section
+                            // Profile Avatar Section with improved styling
                             Center(
                               child: Stack(
                                 clipBehavior: Clip.none,
@@ -453,36 +476,37 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         ? null
                                         : _pickAndUploadPhoto,
                                     child: Container(
-                                      width: 110.w,
-                                      height: 110.w,
+                                      width: 120.w,
+                                      height: 120.w,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         boxShadow: [
                                           BoxShadow(
                                             color: ThemeColor.charcoalColor
-                                                .withOpacity(0.12),
-                                            blurRadius: 14,
-                                            spreadRadius: 3,
+                                                .withOpacity(0.15),
+                                            blurRadius: 16,
+                                            spreadRadius: 4,
                                           ),
                                         ],
                                       ),
                                       child: CircleAvatar(
-                                        radius: 55.r,
-                                        backgroundColor: ThemeColor.charcoalColor
-                                            .withOpacity(0.1),
-                                        backgroundImage:
-                                            (_profileImageUrl != null &&
-                                                    _profileImageUrl!.isNotEmpty)
-                                                ? NetworkImage(_profileImageUrl!)
-                                                    as ImageProvider
-                                                : null,
+                                        radius: 60.r,
+                                        backgroundColor: ThemeColor
+                                            .charcoalColor
+                                            .withOpacity(0.12),
+                                        backgroundImage: (_profileImageUrl !=
+                                                    null &&
+                                                _profileImageUrl!.isNotEmpty)
+                                            ? NetworkImage(_profileImageUrl!)
+                                                as ImageProvider
+                                            : null,
                                         child: (_profileImageUrl == null ||
                                                 _profileImageUrl!.isEmpty)
                                             ? Icon(
                                                 Icons.person,
-                                                size: 50.sp,
+                                                size: 55.sp,
                                                 color: ThemeColor.charcoalColor
-                                                    .withOpacity(0.6),
+                                                    .withOpacity(0.7),
                                               )
                                             : null,
                                       ),
@@ -496,18 +520,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                           ? null
                                           : _pickAndUploadPhoto,
                                       child: Container(
-                                        padding: EdgeInsets.all(8.w),
+                                        padding: EdgeInsets.all(10.w),
                                         decoration: BoxDecoration(
                                           color: ThemeColor.charcoalColor,
                                           shape: BoxShape.circle,
                                           border: Border.all(
                                             color: Colors.white,
-                                            width: 3,
+                                            width: 3.5,
                                           ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.black.withOpacity(0.2),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
                                         ),
                                         child: Icon(
                                           Icons.camera_alt,
-                                          size: 16.sp,
+                                          size: 18.sp,
                                           color: Colors.white,
                                         ),
                                       ),
@@ -518,14 +550,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       child: Container(
                                         decoration: const BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: Colors.black26,
+                                          color: Colors.black38,
                                         ),
                                         child: const Center(
                                           child: SizedBox(
-                                            width: 28,
-                                            height: 28,
+                                            width: 32,
+                                            height: 32,
                                             child: CircularProgressIndicator(
-                                              strokeWidth: 3,
+                                              strokeWidth: 3.5,
                                               color: Colors.white,
                                             ),
                                           ),
@@ -535,11 +567,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 ],
                               ),
                             ),
-                            SizedBox(height: 32.h),
+                            SizedBox(height: 36.h),
 
-                            // Personal Information Section
+                            // Personal Information Section with improved styling
                             _buildSectionTitle('Personal Information'),
-                            SizedBox(height: 16.h),
+                            SizedBox(height: 18.h),
 
                             CustomFormTextField(
                               controller: _name,
@@ -550,7 +582,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               textInputAction: TextInputAction.next,
                               autofillHints: const [AutofillHints.name],
                             ),
-                            SizedBox(height: 16.h),
+                            SizedBox(height: 18.h),
 
                             AbsorbPointer(
                               child: CustomFormTextField(
@@ -563,7 +595,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 autofillHints: const [AutofillHints.email],
                               ),
                             ),
-                            SizedBox(height: 16.h),
+                            SizedBox(height: 18.h),
 
                             Row(
                               children: [
@@ -582,7 +614,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 12.w),
+                                SizedBox(width: 16.w),
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () => _showGenderPicker(context),
@@ -601,11 +633,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               ],
                             ),
 
-                            SizedBox(height: 28.h),
+                            SizedBox(height: 32.h),
 
-                            // Contact Information Section
+                            // Contact Information Section with improved styling
                             _buildSectionTitle('Contact Information'),
-                            SizedBox(height: 16.h),
+                            SizedBox(height: 18.h),
 
                             CustomFormTextField(
                               controller: _phone,
@@ -622,7 +654,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 AutofillHints.telephoneNumber
                               ],
                             ),
-                            SizedBox(height: 16.h),
+                            SizedBox(height: 18.h),
 
                             GestureDetector(
                               onTap: () {
@@ -631,15 +663,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   showPhoneCode: false,
                                   countryListTheme: CountryListThemeData(
                                     borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(20.r),
-                                      topRight: Radius.circular(20.r),
+                                      topLeft: Radius.circular(22.r),
+                                      topRight: Radius.circular(22.r),
                                     ),
                                     inputDecoration: InputDecoration(
                                       hintText: 'Search country',
                                       prefixIcon: const Icon(Icons.search),
                                       border: OutlineInputBorder(
                                         borderRadius:
-                                            BorderRadius.circular(12.r),
+                                            BorderRadius.circular(14.r),
                                       ),
                                     ),
                                   ),
@@ -663,19 +695,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               ),
                             ),
 
-                            SizedBox(height: 32.h),
+                            SizedBox(height: 36.h),
 
-                            // Save Button
+                            // Save Button with improved styling
                             CustomButton(
                               onTap: isLoading
                                   ? null
                                   : () {
                                       if (_formKey.currentState!.validate()) {
                                         context.read<EditProfileCubit>().save(
-                                              fullName: _name.text,
-                                              phoneNumber: _phone.text,
-                                              country: _countryController.text,
-                                              dob: _dobController.text,
+                                              fullName: _name.text.trim(),
+                                              phoneNumber: _phone.text.trim(),
+                                              country:
+                                                  _countryController.text.trim(),
+                                              dob: _dobController.text.trim(),
                                               gender: _selectedGender ?? '',
                                             );
                                       } else {
@@ -685,7 +718,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               text: isLoading ? 'Saving...' : 'Save Changes',
                             ),
 
-                            SizedBox(height: 20.h),
+                            SizedBox(height: 24.h),
                           ],
                         ),
                       ),
@@ -704,18 +737,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Row(
       children: [
         Container(
-          width: 4.w,
-          height: 20.h,
+          width: 5.w,
+          height: 24.h,
           decoration: BoxDecoration(
             color: ThemeColor.charcoalColor,
-            borderRadius: BorderRadius.circular(2.r),
+            borderRadius: BorderRadius.circular(3.r),
           ),
         ),
-        SizedBox(width: 8.w),
+        SizedBox(width: 10.w),
         Text(
           title,
           style: TextStyle(
-            fontSize: 16.sp,
+            fontSize: 18.sp,
             fontWeight: FontWeight.bold,
             color: ThemeColor.charcoalColor,
           ),

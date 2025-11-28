@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,64 +12,62 @@ class TripInterestsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     final cubit = context.read<AiTripCubit>();
 
     return BlocBuilder<AiTripCubit, AiTripState>(
       builder: (context, state) {
-        
         if (state is! AiTripData) {
-          
           return const Center(child: CircularProgressIndicator());
         }
 
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
+        return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 50.h),
-              Text(
-                '       What are you most  \n excited to do on your trip?',
-                style: TextStyle(
-                    fontSize: 22.sp,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.black),
-              ),
               SizedBox(height: 30.h),
+              Text(
+                'What are you most\nexcited to do on your trip?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.black,
+                  height: 1.3,
+                ),
+              ),
+              SizedBox(height: 36.h),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                
                 itemCount: cubit.availableInterests.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  mainAxisSpacing: 15.h,
-                  crossAxisSpacing: 15.w,
-                  childAspectRatio: 3,
+                  mainAxisSpacing: 18.h,
+                  crossAxisSpacing: 18.w,
+                  childAspectRatio: 3.2,
                 ),
                 itemBuilder: (context, index) {
                   final interest = cubit.availableInterests[index];
-                  
                   final isSelected = state.selectedInterests.contains(interest);
+
                   return _buildInterestToggle(
                     interest,
                     isSelected,
-                    () => cubit.toggleInterest(interest), 
+                    () => cubit.toggleInterest(interest),
                   );
                 },
               ),
-              SizedBox(height: 40.h),
+              SizedBox(height: 44.h),
               NextButton(
                 onPressed: () {
-
                   cubit.generateTripPlan();
 
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => BlocProvider.value(
-                        
                         value: cubit,
                         child: const TripSplashScreen(),
                       ),
@@ -80,7 +76,7 @@ class TripInterestsScreen extends StatelessWidget {
                 },
                 text: 'Generate My Custom Trip',
               ),
-              SizedBox(height: 40.h),
+              SizedBox(height: 44.h),
             ],
           ),
         );
@@ -89,23 +85,39 @@ class TripInterestsScreen extends StatelessWidget {
   }
 
   Widget _buildInterestToggle(
-      String label, bool isSelected, VoidCallback onPressed) {
-    
+    String label,
+    bool isSelected,
+    VoidCallback onPressed,
+  ) {
     return Container(
-      height: 50.h,
+      height: 56.h,
       width: double.infinity,
       decoration: BoxDecoration(
         color: isSelected ? AppColors.primary : AppColors.primaryLight,
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: AppColors.borderDark, width: 2.w),
+        boxShadow: [
+          BoxShadow(
+            color: isSelected
+                ? AppColors.primary.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: TextButton(
         onPressed: onPressed,
+        style: TextButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+        ),
         child: Text(
           label,
           style: TextStyle(
             color: isSelected ? AppColors.white : AppColors.black,
-            fontSize: 17.sp,
+            fontSize: 18.sp,
             fontWeight: FontWeight.w500,
           ),
         ),

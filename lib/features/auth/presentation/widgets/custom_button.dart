@@ -5,13 +5,13 @@ import 'package:rahhala_app/core/theme/app_theme.dart';
 class CustomButton extends StatelessWidget {
   final VoidCallback? onTap;
   final String text;
-  final bool isLoading; 
+  final bool isLoading;
 
   const CustomButton({
     super.key,
     required this.onTap,
     required this.text,
-    this.isLoading = false, 
+    this.isLoading = false,
   });
 
   @override
@@ -24,22 +24,25 @@ class CustomButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
-        padding: EdgeInsets.symmetric(vertical: 16.h),
-        minimumSize: Size(double.infinity, 50.h),
+        padding: EdgeInsets.symmetric(vertical: 18.h),
+        minimumSize: Size(double.infinity, 56.h),
+        elevation: 4,
+        shadowColor: ThemeColor.primaryColor.withOpacity(0.3),
+        animationDuration: const Duration(milliseconds: 200),
       ),
       child: isLoading
           ? const SizedBox(
-              height: 20,
-              width: 20,
+              height: 24,
+              width: 24,
               child: CircularProgressIndicator(
                 color: Colors.white,
-                strokeWidth: 2.5,
+                strokeWidth: 3,
               ),
             )
           : Text(
               text,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 17,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),

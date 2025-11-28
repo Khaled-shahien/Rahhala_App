@@ -7,6 +7,7 @@ import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_mod
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/transportation_widgets.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/expansion_tile_components.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
+import 'package:rahhala_app/core/widgets/background_decorator.dart';
 
 // Using centralized colors from AppColors
 const Color darkBrown = AppColors.darkBrown;
@@ -29,80 +30,82 @@ class TripDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: screenBackgroundColor,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.only(
-                left: 16.w,
-                right: 16.w,
-                bottom: 24.h,
-                top: 16.h,
-              ),
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(25),
-                  bottomRight: Radius.circular(25),
+        child: BackgroundDecorator(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.only(
+                  left: 16.w,
+                  right: 16.w,
+                  bottom: 24.h,
+                  top: 16.h,
                 ),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [darkBrown, mediumBrown, lightBrown],
-                  stops: [0.0, 0.5, 1.0],
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(25),
+                    bottomRight: Radius.circular(25),
+                  ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [darkBrown, mediumBrown, lightBrown],
+                    stops: [0.0, 0.5, 1.0],
+                  ),
                 ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildTitle(),
-                  SizedBox(height: 16.h),
-                  _buildHeaderBar(plan.destination, plan.totalEstimatedCost),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildTitle(),
                     SizedBox(height: 16.h),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: plan.days.length,
-                      itemBuilder: (context, index) {
-                        final day = plan.days[index];
-                        return _buildDayExpansionTile(
-                          context,
-                          dayNumber: day.day,
-                          title: day.title,
-                          cost: day.estimatedDayCost,
-                          children: [
-                            _buildDayDetailsContent(context, day.activities),
-                          ],
-                        );
-                      },
-                    ),
-                    SizedBox(height: 16.h),
-                    _buildSimpleExpansionTile(
-                      icon: Icons.lightbulb_outline,
-                      title: "Budget tips",
-                      content: plan.budgetTips,
-                    ),
-                    SizedBox(height: 16.h),
-                    _buildSimpleExpansionTile(
-                      icon: Icons.favorite_border,
-                      title: "Travel tips",
-                      content: plan.travelTips,
-                    ),
-                    SizedBox(height: 32.h),
+                    _buildHeaderBar(plan.destination, plan.totalEstimatedCost),
                   ],
                 ),
               ),
-            ),
-          ],
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      SizedBox(height: 16.h),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: plan.days.length,
+                        itemBuilder: (context, index) {
+                          final day = plan.days[index];
+                          return _buildDayExpansionTile(
+                            context,
+                            dayNumber: day.day,
+                            title: day.title,
+                            cost: day.estimatedDayCost,
+                            children: [
+                              _buildDayDetailsContent(context, day.activities),
+                            ],
+                          );
+                        },
+                      ),
+                      SizedBox(height: 16.h),
+                      _buildSimpleExpansionTile(
+                        icon: Icons.lightbulb_outline,
+                        title: "Budget tips",
+                        content: plan.budgetTips,
+                      ),
+                      SizedBox(height: 16.h),
+                      _buildSimpleExpansionTile(
+                        icon: Icons.favorite_border,
+                        title: "Travel tips",
+                        content: plan.travelTips,
+                      ),
+                      SizedBox(height: 32.h),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -50,9 +49,8 @@ class _AIRecommendationTabFlowState extends State<AIRecommendationTabFlow> {
   }
 
   Widget _buildNavigationHeader() {
-    
     return Container(
-      height: 56.0,
+      height: 60.0,
       color: AppColors.backgroundGray,
       alignment: Alignment.centerLeft,
       child: _currentStep == 0
@@ -66,7 +64,6 @@ class _AIRecommendationTabFlowState extends State<AIRecommendationTabFlow> {
   }
 
   Widget _buildDashedProgress(int currentStep) {
-    
     const int totalSteps = 3;
     List<Widget> dashes = [];
 
@@ -76,16 +73,16 @@ class _AIRecommendationTabFlowState extends State<AIRecommendationTabFlow> {
         Expanded(
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            height: 5.h,
+            height: 6.h,
             decoration: BoxDecoration(
               color: isActive ? AppColors.primary : Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(5.r),
+              borderRadius: BorderRadius.circular(6.r),
             ),
           ),
         ),
       );
       if (i < totalSteps - 1) {
-        dashes.add(SizedBox(width: 8.w));
+        dashes.add(SizedBox(width: 10.w));
       }
     }
     return Row(children: dashes);
@@ -93,14 +90,13 @@ class _AIRecommendationTabFlowState extends State<AIRecommendationTabFlow> {
 
   @override
   Widget build(BuildContext context) {
-    
     return BlocProvider(
       create: (context) => sl<AiTripCubit>(),
       child: Column(
         children: [
           _buildNavigationHeader(),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 16.h),
+            padding: EdgeInsets.symmetric(horizontal: 44.w, vertical: 20.h),
             child: _buildDashedProgress(_currentStep),
           ),
           Expanded(
@@ -113,10 +109,9 @@ class _AIRecommendationTabFlowState extends State<AIRecommendationTabFlow> {
                 });
               },
               children: [
-                
                 TripInfoScreen(onNext: _nextPage),
                 TripBudgetRangeScreen(onNext: _nextPage),
-                const TripInterestsScreen(), 
+                const TripInterestsScreen(),
               ],
             ),
           ),

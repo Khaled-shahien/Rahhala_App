@@ -1,17 +1,15 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 
 class CustomFormTextField extends StatefulWidget {
   final TextEditingController controller;
-  final String labelText; 
-  final String hintText; 
+  final String labelText;
+  final String hintText;
   final String? Function(String?)? validator;
 
-  final bool obscureText; 
-  final Widget? suffixIcon; 
+  final bool obscureText;
+  final Widget? suffixIcon;
 
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
@@ -25,11 +23,11 @@ class CustomFormTextField extends StatefulWidget {
   const CustomFormTextField({
     super.key,
     required this.controller,
-    required this.labelText, 
-    required this.hintText, 
+    required this.labelText,
+    required this.hintText,
     this.validator,
-    this.obscureText = false, 
-    this.suffixIcon, 
+    this.obscureText = false,
+    this.suffixIcon,
     this.keyboardType,
     this.inputFormatters,
     this.prefixIcon,
@@ -65,7 +63,7 @@ class _CustomFormTextFieldState extends State<CustomFormTextField> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
-      obscureText: widget.obscureText, 
+      obscureText: widget.obscureText,
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
       textInputAction: widget.textInputAction,
@@ -80,29 +78,29 @@ class _CustomFormTextFieldState extends State<CustomFormTextField> {
         widget.onChanged?.call(v);
       },
       decoration: InputDecoration(
-        labelText: widget.labelText, 
-        hintText: widget.hintText, 
+        labelText: widget.labelText,
+        hintText: widget.hintText,
         filled: true,
         fillColor: Colors.grey.shade100,
         prefixIcon: widget.prefixIcon != null
             ? Icon(widget.prefixIcon, color: ThemeColor.primaryColor)
             : null,
-        suffixIcon: widget.suffixIcon, 
+        suffixIcon: widget.suffixIcon,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: _borderColor, width: 1.5),
+          borderSide: BorderSide(color: _borderColor, width: 1.8),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: _borderColor, width: 2),
+          borderSide: BorderSide(color: _borderColor, width: 2.2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Colors.red, width: 1.5),
+          borderSide: const BorderSide(color: Colors.red, width: 1.8),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
+          borderSide: const BorderSide(color: Colors.red, width: 2.2),
         ),
       ),
     );

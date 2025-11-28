@@ -53,45 +53,46 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
         ),
         child: Padding(
-          padding: EdgeInsets.all(24.w),
+          padding: EdgeInsets.all(28.w),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 80.w,
-                height: 80.w,
+                width: 90.w,
+                height: 90.w,
                 decoration: BoxDecoration(
-                  color: ThemeColor.primaryColor.withOpacity(0.1),
+                  color: ThemeColor.primaryColor.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.schedule_rounded,
-                  size: 40.sp,
+                  size: 45.sp,
                   color: ThemeColor.primaryColor,
                 ),
               ),
-              SizedBox(height: 20.h),
+              SizedBox(height: 24.h),
               Text(
                 'Coming Soon!',
                 style: TextStyle(
-                  fontSize: 22.sp,
+                  fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 12.h),
+              SizedBox(height: 16.h),
               Text(
                 '$featureName feature is under development.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 15.sp,
+                  fontSize: 16.sp,
                   color: Colors.grey[600],
+                  height: 1.5,
                 ),
               ),
-              SizedBox(height: 24.h),
+              SizedBox(height: 28.h),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -99,15 +100,15 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ThemeColor.primaryColor,
                     foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 12.h),
+                    padding: EdgeInsets.symmetric(vertical: 14.h),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                   child: Text(
                     'Got it',
                     style: TextStyle(
-                      fontSize: 16.sp,
+                      fontSize: 17.sp,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -128,7 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(title),
         actions: [
           TextButton(
@@ -139,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
               backgroundColor: okColor,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+                  borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () => Navigator.pop(context, true),
             child: Text(okLabel),
@@ -205,12 +206,10 @@ class _ProfilePageState extends State<ProfilePage> {
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: 16.w,
-              vertical: 16.h,
-            ),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (!widget.embedded)
                   Row(
@@ -227,69 +226,138 @@ class _ProfilePageState extends State<ProfilePage> {
                         },
                         icon: Icon(
                           Icons.arrow_back_ios_new_rounded,
-                          size: 22.sp,
+                          size: 24.sp,
                           color: Colors.black87,
                         ),
                         style: IconButton.styleFrom(
                           backgroundColor: Colors.grey[100],
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                           ),
+                        ),
+                      ),
+                      SizedBox(width: 16.w),
+                      Text(
+                        'Profile',
+                        style: TextStyle(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
                         ),
                       ),
                       const Spacer(),
                     ],
                   ),
-                if (!widget.embedded) SizedBox(height: 16.h),
-                Hero(
-                  tag: 'profile_avatar',
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: ThemeColor.primaryColor.withOpacity(0.2),
-                          blurRadius: 16,
-                          spreadRadius: 4,
-                        ),
+                if (!widget.embedded) SizedBox(height: 20.h),
+
+                // Profile header with improved styling
+                Container(
+                  padding: EdgeInsets.fromLTRB(20.w, 22.h, 20.w, 24.h),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        ThemeColor.primaryColor.withOpacity(0.08),
+                        Colors.white,
                       ],
                     ),
-                    child: CircleAvatar(
-                      radius: 56.r,
-                      backgroundColor: Colors.grey.shade300,
-                      backgroundImage: (profileImageUrl != null &&
-                              profileImageUrl.isNotEmpty)
-                          ? NetworkImage(profileImageUrl) as ImageProvider
-                          : null,
-                      child:
-                          (profileImageUrl == null || profileImageUrl.isEmpty)
-                              ? Icon(
-                                  Icons.person,
-                                  color: Colors.white,
-                                  size: 48.sp,
-                                )
-                              : null,
-                    ),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: Colors.grey[200]!),
+                    boxShadow: [
+                      BoxShadow(
+                        color: ThemeColor.primaryColor.withOpacity(0.1),
+                        blurRadius: 30,
+                        offset: const Offset(0, 12),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(height: 16.h),
-                Text(
-                  displayName,
-                  style: TextStyle(
-                    fontSize: 24.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                  child: Column(
+                    children: [
+                      Hero(
+                        tag: 'profile_avatar',
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: ThemeColor.primaryColor.withOpacity(0.2),
+                                blurRadius: 20,
+                                spreadRadius: 6,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: CircleAvatar(
+                            radius: 60.r,
+                            backgroundColor: Colors.grey.shade300,
+                            backgroundImage: (profileImageUrl != null &&
+                                    profileImageUrl.isNotEmpty)
+                                ? NetworkImage(profileImageUrl) as ImageProvider
+                                : null,
+                            child: (profileImageUrl == null ||
+                                    profileImageUrl.isEmpty)
+                                ? Icon(
+                                    Icons.person,
+                                    color: Colors.white,
+                                    size: 52.sp,
+                                  )
+                                : null,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 18.h),
+                      Text(
+                        displayName,
+                        style: TextStyle(
+                          fontSize: 26.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 10.h),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14.w,
+                          vertical: 10.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.grey[200]!),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.mail_outline_rounded,
+                              size: 18.sp,
+                              color: Colors.grey[600],
+                            ),
+                            SizedBox(width: 10.w),
+                            Flexible(
+                              child: Text(
+                                displayEmail,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: Colors.grey[700],
+                                  height: 1.3,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 6.h),
-                Text(
-                  displayEmail,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.grey[600],
-                  ),
-                  textAlign: TextAlign.center,
                 ),
               ],
             ),
@@ -307,84 +375,134 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
         SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           sliver: SliverList(
             delegate: SliverChildListDelegate([
-              SizedBox(height: 8.h),
-              ProfileListTile(
-                icon: Icons.edit_outlined,
-                title: 'Edit profile',
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const EditProfilePage(),
-                    ),
-                  );
-                  _profileCubit.fetch();
-                },
-              ),
-              ProfileListTile(
-                icon: Icons.notifications_outlined,
-                title: 'Notification',
-                onTap: () => _showComingSoon('Notification'),
-              ),
-              ProfileListTile(
-                icon: Icons.language_outlined,
-                title: 'Language',
-                onTap: () => _showComingSoon('Language'),
-              ),
-              ProfileListTile(
-                icon: Icons.card_membership_outlined,
-                title: 'Plans',
-                onTap: () => _showComingSoon('Plans'),
-              ),
-              ProfileListTile(
-                icon: Icons.palette_outlined,
-                title: 'Appearance',
-                onTap: () => _showComingSoon('Appearance'),
-              ),
-              ProfileListTile(
-                icon: Icons.lock_outline,
-                title: 'Change password',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ResetPasswordLoggedInPage(),
-                    ),
-                  );
-                },
-              ),
-              ProfileListTile(
-                icon: Icons.help_outline_rounded,
-                title: 'Help and Support',
-                onTap: () => _showComingSoon('Help and Support'),
-              ),
               SizedBox(height: 16.h),
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: Colors.grey[200],
-              ),
-              SizedBox(height: 16.h),
-              ProfileListTile(
-                icon: Icons.logout_rounded,
-                title: 'Logout',
-                tint: ThemeColor.primaryColor,
-                onTap: logout,
-              ),
-              ProfileListTile(
-                icon: Icons.delete_outline_rounded,
-                title: 'Delete Account',
-                tint: Colors.red,
-                onTap: deleteAccount,
-              ),
-              SizedBox(height: 32.h),
+              _sectionTitle('Account'),
+              SizedBox(height: 12.h),
+              _sectionCard([
+                ProfileListTile(
+                  icon: Icons.edit_outlined,
+                  title: 'Edit profile',
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const EditProfilePage(),
+                      ),
+                    );
+                    _profileCubit.fetch();
+                  },
+                ),
+                Divider(height: 1, color: Colors.grey[200]),
+                ProfileListTile(
+                  icon: Icons.lock_outline,
+                  title: 'Change password',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ResetPasswordLoggedInPage(),
+                      ),
+                    );
+                  },
+                ),
+              ]),
+              SizedBox(height: 22.h),
+              _sectionTitle('Preferences'),
+              SizedBox(height: 12.h),
+              _sectionCard([
+                ProfileListTile(
+                  icon: Icons.notifications_outlined,
+                  title: 'Notification',
+                  onTap: () => _showComingSoon('Notification'),
+                ),
+                Divider(height: 1, color: Colors.grey[200]),
+                ProfileListTile(
+                  icon: Icons.language_outlined,
+                  title: 'Language',
+                  onTap: () => _showComingSoon('Language'),
+                ),
+                Divider(height: 1, color: Colors.grey[200]),
+                ProfileListTile(
+                  icon: Icons.card_membership_outlined,
+                  title: 'Plans',
+                  onTap: () => _showComingSoon('Plans'),
+                ),
+                Divider(height: 1, color: Colors.grey[200]),
+                ProfileListTile(
+                  icon: Icons.palette_outlined,
+                  title: 'Appearance',
+                  onTap: () => _showComingSoon('Appearance'),
+                ),
+              ]),
+              SizedBox(height: 22.h),
+              _sectionTitle('Support'),
+              SizedBox(height: 12.h),
+              _sectionCard([
+                ProfileListTile(
+                  icon: Icons.help_outline_rounded,
+                  title: 'Help and Support',
+                  onTap: () => _showComingSoon('Help and Support'),
+                ),
+              ]),
+              SizedBox(height: 22.h),
+              _sectionTitle('Danger zone'),
+              SizedBox(height: 12.h),
+              _sectionCard([
+                ProfileListTile(
+                  icon: Icons.logout_rounded,
+                  title: 'Logout',
+                  tint: ThemeColor.primaryColor,
+                  onTap: logout,
+                ),
+                Divider(height: 1, color: Colors.grey[200]),
+                ProfileListTile(
+                  icon: Icons.delete_outline_rounded,
+                  title: 'Delete Account',
+                  tint: Colors.red,
+                  onTap: deleteAccount,
+                ),
+              ]),
+              SizedBox(height: 36.h),
             ]),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 6.w),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey[600],
+          letterSpacing: 0.3,
+        ),
+      ),
+    );
+  }
+
+  Widget _sectionCard(List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey[200]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(children: children),
     );
   }
 
@@ -451,14 +569,14 @@ class _ProfilePageState extends State<ProfilePage> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF3377FF).withOpacity(0.15),
-              blurRadius: 28,
+              color: const Color(0xFF3377FF).withOpacity(0.18),
+              blurRadius: 30,
               spreadRadius: 6,
               offset: const Offset(0, 8),
             ),
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 10,
+              color: Colors.black.withOpacity(0.18),
+              blurRadius: 12,
               offset: const Offset(0, 6),
             ),
           ],
@@ -471,12 +589,12 @@ class _ProfilePageState extends State<ProfilePage> {
           backgroundColor: ThemeColor.primaryColor,
           elevation: 0,
           shape: const CircleBorder(),
-          child: const Icon(Icons.search, color: Colors.white, size: 26),
+          child: const Icon(Icons.search, color: Colors.white, size: 28),
         ),
       ),
       bottomNavigationBar: BottomAppBar(
         shape: const SoftArcNotchedShape(arcWidth: 120, arcHeight: 22),
-        notchMargin: 4,
+        notchMargin: 6,
         elevation: 0,
         color: Colors.transparent,
         child: RahhalaBottomBar(
@@ -490,7 +608,9 @@ class _ProfilePageState extends State<ProfilePage> {
           },
         ),
       ),
-      body: SafeArea(child: content),
+      body: SafeArea(
+        child: content,
+      ),
     );
   }
 }

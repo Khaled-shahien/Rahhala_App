@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,7 +13,6 @@ class TripInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     final cubit = context.read<AiTripCubit>();
 
     final months = [
@@ -64,41 +61,36 @@ class TripInfoScreen extends StatelessWidget {
 
     return BlocBuilder<AiTripCubit, AiTripState>(
       builder: (context, state) {
-        
         if (state is! AiTripData) {
-          
           return const Center(child: CircularProgressIndicator());
         }
 
         return SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 40.h),
-                Text('Where do you want to go?', style: AppTextStyles.heading),
-                SizedBox(height: 24.h),
-                _buildGovernorateSelector(
-                  governorates,
-                  state.destination, 
-                  cubit,
-                ),
-                SizedBox(height: 40.h),
-                Text('When do you want to go?', style: AppTextStyles.heading),
-                SizedBox(height: 24.h),
-                _buildDaysSelector(state.totalDays, cubit), 
-                SizedBox(height: 24.h),
-                _buildMonthSelector(
-                    months, state.selectedMonth, cubit), 
-                SizedBox(height: 70.h),
-                NextButton(
-                  onPressed: onNext,
-                ),
-                SizedBox(height: 40.h),
-              ],
-            ),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20.h),
+              Text('Where do you want to go?', style: AppTextStyles.heading),
+              SizedBox(height: 28.h),
+              _buildGovernorateSelector(
+                governorates,
+                state.destination,
+                cubit,
+              ),
+              SizedBox(height: 44.h),
+              Text('When do you want to go?', style: AppTextStyles.heading),
+              SizedBox(height: 28.h),
+              _buildDaysSelector(state.totalDays, cubit),
+              SizedBox(height: 28.h),
+              _buildMonthSelector(months, state.selectedMonth, cubit),
+              SizedBox(height: 76.h),
+              NextButton(
+                onPressed: onNext,
+              ),
+              SizedBox(height: 44.h),
+            ],
           ),
         );
       },
@@ -112,13 +104,13 @@ class TripInfoScreen extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF6A4D3B).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(15.r),
+        color: const Color(0xFF6A4D3B).withOpacity(0.12),
+        borderRadius: BorderRadius.circular(18.r),
         border: Border.all(
           color: const Color(0xFFA88866),
-          width: 1.5.w,
+          width: 1.8.w,
         ),
       ),
       child: DropdownButton<String>(
@@ -126,8 +118,8 @@ class TripInfoScreen extends StatelessWidget {
         hint: Text(
           'Select a governorate',
           style: TextStyle(
-            color: const Color(0xFF6A4D3B).withOpacity(0.7),
-            fontSize: 16.sp,
+            color: const Color(0xFF6A4D3B).withOpacity(0.8),
+            fontSize: 17.sp,
           ),
         ),
         isExpanded: true,
@@ -135,13 +127,13 @@ class TripInfoScreen extends StatelessWidget {
         icon: const Icon(Icons.map_outlined, color: Color(0xFF6A4D3B)),
         style: TextStyle(
           color: const Color(0xFF6A4D3B),
-          fontSize: 16.sp,
+          fontSize: 17.sp,
           fontWeight: FontWeight.w500,
         ),
         dropdownColor: Colors.white,
         onChanged: (String? newValue) {
           if (newValue != null) {
-            cubit.updateDestination(newValue); 
+            cubit.updateDestination(newValue);
           }
         },
         items: governorates.map<DropdownMenuItem<String>>((String value) {
@@ -162,14 +154,13 @@ class TripInfoScreen extends StatelessWidget {
         Row(
           children: [
             _buildDayButton(Icons.remove, () {
-              if (days > 1) cubit.updateDays(days - 1); 
+              if (days > 1) cubit.updateDays(days - 1);
             }),
-            SizedBox(width: 10.w),
+            SizedBox(width: 14.w),
             Text('$days',
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
-            SizedBox(width: 10.w),
-            _buildDayButton(Icons.add,
-                () => cubit.updateDays(days + 1)), 
+                style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
+            SizedBox(width: 14.w),
+            _buildDayButton(Icons.add, () => cubit.updateDays(days + 1)),
           ],
         ),
       ],
@@ -177,16 +168,15 @@ class TripInfoScreen extends StatelessWidget {
   }
 
   Widget _buildDayButton(IconData icon, VoidCallback onPressed) {
-    
     return InkWell(
       onTap: onPressed,
       child: Container(
-        padding: EdgeInsets.all(8.r),
+        padding: EdgeInsets.all(10.r),
         decoration: const BoxDecoration(
           color: Color(0xFFA88866),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, size: 20, color: Colors.white),
+        child: Icon(icon, size: 22, color: Colors.white),
       ),
     );
   }
@@ -198,13 +188,13 @@ class TripInfoScreen extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF6A4D3B).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(15.r),
+        color: const Color(0xFF6A4D3B).withOpacity(0.12),
+        borderRadius: BorderRadius.circular(18.r),
         border: Border.all(
           color: const Color(0xFFA88866),
-          width: 1.5.w,
+          width: 1.8.w,
         ),
       ),
       child: DropdownButton<String>(
@@ -212,8 +202,8 @@ class TripInfoScreen extends StatelessWidget {
         hint: Text(
           'Select a month',
           style: TextStyle(
-            color: const Color(0xFF6A4D3B).withOpacity(0.7),
-            fontSize: 16.sp,
+            color: const Color(0xFF6A4D3B).withOpacity(0.8),
+            fontSize: 17.sp,
           ),
         ),
         isExpanded: true,
@@ -222,13 +212,13 @@ class TripInfoScreen extends StatelessWidget {
             const Icon(Icons.calendar_month_outlined, color: Color(0xFF6A4D3B)),
         style: TextStyle(
           color: const Color(0xFF6A4D3B),
-          fontSize: 16.sp,
+          fontSize: 17.sp,
           fontWeight: FontWeight.w500,
         ),
         dropdownColor: Colors.white,
         onChanged: (String? newValue) {
           if (newValue != null) {
-            cubit.selectMonth(newValue); 
+            cubit.selectMonth(newValue);
           }
         },
         items: months.map<DropdownMenuItem<String>>((String month) {

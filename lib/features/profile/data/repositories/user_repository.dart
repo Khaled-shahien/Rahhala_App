@@ -10,6 +10,8 @@ abstract class UserRepo {
     required String fullName,
     String? phoneNumber,
     String? country,
+    String? dateOfBirth, // Added dateOfBirth parameter
+    String? gender, // Added gender parameter
   });
 
   Future<Either<Failure, SuccessMessageModel>> deleteProfile();

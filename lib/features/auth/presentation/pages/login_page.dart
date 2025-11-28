@@ -20,6 +20,7 @@ import 'package:rahhala_app/features/auth/presentation/widgets/custom_form_text_
 import 'package:rahhala_app/features/auth/presentation/widgets/or_divider.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/social_login_section.dart';
 import 'package:rahhala_app/features/profile/data/repositories/user_repository.dart';
+import 'package:rahhala_app/core/widgets/background_decorator.dart';
 
 class LoginPage extends StatefulWidget {
   final String? initialEmail;
@@ -181,128 +182,279 @@ class _LoginPageState extends State<LoginPage> {
 
               return GestureDetector(
                 onTap: () => FocusScope.of(context).unfocus(),
-                child: Stack(
-                  children: [
-                    SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: 24.w),
-                      child: Form(
-                        key: _formKey,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            SizedBox(height: 12.h),
-                            Center(
-                              child: SvgPicture.asset(
-                                'assets/images/logo.svg',
-                                width: 180.w,
-                                height: 180.h,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            SizedBox(height: 20.h),
-                            const Text(
-                              'Welcome Back',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: ThemeColor.primaryColor,
-                              ),
-                            ),
-                            SizedBox(height: 8.h),
-                            const Text(
-                              'Log in to your Rahhala account',
-                              textAlign: TextAlign.center,
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                            SizedBox(height: 40.h),
-
-                            CustomFormTextField(
-                              labelText: 'Email',
-                              hintText: 'Enter your email',
-                              controller: _emailController,
-                              keyboardType: TextInputType.emailAddress,
-                              prefixIcon: Icons.email_outlined,
-                              validator: AppValidators.validateEmail,
-                              textInputAction: TextInputAction.next,
-                              autofillHints: const [AutofillHints.email],
-                            ),
-                            SizedBox(height: 20.h),
-
-                            CustomFormTextField(
-                              labelText: 'Password',
-                              hintText: 'Enter your password',
-                              controller: _passwordController,
-                              obscureText: !_isPasswordVisible, 
-                              prefixIcon: Icons.lock_outline,
-                              suffixIcon: IconButton(
-                                onPressed: () => setState(
-                                  () =>
-                                      _isPasswordVisible = !_isPasswordVisible,
+                child: BackgroundDecorator(
+                  child: Stack(
+                    children: [
+                      SingleChildScrollView(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20.w,
+                          vertical: 20.h,
+                        ),
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 560.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                SizedBox(height: 12.h),
+                                // Row(
+                                //   children: [
+                                //     Container(
+                                //       padding: EdgeInsets.symmetric(
+                                //         horizontal: 12.w,
+                                //         vertical: 8.h,
+                                //       ),
+                                //       decoration: BoxDecoration(
+                                //         color: Colors.white,
+                                //         borderRadius:
+                                //             BorderRadius.circular(14.r),
+                                //         boxShadow: [
+                                //           BoxShadow(
+                                //             color:
+                                //                 Colors.black.withOpacity(0.05),
+                                //             blurRadius: 12,
+                                //             offset: const Offset(0, 6),
+                                //           ),
+                                //         ],
+                                //         border: Border.all(
+                                //           color: ThemeColor.primaryColor
+                                //               .withOpacity(0.16),
+                                //         ),
+                                //       ),
+                                //       child: Row(
+                                //         children: [
+                                //           Icon(
+                                //             Icons.flight_takeoff_rounded,
+                                //             color: ThemeColor.primaryColor,
+                                //             size: 18.sp,
+                                //           ),
+                                //           SizedBox(width: 8.w),
+                                //           Text(
+                                //             'Rahhala',
+                                //             style: TextStyle(
+                                //               fontSize: 15.sp,
+                                //               fontWeight: FontWeight.w700,
+                                //               color: ThemeColor.charcoalColor,
+                                //             ),
+                                //           ),
+                                //         ],
+                                //       ),
+                                //     ),
+                                //     const Spacer(),
+                                //     TextButton(
+                                //       onPressed: _navigateToSignUp,
+                                //       child: Text(
+                                //         'Create Account',
+                                //         style: TextStyle(
+                                //           color: ThemeColor.charcoalColor,
+                                //           fontWeight: FontWeight.w600,
+                                //           fontSize: 14.sp,
+                                //         ),
+                                //       ),
+                                //     ),
+                                //   ],
+                                // ),
+                                SizedBox(height: 24.h),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 20.w,
+                                    vertical: 22.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(28.r),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.06),
+                                        blurRadius: 22,
+                                        offset: const Offset(0, 12),
+                                      ),
+                                    ],
+                                    border: Border.all(
+                                      color: ThemeColor.primaryColor
+                                          .withOpacity(0.08),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      SizedBox(height: 6.h),
+                                      Center(
+                                        child: SvgPicture.asset(
+                                          'assets/images/logo.svg',
+                                          width: 140.w,
+                                          height: 140.h,
+                                        ),
+                                      ),
+                                      SizedBox(height: 10.h),
+                                      Text(
+                                        'Welcome Back',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 24.sp,
+                                          fontWeight: FontWeight.w800,
+                                          color: ThemeColor.charcoalColor,
+                                        ),
+                                      ),
+                                      SizedBox(height: 6.h),
+                                      Text(
+                                        'Log in to continue exploring curated trips.',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          color: Colors.grey[600],
+                                          height: 1.4,
+                                        ),
+                                      ),
+                                      SizedBox(height: 24.h),
+                                      Form(
+                                        key: _formKey,
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children: [
+                                            CustomFormTextField(
+                                              labelText: 'Email',
+                                              hintText: 'Enter your email',
+                                              controller: _emailController,
+                                              keyboardType:
+                                                  TextInputType.emailAddress,
+                                              prefixIcon: Icons.email_outlined,
+                                              validator:
+                                                  AppValidators.validateEmail,
+                                              textInputAction:
+                                                  TextInputAction.next,
+                                              autofillHints: const [
+                                                AutofillHints.email
+                                              ],
+                                            ),
+                                            SizedBox(height: 16.h),
+                                            CustomFormTextField(
+                                              labelText: 'Password',
+                                              hintText: 'Enter your password',
+                                              controller: _passwordController,
+                                              obscureText: !_isPasswordVisible,
+                                              prefixIcon: Icons.lock_outline,
+                                              suffixIcon: IconButton(
+                                                onPressed: () => setState(
+                                                  () => _isPasswordVisible =
+                                                      !_isPasswordVisible,
+                                                ),
+                                                icon: Icon(
+                                                  _isPasswordVisible
+                                                      ? Icons.visibility_off
+                                                      : Icons.visibility,
+                                                ),
+                                                color: ThemeColor.primaryColor,
+                                                tooltip: _isPasswordVisible
+                                                    ? 'Hide password'
+                                                    : 'Show password',
+                                              ),
+                                              validator: AppValidators
+                                                  .validateLoginPassword,
+                                              textInputAction:
+                                                  TextInputAction.done,
+                                              onFieldSubmitted: (_) =>
+                                                  _submit(context, state),
+                                              autofillHints: const [
+                                                AutofillHints.password
+                                              ],
+                                            ),
+                                            SizedBox(height: 10.h),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Secure sign-in to continue your journey.',
+                                                    style: TextStyle(
+                                                      fontSize: 12.sp,
+                                                      color: Colors.grey[600],
+                                                      height: 1.4,
+                                                    ),
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed:
+                                                      _navigateToForgotPassword,
+                                                  child: const Text(
+                                                    'Forgot Password?',
+                                                    style: TextStyle(
+                                                      color: ThemeColor
+                                                          .primaryColor,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 6.h),
+                                            CustomButton(
+                                              onTap: isLoading
+                                                  ? null
+                                                  : () =>
+                                                      _submit(context, state),
+                                              text: isLoading
+                                                  ? 'Logging In...'
+                                                  : 'Log In',
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                icon: Icon(
-                                  _isPasswordVisible
-                                      ? Icons.visibility_off
-                                      : Icons.visibility,
+                                SizedBox(height: 22.h),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 18.w,
+                                    vertical: 20.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20.r),
+                                    border: Border.all(
+                                      color: Colors.grey[100]!,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.04),
+                                        blurRadius: 18,
+                                        offset: const Offset(0, 10),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      const OrDivider(text: "Or"),
+                                      SizedBox(height: 18.h),
+                                      SocialLoginSection(
+                                        promptText: "Don't have an account?",
+                                        actionText: "Sign Up",
+                                        onActionTap: _navigateToSignUp,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                color: ThemeColor.primaryColor,
-                                tooltip: _isPasswordVisible
-                                    ? 'Hide password'
-                                    : 'Show password',
-                              ),
-                              validator: AppValidators.validateLoginPassword,
-                              textInputAction: TextInputAction.done,
-                              onFieldSubmitted: (_) => _submit(context, state),
-                              autofillHints: const [AutofillHints.password],
+                                SizedBox(height: 12.h),
+                              ],
                             ),
-
-                            SizedBox(height: 12.h),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: _navigateToForgotPassword,
-                                child: const Text(
-                                  'Forgot Password?',
-                                  style:
-                                      TextStyle(color: ThemeColor.primaryColor),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 20.h),
-
-                            CustomButton(
-                              onTap: isLoading
-                                  ? null
-                                  : () => _submit(context, state),
-                              text: isLoading ? 'Logging In...' : 'Log In',
-                            ),
-                            SizedBox(height: 30.h),
-
-                            const OrDivider(text: "Or"),
-                            SizedBox(height: 30.h),
-
-                            SocialLoginSection(
-                              promptText: "Don't have an account?",
-                              actionText: "Sign Up",
-                              onActionTap: _navigateToSignUp,
-                            ),
-                            SizedBox(height: 30.h),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
-
-                    if (isLoading)
-                      Container(
-                        color: Colors.black45,
-                        alignment: Alignment.center,
-                        child: const CircularProgressIndicator(
-                          color: ThemeColor.primaryColor,
+                      if (isLoading)
+                        Container(
+                          color: Colors.black26,
+                          alignment: Alignment.center,
+                          child: const CircularProgressIndicator(
+                            color: ThemeColor.primaryColor,
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },

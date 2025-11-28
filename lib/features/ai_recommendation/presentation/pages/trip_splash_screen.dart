@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,9 +17,8 @@ class TripSplashScreen extends StatefulWidget {
 }
 
 class _TripSplashScreenState extends State<TripSplashScreen> {
-
   late Timer _textTimer;
-  
+
   int _messageIndex = 0;
 
   final List<String> _loadingMessages = [
@@ -46,7 +44,6 @@ class _TripSplashScreenState extends State<TripSplashScreen> {
 
   @override
   void dispose() {
-    
     _textTimer.cancel();
     super.dispose();
   }
@@ -59,17 +56,14 @@ class _TripSplashScreenState extends State<TripSplashScreen> {
     return BlocListener<AiTripCubit, AiTripState>(
       listener: (context, state) {
         if (state is AiTripSuccess) {
-          
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => TripDetailsScreen(
-                
                 plan: state.response.response,
               ),
             ),
           );
         } else if (state is AiTripFailure) {
-          
           showAppNotification(
             context: context,
             title: "Error",
@@ -83,7 +77,6 @@ class _TripSplashScreenState extends State<TripSplashScreen> {
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
@@ -112,7 +105,6 @@ class _TripSplashScreenState extends State<TripSplashScreen> {
                     fontSize: 34.sp,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    
                   ),
                 ),
                 SizedBox(height: 12.h),
@@ -142,13 +134,11 @@ class _TripSplashScreenState extends State<TripSplashScreen> {
                   ),
                 ),
                 SizedBox(height: 20.h),
-
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 60.w),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10.r),
                     child: LinearProgressIndicator(
-                      
                       backgroundColor: Colors.white.withOpacity(0.2),
                       valueColor:
                           const AlwaysStoppedAnimation<Color>(Colors.white),

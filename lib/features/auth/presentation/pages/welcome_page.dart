@@ -6,6 +6,7 @@ import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
 import 'package:rahhala_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_button.dart';
+import 'package:rahhala_app/core/widgets/background_decorator.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -41,101 +42,118 @@ class WelcomePage extends StatelessWidget {
     }
 
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(AppAssets.imagesWelcomeImage, fit: BoxFit.cover),
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.black.withOpacity(0.55),
-                  Colors.black.withOpacity(0.25),
-                  Colors.transparent,
-                ],
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
+      body: BackgroundDecorator(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Background image with improved styling
+            Image.asset(
+              AppAssets.imagesWelcomeImage,
+              fit: BoxFit.cover,
+            ),
+
+            // Gradient overlay with improved styling
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.black.withOpacity(0.6),
+                    Colors.black.withOpacity(0.3),
+                    Colors.transparent,
+                  ],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.center,
+                ),
               ),
             ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ShaderMask(
-                    shaderCallback: (bounds) => const LinearGradient(
-                      colors: [ThemeColor.amber, ThemeColor.orange],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ).createShader(bounds),
-                    child: Text(
-                      'RAHHALA',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 55.sp,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 4,
-                        color: Colors.white,
-                        shadows: const [
-                          Shadow(
-                              blurRadius: 20.0,
-                              color: Colors.black87,
-                              offset: Offset(3.0, 3.0)),
-                        ],
+
+            // Content with improved layout
+            SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // App title with improved styling
+                    ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [ThemeColor.amber, ThemeColor.orange],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ).createShader(bounds),
+                      child: Text(
+                        'RAHHALA',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 58.sp,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 4,
+                          color: Colors.white,
+                          shadows: const [
+                            Shadow(
+                                blurRadius: 20.0,
+                                color: Colors.black87,
+                                offset: Offset(3.0, 3.0)),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 12.h),
-                  Text(
-                    'Egyptian trips with a personal touch!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.95),
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.8,
-                      shadows: const [
-                        Shadow(
-                            blurRadius: 8.0,
-                            color: Colors.black54,
-                            offset: Offset(1.0, 2.0))
-                      ],
-                    ),
-                  ),
-                  const Spacer(),
-                  CustomButton(text: 'Get Started', onTap: navigateToLogin),
-                  SizedBox(height: 16.h),
+                    SizedBox(height: 16.h),
 
-                  OutlinedButton(
-                    onPressed: continueAsGuest,
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16.h),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
-                      side: const BorderSide(color: Colors.white, width: 1.8),
-                    ),
-                    child: Text(
-                      'Continue as Guest',
+                    // Subtitle with improved styling
+                    Text(
+                      'Egyptian trips with a personal touch!',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
+                        color: Colors.white.withOpacity(0.95),
+                        fontSize: 19.sp,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.8,
+                        height: 1.4,
                         shadows: const [
                           Shadow(
                               blurRadius: 8.0,
-                              color: Colors.black45,
-                              offset: Offset(1.5, 1.5))
+                              color: Colors.black54,
+                              offset: Offset(1.0, 2.0))
                         ],
                       ),
                     ),
-                  ),
-                ],
+
+                    const Spacer(),
+
+                    // Buttons with improved styling
+                    CustomButton(text: 'Get Started', onTap: navigateToLogin),
+                    SizedBox(height: 20.h),
+
+                    OutlinedButton(
+                      onPressed: continueAsGuest,
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 18.h),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                        side: const BorderSide(color: Colors.white, width: 2),
+                      ),
+                      child: Text(
+                        'Continue as Guest',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.bold,
+                          shadows: const [
+                            Shadow(
+                                blurRadius: 8.0,
+                                color: Colors.black45,
+                                offset: Offset(1.5, 1.5))
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

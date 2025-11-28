@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/features/onboarding/presentation/pages/onboarding_screen.dart';
@@ -26,8 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkFirstTime() async {
-    
-    await Future.delayed(const Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 3));
 
     if (!mounted) return;
 
@@ -38,13 +35,10 @@ class _SplashScreenState extends State<SplashScreen> {
     final hasToken = sl<TokenStorage>().hasToken;
 
     if (!hasSeenOnboarding) {
-      
       _navigateToOnboarding();
     } else if (hasToken) {
-      
       _navigateToHome();
     } else {
-      
       _navigateToWelcome();
     }
   }
@@ -80,56 +74,59 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            
-            Container(
-              width: 120.w,
-              height: 120.w,
-              decoration: BoxDecoration(
-                color: ThemeColor.primaryColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.flight_takeoff_rounded,
-                size: 60.sp,
-                color: ThemeColor.primaryColor,
-              ),
-            ),
-            SizedBox(height: 24.h),
-
-            Text(
-              'Rahhala',
-              style: TextStyle(
-                fontSize: 32.sp,
-                fontWeight: FontWeight.bold,
-                color: ThemeColor.primaryColor,
-              ),
-            ),
-            SizedBox(height: 8.h),
-
-            Text(
-              'Your Travel Companion',
-              style: TextStyle(
-                fontSize: 16.sp,
-                color: Colors.grey[600],
-              ),
-            ),
-            SizedBox(height: 48.h),
-
-            SizedBox(
-              width: 40.w,
-              height: 40.w,
-              child: const CircularProgressIndicator(
-                strokeWidth: 3,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  ThemeColor.primaryColor,
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Logo container with improved styling
+              Container(
+                width: 140.w,
+                height: 140.w,
+                decoration: BoxDecoration(
+                  color: ThemeColor.primaryColor.withOpacity(0.15),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: ThemeColor.primaryColor.withOpacity(0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.flight_takeoff_rounded,
+                  size: 70.sp,
+                  color: ThemeColor.primaryColor,
                 ),
               ),
-            ),
-          ],
+              SizedBox(height: 32.h),
+
+              // App title with improved typography
+              Text(
+                'Rahhala',
+                style: TextStyle(
+                  fontSize: 36.sp,
+                  fontWeight: FontWeight.bold,
+                  color: ThemeColor.primaryColor,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              SizedBox(height: 12.h),
+
+              // Subtitle with better styling
+              Text(
+                'Your Travel Companion',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[600],
+                  height: 1.4,
+                ),
+              ),
+              SizedBox(height: 56.h),
+            ],
+          ),
         ),
       ),
     );

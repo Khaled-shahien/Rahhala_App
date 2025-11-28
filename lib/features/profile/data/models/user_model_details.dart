@@ -11,6 +11,8 @@ class UserModelDetails extends Equatable {
   final String? countryId;
   final String? countryName;
   final DateTime? createdAt;
+  final String? gender; // Added gender property
+  final String? dateOfBirth; // Added dateOfBirth property
 
   const UserModelDetails({
     required this.id,
@@ -23,6 +25,8 @@ class UserModelDetails extends Equatable {
     this.countryId,
     this.countryName,
     this.createdAt,
+    this.gender, // Added gender parameter
+    this.dateOfBirth, // Added dateOfBirth parameter
   });
 
   factory UserModelDetails.fromJson(Map<String, dynamic> json) {
@@ -82,6 +86,11 @@ class UserModelDetails extends Equatable {
       countryName:
           data['countryName']?.toString() ?? data['country']?.toString(),
       createdAt: createdDate,
+      gender: data['gender']?.toString().trim(), // Added gender
+      dateOfBirth:
+          data['dateOfBirth']?.toString().trim() ?? // Added dateOfBirth
+              data['birthDate']?.toString().trim() ??
+              data['dob']?.toString().trim(),
     );
   }
 
@@ -97,6 +106,8 @@ class UserModelDetails extends Equatable {
       'countryId': countryId,
       'countryName': countryName,
       'createdAt': createdAt?.toIso8601String(),
+      'gender': gender, // Added gender
+      'dateOfBirth': dateOfBirth, // Added dateOfBirth
     };
   }
 
@@ -111,6 +122,8 @@ class UserModelDetails extends Equatable {
     String? countryId,
     String? countryName,
     DateTime? createdAt,
+    String? gender, // Added gender
+    String? dateOfBirth, // Added dateOfBirth
   }) {
     return UserModelDetails(
       id: id ?? this.id,
@@ -123,6 +136,8 @@ class UserModelDetails extends Equatable {
       countryId: countryId ?? this.countryId,
       countryName: countryName ?? this.countryName,
       createdAt: createdAt ?? this.createdAt,
+      gender: gender ?? this.gender, // Added gender
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth, // Added dateOfBirth
     );
   }
 
@@ -138,10 +153,12 @@ class UserModelDetails extends Equatable {
         countryId,
         countryName,
         createdAt,
+        gender, // Added gender
+        dateOfBirth, // Added dateOfBirth
       ];
 
   @override
   String toString() {
-    return 'UserModelDetails(id: $id, fullName: $fullName, email: $email, profileImageUrl: $profileImageUrl)';
+    return 'UserModelDetails(id: $id, fullName: $fullName, email: $email, profileImageUrl: $profileImageUrl, gender: $gender)';
   }
 }

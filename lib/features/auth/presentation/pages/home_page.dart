@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -36,7 +34,12 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: ThemeColor.primaryColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        margin: EdgeInsets.only(
+          bottom: 60.h,
+          right: 20.w,
+          left: 20.w,
         ),
       ),
     );
@@ -53,7 +56,6 @@ class _HomePageState extends State<HomePage> {
     } else if (index == 3) {
       _notifyComingSoon('Trip Planner page - Coming soon!');
     }
-    
   }
 
   @override
@@ -64,22 +66,16 @@ class _HomePageState extends State<HomePage> {
     final profileImageUrl = storage.profileImageUrl;
 
     final List<Widget> pages = [
-      
       _HomeMainSection(
         isGuest: widget.isGuest,
         displayName: displayName,
         email: email,
         profileImageUrl: profileImageUrl,
       ),
-
       const _SoonPage(title: 'Wishlist'),
-
       const _SoonPage(title: 'Search'),
-
       const _SoonPage(title: 'Trip Planner'),
-
       const AIRecommendationTabFlow(),
-
       const ProfilePage(embedded: true),
     ];
 
@@ -92,70 +88,70 @@ class _HomePageState extends State<HomePage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              ThemeColor.primaryColor.withOpacity(0.08),
-              ThemeColor.primaryColor.withOpacity(0.12),
+              ThemeColor.primaryColor.withOpacity(0.1),
               ThemeColor.primaryColor.withOpacity(0.15),
+              ThemeColor.primaryColor.withOpacity(0.18),
             ],
           ),
           boxShadow: [
             BoxShadow(
-              color: ThemeColor.primaryColor.withOpacity(0.18),
-              blurRadius: 20,
-              offset: const Offset(0, -3),
+              color: ThemeColor.primaryColor.withOpacity(0.2),
+              blurRadius: 22,
+              offset: const Offset(0, -4),
             ),
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 12,
-              offset: const Offset(0, -2),
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 14,
+              offset: const Offset(0, -3),
             ),
           ],
         ),
         child: CurvedNavigationBar(
           key: _bottomNavigationKey,
           index: _currentIndex,
-          height: 65.0,
+          height: 70.0,
           items: <Widget>[
             Icon(
               Icons.home_outlined,
-              size: 32,
+              size: 34,
               color: _currentIndex == 0
                   ? Colors.white
-                  : ThemeColor.charcoalColor.withOpacity(0.85),
+                  : ThemeColor.charcoalColor.withOpacity(0.9),
             ),
             Icon(
               Icons.favorite_border,
-              size: 32,
+              size: 34,
               color: _currentIndex == 1
                   ? Colors.white
-                  : ThemeColor.charcoalColor.withOpacity(0.85),
+                  : ThemeColor.charcoalColor.withOpacity(0.9),
             ),
             Icon(
               Icons.search,
-              size: 32,
+              size: 34,
               color: _currentIndex == 2
                   ? Colors.white
-                  : ThemeColor.charcoalColor.withOpacity(0.85),
+                  : ThemeColor.charcoalColor.withOpacity(0.9),
             ),
             Icon(
               Icons.event_note_outlined,
-              size: 32,
+              size: 34,
               color: _currentIndex == 3
                   ? Colors.white
-                  : ThemeColor.charcoalColor.withOpacity(0.85),
+                  : ThemeColor.charcoalColor.withOpacity(0.9),
             ),
             Icon(
               Icons.auto_awesome,
-              size: 32,
+              size: 34,
               color: _currentIndex == 4
                   ? Colors.white
-                  : ThemeColor.charcoalColor.withOpacity(0.85),
+                  : ThemeColor.charcoalColor.withOpacity(0.9),
             ),
             Icon(
               Icons.person_outline,
-              size: 32,
+              size: 34,
               color: _currentIndex == 5
                   ? Colors.white
-                  : ThemeColor.charcoalColor.withOpacity(0.85),
+                  : ThemeColor.charcoalColor.withOpacity(0.9),
             ),
           ],
           color: ThemeColor.primaryColor,
@@ -198,7 +194,7 @@ class _HomeMainSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -214,25 +210,27 @@ class _HomeMainSection extends StatelessWidget {
                           ? 'Welcome, Guest! 👋'
                           : 'Hi, ${displayName ?? (email.isNotEmpty ? email.split('@').first : 'there')}! 👋',
                       style: TextStyle(
-                        fontSize: 21.sp,
+                        fontSize: 23.sp,
                         fontWeight: FontWeight.bold,
                         color: ThemeColor.primaryColor,
+                        height: 1.2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 10.h),
                     Text(
                       'Explore amazing destinations',
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontSize: 17.sp,
                         color: ThemeColor.neutralGrayColor,
+                        height: 1.4,
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(width: 12.w),
+              SizedBox(width: 16.w),
               Hero(
                 tag: 'profile_avatar',
                 child: Container(
@@ -240,15 +238,15 @@ class _HomeMainSection extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: ThemeColor.primaryColor.withOpacity(0.2),
-                        blurRadius: 8,
-                        spreadRadius: 2,
+                        color: ThemeColor.primaryColor.withOpacity(0.25),
+                        blurRadius: 10,
+                        spreadRadius: 3,
                       ),
                     ],
                   ),
                   child: CircleAvatar(
-                    radius: 28.r,
-                    backgroundColor: ThemeColor.primaryColor.withOpacity(0.1),
+                    radius: 30.r,
+                    backgroundColor: ThemeColor.primaryColor.withOpacity(0.15),
                     backgroundImage:
                         (profileImageUrl != null && profileImageUrl!.isNotEmpty)
                             ? NetworkImage(profileImageUrl!)
@@ -256,7 +254,7 @@ class _HomeMainSection extends StatelessWidget {
                     child: (profileImageUrl == null || profileImageUrl!.isEmpty)
                         ? Icon(
                             Icons.person,
-                            size: 28.sp,
+                            size: 30.sp,
                             color: ThemeColor.primaryColor,
                           )
                         : null,
@@ -265,20 +263,20 @@ class _HomeMainSection extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 32.h),
+          SizedBox(height: 36.h),
           Expanded(
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    width: 120.w,
-                    height: 120.w,
+                    width: 130.w,
+                    height: 130.w,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          ThemeColor.primaryColor.withOpacity(0.15),
-                          ThemeColor.primaryColor.withOpacity(0.05),
+                          ThemeColor.primaryColor.withOpacity(0.2),
+                          ThemeColor.primaryColor.withOpacity(0.08),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -287,24 +285,24 @@ class _HomeMainSection extends StatelessWidget {
                     ),
                     child: Icon(
                       Icons.explore_outlined,
-                      size: 60.sp,
-                      color: ThemeColor.primaryColor.withOpacity(0.7),
+                      size: 65.sp,
+                      color: ThemeColor.primaryColor.withOpacity(0.8),
                     ),
                   ),
-                  SizedBox(height: 24.h),
+                  SizedBox(height: 28.h),
                   Text(
                     'Home Page Content',
                     style: TextStyle(
-                      fontSize: 20.sp,
+                      fontSize: 22.sp,
                       fontWeight: FontWeight.w600,
                       color: ThemeColor.charcoalColor,
                     ),
                   ),
-                  SizedBox(height: 12.h),
+                  SizedBox(height: 16.h),
                   Text(
                     'Coming Soon...',
                     style: TextStyle(
-                      fontSize: 16.sp,
+                      fontSize: 17.sp,
                       color: ThemeColor.neutralGrayColor,
                     ),
                   ),
@@ -328,7 +326,7 @@ class _SoonPage extends StatelessWidget {
       child: Text(
         '$title — Coming soon',
         style: TextStyle(
-          fontSize: 16.sp,
+          fontSize: 17.sp,
           color: ThemeColor.neutralGrayColor,
         ),
       ),
