@@ -5,7 +5,7 @@ A modern travel companion Flutter application that provides personalized AI-powe
 ## 📱 Screenshots
 
 <p align="center">
-  <img src="assets/screenshots/Splash.png" width="200" alt="Splash Screen"/>
+  <img src="assets/screenshots/splash.png" width="200" alt="Splash Screen"/>
   <img src="assets/screenshots/onboarding1.png" width="200" alt="Onboarding Screen"/>
   <img src="assets/screenshots/onboarding2.png" width="200" alt="Home Screen"/>
   <img src="assets/screenshots/onboarding3.png" width="200" alt="Categories Screen"/>
