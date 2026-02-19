@@ -9,7 +9,7 @@ import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_mod
 import 'package:rahhala_app/features/ai_recommendation/data/repositories/gemini_repository.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/expansion_tile_components.dart';
 
-// Colors based on your design
+// الألوان والثوابت
 const Color headerBackgroundColor = Color(0xFFF2E7D5);
 const Color brownTextColor = Color(0xFF3E3431);
 const Color primaryTextColor = AppColors.darkBrown;
@@ -18,6 +18,7 @@ const Color locationCardBackgroundColor = AppColors.costBadgeBackground;
 const Color screenBackgroundColor = AppColors.screenBackground;
 const Color timelineColor = AppColors.lightBrown;
 const Color costBadgeBgColor = AppColors.costBadgeBackground;
+const Color arrowColor = Color(0xFF008080);
 
 class TripDetailsScreen extends StatefulWidget {
   final TripPlanResponse tripPlan;
@@ -104,10 +105,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- Header Section ---
               _buildHeader(),
-
-              // --- Content Section ---
               Expanded(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
@@ -115,22 +113,13 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   child: Column(
                     children: [
                       SizedBox(height: 16.h),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: plan.days.length,
-                        itemBuilder: (context, index) {
-                          final day = plan.days[index];
-                          return _buildDayExpansionTile(
+                      ...plan.days.map((day) => _buildDayExpansionTile(
                             context,
                             dayNumber: day.day,
                             title: day.title,
                             cost: day.estimatedDayCost,
                             activities: day.activities,
-                          );
-                        },
-                      ),
+                          )),
                       SizedBox(height: 16.h),
                       _buildSimpleExpansionTile(
                         icon: Icons.lightbulb_outline,
@@ -273,33 +262,24 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       ),
       child: CustomExpansionTile(
         tilePadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-        // استخدام Row مع Expanded لمنع التداخل
-        title: Row(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "Day $dayNumber",
-                    style: TextStyle(
-                      color: lightBorderColor,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: primaryTextColor,
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: false,
-                  ),
-                ],
+            Text(
+              "Day $dayNumber",
+              style: TextStyle(
+                color: lightBorderColor,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              title,
+              style: TextStyle(
+                color: primaryTextColor,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -322,56 +302,158 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       BuildContext context, List<Activity> activities) {
     return Container(
       margin: EdgeInsets.all(12.w),
-      padding: EdgeInsets.all(8.w),
+      padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: locationCardBackgroundColor,
         borderRadius: BorderRadius.circular(16.r),
       ),
-      child: ListView.builder(
-        shrinkWrap: true,
-        padding: EdgeInsets.zero,
-        // تم تغيير الـ Physics للسماح بالتمرير البسيط وتجنب Overflow
-        physics: const ClampingScrollPhysics(),
-        itemCount: activities.length,
-        itemBuilder: (context, index) {
-          final act = activities[index];
-          return TimelineWrapper(
-            isFirst: index == 0,
-            isLast: index == activities.length - 1,
-            child: CustomExpansionTile(
-              tilePadding: EdgeInsets.symmetric(horizontal: 8.w),
-              leading: NumberCircle(
-                number: index + 1,
-                backgroundColor: timelineColor,
-                textColor: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ...activities.asMap().entries.map((entry) {
+            int index = entry.key;
+            var act = entry.value;
+            return TimelineWrapper(
+              isFirst: index == 0,
+              isLast: index == activities.length - 1,
+              child: CustomExpansionTile(
+                tilePadding:
+                    EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+                leading: NumberCircle(
+                  number: index + 1,
+                  backgroundColor: timelineColor,
+                  textColor: Colors.white,
+                ),
+                title: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        act.place,
+                        style: TextStyle(
+                          color: primaryTextColor,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
+                    ),
+                  ],
+                ),
+                iconColor: primaryTextColor,
+                collapsedIconColor: primaryTextColor,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsets.only(left: 45.w, right: 12.w, bottom: 12.h),
+                    child: Text(
+                      act.description,
+                      style:
+                          TextStyle(color: primaryTextColor, fontSize: 13.sp),
+                    ),
+                  )
+                ],
               ),
-              title: Expanded(
-                child: Text(
-                  act.place,
-                  style: TextStyle(
-                    color: primaryTextColor,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: false,
+            );
+          }),
+          _buildTransportationSection(activities),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTransportationSection(List<Activity> activities) {
+    final List<Transportation> allTransports = [];
+    for (var activity in activities) {
+      allTransports.addAll(activity.transportation);
+    }
+
+    if (allTransports.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: 16.h, bottom: 8.h),
+          child: Row(
+            children: [
+              Icon(Icons.directions_car_outlined,
+                  size: 18.sp, color: brownTextColor),
+              SizedBox(width: 8.w),
+              Text(
+                "Transportation Routes",
+                style: TextStyle(
+                  color: brownTextColor,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              iconColor: primaryTextColor,
-              collapsedIconColor: primaryTextColor,
-              children: [
-                Padding(
-                  padding:
-                      EdgeInsets.only(left: 45.w, right: 12.w, bottom: 12.h),
-                  child: Text(
-                    act.description,
-                    style: TextStyle(color: primaryTextColor, fontSize: 13.sp),
-                  ),
-                )
-              ],
+            ],
+          ),
+        ),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: allTransports.map((t) => _buildRouteRow(t)).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRouteRow(Transportation t) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8.h),
+      child: Row(
+        children: [
+          _buildRoutePill(t.from),
+          _buildRouteArrow(),
+          _buildRoutePill(t.method, isMethod: true),
+          _buildRouteArrow(),
+          _buildRoutePill(t.to),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRoutePill(String text, {bool isMethod = false}) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: lightBorderColor.withOpacity(0.4), width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (isMethod) ...[
+            Icon(Icons.directions_car, size: 12.sp, color: brownTextColor),
+            SizedBox(width: 4.w),
+          ],
+          Text(
+            text,
+            style: TextStyle(
+              color: brownTextColor,
+              fontSize: 11.sp,
+              fontWeight: FontWeight.w600,
             ),
-          );
-        },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRouteArrow() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4.w),
+      child: Icon(
+        Icons.trending_flat,
+        color: arrowColor,
+        size: 18.sp,
       ),
     );
   }
@@ -443,7 +525,6 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   }
 }
 
-// تم الحفاظ على الـ TimelineWrapper مع تعديل بسيط في التصميم
 class TimelineWrapper extends StatelessWidget {
   final Widget child;
   final bool isFirst;
@@ -471,7 +552,6 @@ class TimelineWrapper extends StatelessWidget {
                   width: 2,
                   color: isFirst ? Colors.transparent : timelineColor,
                 ),
-                // النقطة أو الرقم يتم وضعه عبر الـ leading في الـ Tile
                 Expanded(
                   child: Container(
                     width: 2,
