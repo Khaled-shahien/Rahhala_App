@@ -90,6 +90,7 @@ class Activity extends Equatable {
   final String place;
   final String description;
   final String estimatedCost;
+  final String? image;
   final List<Transportation> transportation;
 
   const Activity({
@@ -97,6 +98,7 @@ class Activity extends Equatable {
     required this.place,
     required this.description,
     required this.estimatedCost,
+    this.image,
     required this.transportation,
   });
 
@@ -106,6 +108,7 @@ class Activity extends Equatable {
       place: json['place'] ?? 'Unknown Place',
       description: json['description'] ?? '',
       estimatedCost: json['estimatedCost']?.toString() ?? "0",
+      image: json['image']?.toString(),
       transportation: (json['transportation'] as List<dynamic>?)
               ?.map((tJson) => Transportation.fromJson(tJson))
               .toList() ??
@@ -115,7 +118,7 @@ class Activity extends Equatable {
 
   @override
   List<Object?> get props =>
-      [time, place, description, estimatedCost, transportation];
+      [time, place, description, estimatedCost, image, transportation];
 }
 
 class Transportation extends Equatable {

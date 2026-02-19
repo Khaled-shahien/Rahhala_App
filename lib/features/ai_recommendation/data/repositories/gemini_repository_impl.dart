@@ -38,7 +38,53 @@ class GeminiRepositoryImpl implements GeminiRepository {
 
       Map<String, dynamic> jsonResponse;
       if (response is String) {
-        jsonResponse = jsonDecode(response);
+        try {
+          // Attempt to parse the JSON response
+          jsonResponse = jsonDecode(response);
+        } on FormatException catch (e) {
+          // Handle potentially malformed JSON by attempting to fix common issues
+          String cleanResponse = response.trim();
+
+          // Ensure JSON is properly closed
+          if (!cleanResponse.endsWith('}') && !cleanResponse.endsWith(']')) {
+            // Try to close any open objects or arrays
+            int openBraces = 0;
+            int openBrackets = 0;
+
+            for (int i = 0; i < cleanResponse.length; i++) {
+              if (cleanResponse[i] == '{') {
+                openBraces++;
+              } else if (cleanResponse[i] == '}')
+                openBraces--;
+              else if (cleanResponse[i] == '[')
+                openBrackets++;
+              else if (cleanResponse[i] == ']') openBrackets--;
+            }
+
+            // Close any unclosed structures
+            while (openBraces > 0) {
+              cleanResponse += '}';
+              openBraces--;
+            }
+            while (openBrackets > 0) {
+              cleanResponse += ']';
+              openBrackets--;
+            }
+
+            try {
+              jsonResponse = jsonDecode(cleanResponse);
+            } catch (parseError) {
+              print("Failed to parse JSON after cleanup: $parseError");
+              print("Original response: $response");
+              return Left(ServerFailure(
+                  message:
+                      "Failed to parse server response: ${parseError.toString()}"));
+            }
+          } else {
+            return Left(ServerFailure(
+                message: "Error parsing server response: ${e.message}"));
+          }
+        }
       } else if (response is Map<String, dynamic>) {
         jsonResponse = response;
       } else {
