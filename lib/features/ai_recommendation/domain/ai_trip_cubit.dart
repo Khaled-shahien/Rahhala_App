@@ -25,6 +25,10 @@ class AiTripCubit extends Cubit<AiTripState> {
 
   AiTripCubit({required this.geminiRepository}) : super(const AiTripInitial());
 
+  void init() {
+    emit(const AiTripData());
+  }
+
   void updateDestination(String dest) {
     if (state is AiTripData) {
       emit((state as AiTripData).copyWith(destination: dest));
