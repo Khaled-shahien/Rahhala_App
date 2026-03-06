@@ -24,6 +24,13 @@ import 'package:rahhala_app/features/ai_recommendation/data/repositories/gemini_
 import 'package:rahhala_app/features/ai_recommendation/data/repositories/gemini_repository_impl.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_cubit.dart';
 
+// Custom Trip imports
+import 'package:rahhala_app/features/custom_trip/data/sources/trip_api_service.dart';
+import 'package:rahhala_app/features/custom_trip/data/repositories/trip_repository.dart';
+import 'package:rahhala_app/features/custom_trip/domain/repositories/trip_repository_interface.dart';
+import 'package:rahhala_app/features/custom_trip/domain/usecases/generate_trip_plan_usecase.dart';
+import 'package:rahhala_app/features/custom_trip/presentation/cubit/custom_trip_cubit.dart';
+
 final sl = GetIt.instance;
 
 Future<void> setupServiceLocator() async {
@@ -58,4 +65,14 @@ Future<void> setupServiceLocator() async {
       () => GeminiRepositoryImpl(apiConsumer: sl<ApiConsumer>()));
   sl.registerFactory<AiTripCubit>(
       () => AiTripCubit(geminiRepository: sl<GeminiRepository>()));
+
+  // Custom Trip registration
+  sl.registerLazySingleton<TripApiService>(
+      () => TripApiService(dio: sl<Dio>()));
+  sl.registerLazySingleton<TripRepositoryInterface>(
+      () => TripRepository(apiService: sl<TripApiService>()));
+  sl.registerLazySingleton<GenerateTripPlanUsecase>(
+      () => GenerateTripPlanUsecase(sl<TripRepositoryInterface>()));
+  sl.registerFactory<CustomTripCubit>(() =>
+      CustomTripCubit(generateTripPlanUsecase: sl<GenerateTripPlanUsecase>()));
 }

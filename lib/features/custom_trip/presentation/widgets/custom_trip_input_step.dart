@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_text_styles.dart';
-import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_cubit.dart';
-import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_state.dart';
 import 'package:rahhala_app/features/custom_trip/presentation/constants/egypt_governorates.dart';
+import 'package:rahhala_app/features/custom_trip/presentation/cubit/custom_trip_cubit.dart';
 
 class CustomTripInputStep extends StatelessWidget {
   final VoidCallback onNext;
@@ -13,14 +12,10 @@ class CustomTripInputStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<AiTripCubit>();
+    final cubit = context.read<CustomTripCubit>();
 
-    return BlocBuilder<AiTripCubit, AiTripState>(
+    return BlocBuilder<CustomTripCubit, CustomTripState>(
       builder: (context, state) {
-        if (state is! AiTripData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
         return SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
@@ -35,14 +30,14 @@ class CustomTripInputStep extends StatelessWidget {
                 style: AppTextStyles.heading,
               ),
               SizedBox(height: 16.h),
-              _buildGovernorateSelector(context, state.destination, cubit),
+              _buildGovernorateSelector(context, state.selectedRegion, cubit),
               SizedBox(height: 44.h),
               Text(
                 'How many days?',
                 style: AppTextStyles.heading,
               ),
               SizedBox(height: 20.h),
-              _buildDaysSelector(state.totalDays, cubit),
+              _buildDaysSelector(state.numberOfDays, cubit),
               SizedBox(height: 60.h),
               _buildNextButton(state, onNext),
               SizedBox(height: 44.h),
@@ -75,7 +70,7 @@ class CustomTripInputStep extends StatelessWidget {
   Widget _buildGovernorateSelector(
     BuildContext context,
     String? selected,
-    AiTripCubit cubit,
+    CustomTripCubit cubit,
   ) {
     return GestureDetector(
       onTap: () => _showGovernorateSheet(context, selected, cubit),
@@ -118,7 +113,7 @@ class CustomTripInputStep extends StatelessWidget {
   void _showGovernorateSheet(
     BuildContext context,
     String? selected,
-    AiTripCubit cubit,
+    CustomTripCubit cubit,
   ) {
     showModalBottomSheet(
       context: context,
@@ -190,7 +185,7 @@ class CustomTripInputStep extends StatelessWidget {
                               )
                             : null,
                         onTap: () {
-                          cubit.updateDestination(gov);
+                          cubit.updateRegion(gov);
                           Navigator.pop(context);
                         },
                       );
@@ -206,7 +201,7 @@ class CustomTripInputStep extends StatelessWidget {
     );
   }
 
-  Widget _buildDaysSelector(int days, AiTripCubit cubit) {
+  Widget _buildDaysSelector(int days, CustomTripCubit cubit) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
       decoration: BoxDecoration(
@@ -274,9 +269,9 @@ class CustomTripInputStep extends StatelessWidget {
     );
   }
 
-  Widget _buildNextButton(AiTripData state, VoidCallback onNext) {
+  Widget _buildNextButton(CustomTripState state, VoidCallback onNext) {
     final isEnabled =
-        state.destination != null && state.destination!.isNotEmpty;
+        state.selectedRegion != null && state.selectedRegion!.isNotEmpty;
 
     return SizedBox(
       width: double.infinity,
