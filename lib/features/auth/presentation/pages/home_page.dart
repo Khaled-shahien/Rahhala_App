@@ -7,6 +7,7 @@ import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/ai_recommendation_tab_flow.dart';
+import 'package:rahhala_app/features/custom_trip/presentation/pages/custom_trip_flow_screen.dart';
 import 'package:rahhala_app/features/profile/presentation/pages/profile_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -53,9 +54,10 @@ class _HomePageState extends State<HomePage> {
     } else if (index == 2) {
       HapticFeedback.mediumImpact();
       _notifyComingSoon('Search - Coming soon!');
-    } else if (index == 3) {
-      _notifyComingSoon('Trip Planner page - Coming soon!');
     }
+    // else if (index == 3) {
+    //   _notifyComingSoon('Trip Planner page - Coming soon!');
+    // }
   }
 
   @override
@@ -74,7 +76,8 @@ class _HomePageState extends State<HomePage> {
       ),
       const _SoonPage(title: 'Wishlist'),
       const _SoonPage(title: 'Search'),
-      const _SoonPage(title: 'Trip Planner'),
+      const CustomTripFlowScreen(),
+      //const _SoonPage(title: 'Trip Planner'),
       const AIRecommendationTabFlow(),
       const ProfilePage(embedded: true),
     ];
