@@ -21,7 +21,7 @@ class AppConstants {
 
   /// API Base URL
   static const String baseUrl =
-      'https://api.rahhala.com'; // Change this to actual API
+      'https://rahhallaweb2026.runasp.net';
 
   /// Request timeout
   static const Duration apiTimeout = Duration(seconds: 30);

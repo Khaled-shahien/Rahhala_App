@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/features/image_search/data/repositories/image_search_repository_impl.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_cubit.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_repository.dart';
@@ -58,6 +59,27 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<Dio>(() => dio);
   sl.registerLazySingleton<ApiConsumer>(() => DioConsumer(dio: sl<Dio>()));
 
+  // ChatBot Dio instance with its own base URL
+  final chatBotDio = Dio(BaseOptions(
+    baseUrl: EndPoints.chatBotBaseUrl,
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    connectTimeout: const Duration(seconds: 30),
+    receiveTimeout: const Duration(seconds: 60),
+    responseType: ResponseType.json,
+  ));
+  chatBotDio.interceptors.add(LogInterceptor(
+    request: true,
+    requestBody: true,
+    requestHeader: true,
+    error: true,
+    responseBody: true,
+    responseHeader: false,
+  ));
+  sl.registerLazySingleton<Dio>(instanceName: 'chatbot', () => chatBotDio);
+
   sl.registerLazySingleton<AuthRepo>(
       () => AuthRepoImpl(apiConsumer: sl<ApiConsumer>()));
   sl.registerFactory<LoginCubit>(() => LoginCubit(authRepo: sl<AuthRepo>()));
@@ -103,7 +125,7 @@ Future<void> setupServiceLocator() async {
 
   // ChatBot registration
   sl.registerLazySingleton<ChatBotApiService>(
-    () => ChatBotApiService(dio: sl<Dio>()),
+    () => ChatBotApiService(dio: sl<Dio>(instanceName: 'chatbot')),
   );
   sl.registerLazySingleton<ChatBotRepository>(
     () => ChatBotRepositoryImpl(
