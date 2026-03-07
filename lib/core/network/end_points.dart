@@ -17,6 +17,7 @@ class EndPoints {
   static const String saveTrip = '/api/gemini/Save_Trip';
   static const String generateSpecificPlan =
       '/api/gemini/Generate_Specific_Plan';
+  static const String imageSearch = '/api/PhotoApi/upload';
 }
 
 class ApiKey {

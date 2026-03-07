@@ -1,5 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:rahhala_app/features/image_search/data/repositories/image_search_repository_impl.dart';
+import 'package:rahhala_app/features/image_search/domain/image_search_cubit.dart';
+import 'package:rahhala_app/features/image_search/domain/image_search_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:rahhala_app/core/network/api_consumer.dart';
@@ -75,4 +78,14 @@ Future<void> setupServiceLocator() async {
       () => GenerateTripPlanUsecase(sl<TripRepositoryInterface>()));
   sl.registerFactory<CustomTripCubit>(() =>
       CustomTripCubit(generateTripPlanUsecase: sl<GenerateTripPlanUsecase>()));
+
+  sl.registerLazySingleton<ImageSearchRepository>(
+    () => ImageSearchRepositoryImpl(dio: sl<Dio>()),
+  );
+  // sl.registerLazySingleton<ImageSearchRepository>(
+  //   () => ImageSearchRepositoryImpl(dio: sl<Dio>()),
+  // );
+  sl.registerFactory<ImageSearchCubit>(
+    () => ImageSearchCubit(repository: sl<ImageSearchRepository>()),
+  );
 }
