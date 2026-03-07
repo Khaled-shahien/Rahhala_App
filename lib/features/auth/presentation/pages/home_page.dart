@@ -8,6 +8,7 @@ import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/ai_recommendation_tab_flow.dart';
 import 'package:rahhala_app/features/custom_trip/presentation/pages/custom_trip_flow_screen.dart';
+import 'package:rahhala_app/features/image_search/presentation/widgets/image_search_bar.dart';
 import 'package:rahhala_app/features/profile/presentation/pages/profile_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -266,6 +267,8 @@ class _HomeMainSection extends StatelessWidget {
               ),
             ],
           ),
+          SizedBox(height: 16.h),
+          const ImageSearchBar(),
           SizedBox(height: 36.h),
           Expanded(
             child: Center(
