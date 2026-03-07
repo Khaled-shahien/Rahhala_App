@@ -18,6 +18,11 @@ class EndPoints {
   static const String generateSpecificPlan =
       '/api/gemini/Generate_Specific_Plan';
   static const String imageSearch = '/api/PhotoApi/upload';
+
+  // ChatBot endpoints
+  static const String chatBot = '/api/chat';
+  static const String createChatContext = '/api/chat/context';
+  static const String discardChatContext = '/api/chat/context/discard';
 }
 
 class ApiKey {

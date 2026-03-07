@@ -34,6 +34,13 @@ import 'package:rahhala_app/features/custom_trip/domain/repositories/trip_reposi
 import 'package:rahhala_app/features/custom_trip/domain/usecases/generate_trip_plan_usecase.dart';
 import 'package:rahhala_app/features/custom_trip/presentation/cubit/custom_trip_cubit.dart';
 
+// ChatBot imports
+import 'package:rahhala_app/features/chatbot/data/sources/chat_bot_api_service.dart';
+import 'package:rahhala_app/features/chatbot/data/repositories/chat_bot_repository_impl.dart';
+import 'package:rahhala_app/features/chatbot/domain/repositories/chat_bot_repository.dart';
+import 'package:rahhala_app/features/chatbot/domain/usecases/send_message_usecase.dart';
+import 'package:rahhala_app/features/chatbot/presentation/cubit/chat_bot_cubit.dart';
+
 final sl = GetIt.instance;
 
 Future<void> setupServiceLocator() async {
@@ -87,5 +94,20 @@ Future<void> setupServiceLocator() async {
   // );
   sl.registerFactory<ImageSearchCubit>(
     () => ImageSearchCubit(repository: sl<ImageSearchRepository>()),
+  );
+
+  // ChatBot registration
+  sl.registerLazySingleton<ChatBotApiService>(
+    () => ChatBotApiService(dio: sl<Dio>()),
+  );
+  sl.registerLazySingleton<ChatBotRepository>(
+    () => ChatBotRepositoryImpl(
+        apiService: sl<ChatBotApiService>(), apiConsumer: sl<ApiConsumer>()),
+  );
+  sl.registerLazySingleton<SendMessageUseCase>(
+    () => SendMessageUseCase(sl<ChatBotRepository>()),
+  );
+  sl.registerFactory<ChatBotCubit>(
+    () => ChatBotCubit(repository: sl<ChatBotRepository>()),
   );
 }

@@ -58,22 +58,13 @@ class RahhalaBottomBar extends StatelessWidget {
                       onTap: () => onTap(1),
                     ),
                   ),
-                  
                   SizedBox(width: 70.w),
-                  Expanded(
-                    child: _NavItem(
-                      icon: Icons.event_note_outlined,
-                      label: 'Trip planner',
-                      selected: currentIndex == 2,
-                      onTap: () => onTap(2),
-                    ),
-                  ),
                   Expanded(
                     child: _NavItem(
                       icon: Icons.person_outline,
                       label: 'Profile',
-                      selected: currentIndex == 3,
-                      onTap: () => onTap(3),
+                      selected: currentIndex == 2,
+                      onTap: () => onTap(2),
                     ),
                   ),
                 ],
@@ -117,7 +108,7 @@ class _NavItem extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 14, 
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: selected ? sel : un,
               ),

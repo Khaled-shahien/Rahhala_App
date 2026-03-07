@@ -6,10 +6,10 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
-import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/ai_recommendation_tab_flow.dart';
-import 'package:rahhala_app/features/custom_trip/presentation/pages/custom_trip_flow_screen.dart';
 import 'package:rahhala_app/features/image_search/presentation/widgets/image_search_bar.dart';
 import 'package:rahhala_app/features/profile/presentation/pages/profile_page.dart';
+import 'package:rahhala_app/features/trip_type_selection/presentation/pages/trip_type_selection_screen.dart';
+import 'package:rahhala_app/features/chatbot/presentation/pages/chat_bot_screen.dart';
 
 class HomePage extends StatefulWidget {
   final bool isGuest;
@@ -56,9 +56,6 @@ class _HomePageState extends State<HomePage> {
       HapticFeedback.mediumImpact();
       _notifyComingSoon('Search - Coming soon!');
     }
-    // else if (index == 3) {
-    //   _notifyComingSoon('Trip Planner page - Coming soon!');
-    // }
   }
 
   @override
@@ -77,9 +74,7 @@ class _HomePageState extends State<HomePage> {
       ),
       const _SoonPage(title: 'Wishlist'),
       const _SoonPage(title: 'Search'),
-      const CustomTripFlowScreen(),
-      //const _SoonPage(title: 'Trip Planner'),
-      const AIRecommendationTabFlow(),
+      const TripTypeSelectionScreen(),
       const ProfilePage(embedded: true),
     ];
 
@@ -137,23 +132,16 @@ class _HomePageState extends State<HomePage> {
                   : ThemeColor.charcoalColor.withOpacity(0.9),
             ),
             Icon(
-              Icons.event_note_outlined,
+              Icons.auto_awesome,
               size: 34,
               color: _currentIndex == 3
                   ? Colors.white
                   : ThemeColor.charcoalColor.withOpacity(0.9),
             ),
             Icon(
-              Icons.auto_awesome,
-              size: 34,
-              color: _currentIndex == 4
-                  ? Colors.white
-                  : ThemeColor.charcoalColor.withOpacity(0.9),
-            ),
-            Icon(
               Icons.person_outline,
               size: 34,
-              color: _currentIndex == 5
+              color: _currentIndex == 4
                   ? Colors.white
                   : ThemeColor.charcoalColor.withOpacity(0.9),
             ),
@@ -172,9 +160,60 @@ class _HomePageState extends State<HomePage> {
           statusBarColor: Colors.transparent,
         ),
         child: SafeArea(
-          child: IndexedStack(
-            index: _currentIndex,
-            children: pages,
+          child: Stack(
+            children: [
+              IndexedStack(
+                index: _currentIndex,
+                children: pages,
+              ),
+              // Floating Chat Button
+              Positioned(
+                right: 16.w,
+                bottom: 80.h,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    HapticFeedback.mediumImpact();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ChatBotScreen(),
+                      ),
+                    );
+                  },
+                  backgroundColor: ThemeColor.primaryColor,
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: Container(
+                    padding: EdgeInsets.all(12.r),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          ThemeColor.primaryColor,
+                          ThemeColor.primaryColor.withOpacity(0.8),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ThemeColor.primaryColor.withOpacity(0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.smart_toy_outlined,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

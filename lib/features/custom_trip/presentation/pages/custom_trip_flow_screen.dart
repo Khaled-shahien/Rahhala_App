@@ -44,7 +44,7 @@ class _CustomTripFlowScreenState extends State<CustomTripFlowScreen> {
             onPopInvoked: (didPop) {
               if (didPop) {
                 // Reset cubit when navigating back to this screen
-                context.read<CustomTripCubit>().reset();
+                innerContext.read<CustomTripCubit>().reset();
               }
             },
             child: Scaffold(
@@ -52,7 +52,11 @@ class _CustomTripFlowScreenState extends State<CustomTripFlowScreen> {
               appBar: AppBar(
                 backgroundColor: AppColors.white,
                 elevation: 0,
-                automaticallyImplyLeading: false,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new_outlined,
+                      color: Colors.black),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ),
               body: CustomTripInputStep(onNext: goToSplash),
             ),

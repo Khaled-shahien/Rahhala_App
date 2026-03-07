@@ -594,9 +594,9 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0,
         color: Colors.transparent,
         child: RahhalaBottomBar(
-          currentIndex: 3,
+          currentIndex: 2,
           onTap: (i) {
-            if (i == 3) {
+            if (i == 2) {
               return;
             } else {
               Navigator.pop(context);
