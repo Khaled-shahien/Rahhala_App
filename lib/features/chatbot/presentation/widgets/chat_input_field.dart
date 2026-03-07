@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:rahhala_app/core/theme/app_theme.dart';
 
 class ChatInputField extends StatelessWidget {
   final TextEditingController controller;
@@ -18,123 +17,95 @@ class ChatInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(12.w),
+      padding: EdgeInsets.fromLTRB(
+          16.w, 8.h, 16.w, 24.h), // مساحة أسفل SafeArea لراحة الإبهام
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.03),
             blurRadius: 10,
-            offset: const Offset(0, -2),
+            offset: const Offset(0, -5),
           ),
         ],
       ),
       child: SafeArea(
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                decoration: BoxDecoration(
-                  color: ThemeColor.bgColor,
-                  borderRadius: BorderRadius.circular(24.r),
-                  border: Border.all(
-                    color: ThemeColor.neutralGrayColor.withOpacity(0.2),
+              child: TextField(
+                controller: controller,
+                maxLines: 5,
+                minLines: 1,
+                style: TextStyle(fontSize: 15.sp, color: Colors.black87),
+                decoration: InputDecoration(
+                  hintText: 'Type your message...',
+                  hintStyle:
+                      TextStyle(fontSize: 14.sp, color: Colors.grey.shade400),
+                  filled: true,
+                  fillColor:
+                      const Color(0xFFF9F9F9), // خلفية خفيفة جداً لتمييز الحقل
+
+                  // الحواف هنا هي السر في الشكل النظيف
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25.r),
+                    borderSide:
+                        const BorderSide(color: Color(0xFFD1B89A), width: 1.2),
                   ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: controller,
-                        decoration: InputDecoration(
-                          hintText: 'Type your message...',
-                          hintStyle: TextStyle(
-                            fontSize: 15.sp,
-                            color: ThemeColor.neutralGrayColor,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: 14.h,
-                          ),
-                        ),
-                        maxLines: null,
-                        textCapitalization: TextCapitalization.sentences,
-                        onSubmitted: (value) {
-                          if (value.trim().isNotEmpty && !isLoading) {
-                            onSend(value);
-                            HapticFeedback.lightImpact();
-                          }
-                        },
-                      ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25.r),
+                    borderSide: const BorderSide(
+                        color: Color(0xFFD1B89A), width: 1.8), // تبرز عند الضغط
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+
+                  // أيقونة المرفقات بداخل الحافة تماماً
+                  suffixIcon: Padding(
+                    padding: EdgeInsets.only(right: 4.w),
+                    child: IconButton(
+                      icon: Icon(Icons.attach_file_outlined,
+                          color: Colors.grey.shade500, size: 20.sp),
+                      onPressed: () {},
                     ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.attach_file_outlined,
-                        size: 22.sp,
-                        color: ThemeColor.neutralGrayColor,
-                      ),
-                      onPressed: () {
-                        // TODO: Implement attachment feature
-                      },
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
             SizedBox(width: 12.w),
-            GestureDetector(
-              onTap: isLoading
-                  ? null
-                  : () {
-                      if (controller.text.trim().isNotEmpty) {
-                        onSend(controller.text);
-                        controller.clear();
-                        HapticFeedback.lightImpact();
-                      }
-                    },
-              child: Container(
-                padding: EdgeInsets.all(12.r),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isLoading
-                        ? [Colors.grey.shade300, Colors.grey.shade400]
-                        : [
-                            ThemeColor.primaryColor,
-                            ThemeColor.primaryColor.withOpacity(0.8)
-                          ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: ThemeColor.primaryColor.withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: isLoading
-                    ? SizedBox(
-                        width: 20.w,
-                        height: 20.w,
-                        child: const CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        ),
-                      )
-                    : Icon(
-                        Icons.send_rounded,
-                        color: Colors.white,
-                        size: 22.sp,
-                      ),
-              ),
-            ),
+            _buildSendButton(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSendButton() {
+    return Container(
+      height: 48.h,
+      width: 48.h,
+      decoration: const BoxDecoration(
+        color: Color(0xFFD1B89A),
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        icon: isLoading
+            ? SizedBox(
+                width: 20.w,
+                height: 20.w,
+                child: const CircularProgressIndicator(
+                    strokeWidth: 2, color: Colors.white))
+            : const Icon(Icons.send_rounded, color: Colors.white, size: 22),
+        onPressed: isLoading
+            ? null
+            : () {
+                if (controller.text.isNotEmpty) {
+                  onSend(controller.text);
+                  controller.clear();
+                  HapticFeedback.lightImpact();
+                }
+              },
       ),
     );
   }

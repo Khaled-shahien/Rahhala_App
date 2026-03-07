@@ -120,27 +120,30 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
                     child: TypingIndicator(),
                   ),
                 ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, -5),
+              ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  child: SafeArea(
+                    child: ChatInputField(
+                      controller: _messageController,
+                      isLoading: state is ChatBotLoading,
+                      onSend: (message) {
+                        if (message.trim().isNotEmpty) {
+                          cubit.sendMessage(message);
+                          _messageController.clear();
+                        }
+                      },
                     ),
-                  ],
-                ),
-                child: SafeArea(
-                  child: ChatInputField(
-                    controller: _messageController,
-                    isLoading: state is ChatBotLoading,
-                    onSend: (message) {
-                      if (message.trim().isNotEmpty) {
-                        cubit.sendMessage(message);
-                        _messageController.clear();
-                      }
-                    },
                   ),
                 ),
               ),
@@ -157,13 +160,18 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
       surfaceTintColor: Colors.white,
       elevation: 0.5,
       leadingWidth: 40.w,
+      leading: IconButton(
+        icon:
+            const Icon(Icons.arrow_back_ios_new_outlined, color: Colors.black),
+        onPressed: () => Navigator.pop(context),
+      ),
       title: Row(
         children: [
           CircleAvatar(
             radius: 18.r,
             backgroundColor: ThemeColor.primaryColor.withOpacity(0.1),
             child: Icon(
-              Icons.smart_toy,
+              Icons.smart_toy_outlined,
               color: ThemeColor.primaryColor,
               size: 20.sp,
             ),
@@ -173,7 +181,7 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Rahhala AI',
+                'ANIS',
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
@@ -225,14 +233,14 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.explore_outlined,
+                Icons.smart_toy_outlined,
                 size: 70.sp,
                 color: ThemeColor.primaryColor,
               ),
             ),
             SizedBox(height: 24.h),
             Text(
-              'Welcome to Rahhala!',
+              'Welcome to ANIS!',
               style: TextStyle(
                 fontSize: 22.sp,
                 fontWeight: FontWeight.bold,
