@@ -302,7 +302,7 @@ class _PinterestCameraScreenState extends State<PinterestCameraScreen>
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(8.r),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.black38,
           shape: BoxShape.circle,
         ),

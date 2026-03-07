@@ -1,0 +1,334 @@
+{
+    "info": {
+        "name": "ChatBot API - Rahhala App",
+        "description": "Complete ChatBot API endpoint testing collection based on the official API specification",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Standard Chat (Non-Streaming)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"action\": \"chat\",\n  \"payload\": {\n    \"prompt\": \"Hello, I want to visit Dubai!\",\n    \"contextId\": \"OPTIONAL_CONTEXT_ID\",\n    \"conversationHistory\": [\n      { \"role\": \"user\", \"message\": \"Hi\" },\n      { \"role\": \"assistant\", \"message\": \"Hello! Where are you going?\" }\n    ]\n  }\n}"
+                },
+                "url": {
+                    "raw": "https://express-js-on-vercel-ten-roan-21.vercel.app/api/chat",
+                    "protocol": "https",
+                    "host": [
+                        "express-js-on-vercel-ten-roan-21",
+                        "vercel",
+                        "app"
+                    ],
+                    "path": [
+                        "api",
+                        "chat"
+                    ]
+                },
+                "description": "Sends a message to ANIS and waits for the full response."
+            },
+            "response": []
+        },
+        {
+            "name": "2. Streaming Chat",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "text/plain"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"action\": \"chat-stream\",\n  \"payload\": {\n    \"prompt\": \"Tell me a long story about travel.\",\n    \"contextId\": \"OPTIONAL_CONTEXT_ID\",\n    \"conversationHistory\": []\n  }\n}"
+                },
+                "url": {
+                    "raw": "https://express-js-on-vercel-ten-roan-21.vercel.app/api/chat",
+                    "protocol": "https",
+                    "host": [
+                        "express-js-on-vercel-ten-roan-21",
+                        "vercel",
+                        "app"
+                    ],
+                    "path": [
+                        "api",
+                        "chat"
+                    ]
+                },
+                "description": "Sends a message and receives the response in chunks (real-time typing effect).\n\nResponse:\n- Content-Type: text/plain; charset=utf-8\n- Transfer-Encoding: chunked"
+            },
+            "response": []
+        },
+        {
+            "name": "3a. Create Context",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"action\": \"create-context\",\n  \"payload\": {\n    \"items\": {\n      \"userParams\": {\n        \"value\": \"Budget traveler, likes spicy food\"\n      }\n    }\n  }\n}"
+                },
+                "url": {
+                    "raw": "https://express-js-on-vercel-ten-roan-21.vercel.app/api/chat",
+                    "protocol": "https",
+                    "host": [
+                        "express-js-on-vercel-ten-roan-21",
+                        "vercel",
+                        "app"
+                    ],
+                    "path": [
+                        "api",
+                        "chat"
+                    ]
+                },
+                "description": "Initialize a new session with user data."
+            },
+            "response": []
+        },
+        {
+            "name": "3b. Update Context Items",
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "exec": [
+                            "// Get context ID from previous request or use default",
+                            "let contextId = pm.collectionVariables.get(\"contextId\");",
+                            "if (!contextId) {",
+                            "    contextId = 'YOUR_CONTEXT_ID_HERE';",
+                            "}",
+                            "pm.variables.set(\"currentContextId\", contextId);"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"action\": \"update-context-items\",\n  \"payload\": {\n    \"contextId\": \"{{currentContextId}}\",\n    \"items\": {\n      \"location\": {\n        \"value\": \"Paris, France\"\n      }\n    }\n  }\n}"
+                },
+                "url": {
+                    "raw": "https://express-js-on-vercel-ten-roan-21.vercel.app/api/chat",
+                    "protocol": "https",
+                    "host": [
+                        "express-js-on-vercel-ten-roan-21",
+                        "vercel",
+                        "app"
+                    ],
+                    "path": [
+                        "api",
+                        "chat"
+                    ]
+                },
+                "description": "Add or update items in an existing context."
+            },
+            "response": []
+        },
+        {
+            "name": "3c. Get Context",
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "exec": [
+                            "let contextId = pm.collectionVariables.get(\"contextId\");",
+                            "if (!contextId) {",
+                            "    contextId = 'YOUR_CONTEXT_ID_HERE';",
+                            "}",
+                            "pm.variables.set(\"currentContextId\", contextId);"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"action\": \"get-context\",\n  \"payload\": {\n    \"contextId\": \"{{currentContextId}}\"\n  }\n}"
+                },
+                "url": {
+                    "raw": "https://express-js-on-vercel-ten-roan-21.vercel.app/api/chat",
+                    "protocol": "https",
+                    "host": [
+                        "express-js-on-vercel-ten-roan-21",
+                        "vercel",
+                        "app"
+                    ],
+                    "path": [
+                        "api",
+                        "chat"
+                    ]
+                },
+                "description": "Retrieve current stored data."
+            },
+            "response": []
+        },
+        {
+            "name": "3d. Discard Context",
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "exec": [
+                            "let contextId = pm.collectionVariables.get(\"contextId\");",
+                            "if (!contextId) {",
+                            "    contextId = 'YOUR_CONTEXT_ID_HERE';",
+                            "}",
+                            "pm.variables.set(\"currentContextId\", contextId);"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"action\": \"discard-context\",\n  \"payload\": {\n    \"contextId\": \"{{currentContextId}}\"\n  }\n}"
+                },
+                "url": {
+                    "raw": "https://express-js-on-vercel-ten-roan-21.vercel.app/api/chat",
+                    "protocol": "https",
+                    "host": [
+                        "express-js-on-vercel-ten-roan-21",
+                        "vercel",
+                        "app"
+                    ],
+                    "path": [
+                        "api",
+                        "chat"
+                    ]
+                },
+                "description": "Delete the session."
+            },
+            "response": []
+        },
+        {
+            "name": "4. Legacy Simple Mode",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"prompt\": \"Suggest a trip to Italy\"\n}"
+                },
+                "url": {
+                    "raw": "https://express-js-on-vercel-ten-roan-21.vercel.app/api/chat",
+                    "protocol": "https",
+                    "host": [
+                        "express-js-on-vercel-ten-roan-21",
+                        "vercel",
+                        "app"
+                    ],
+                    "path": [
+                        "api",
+                        "chat"
+                    ]
+                },
+                "description": "A fallback for simple completions without conversation history or actions."
+            },
+            "response": []
+        },
+        {
+            "name": "5. Chat with Context ID",
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "exec": [
+                            "let contextId = pm.collectionVariables.get(\"contextId\");",
+                            "if (!contextId) {",
+                            "    contextId = 'YOUR_CONTEXT_ID_HERE';",
+                            "}",
+                            "pm.variables.set(\"currentContextId\", contextId);"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"action\": \"chat\",\n  \"payload\": {\n    \"prompt\": \"What should I do in this city?\",\n    \"contextId\": \"{{currentContextId}}\",\n    \"conversationHistory\": []\n  }\n}"
+                },
+                "url": {
+                    "raw": "https://express-js-on-vercel-ten-roan-21.vercel.app/api/chat",
+                    "protocol": "https",
+                    "host": [
+                        "express-js-on-vercel-ten-roan-21",
+                        "vercel",
+                        "app"
+                    ],
+                    "path": [
+                        "api",
+                        "chat"
+                    ]
+                },
+                "description": "Send a chat message with a specific context ID."
+            },
+            "response": []
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "https://rahhallaweb2026.runasp.net",
+            "type": "string"
+        },
+        {
+            "key": "contextId",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}

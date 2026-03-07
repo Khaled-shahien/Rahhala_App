@@ -1,5 +1,6 @@
 class EndPoints {
-  static const String baseUrl = 'https://rahhallaweb2026.runasp.net';
+  static const String baseUrl =
+      'https://express-js-on-vercel-ten-roan-21.vercel.app';
 
   static const String login = '/api/Auth/Login';
   static const String register = '/api/Auth/register';

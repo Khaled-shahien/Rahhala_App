@@ -39,6 +39,11 @@ import 'package:rahhala_app/features/chatbot/data/sources/chat_bot_api_service.d
 import 'package:rahhala_app/features/chatbot/data/repositories/chat_bot_repository_impl.dart';
 import 'package:rahhala_app/features/chatbot/domain/repositories/chat_bot_repository.dart';
 import 'package:rahhala_app/features/chatbot/domain/usecases/send_message_usecase.dart';
+import 'package:rahhala_app/features/chatbot/domain/usecases/stream_message_usecase.dart';
+import 'package:rahhala_app/features/chatbot/domain/usecases/create_context_usecase.dart';
+import 'package:rahhala_app/features/chatbot/domain/usecases/update_context_items_usecase.dart';
+import 'package:rahhala_app/features/chatbot/domain/usecases/get_context_usecase.dart';
+import 'package:rahhala_app/features/chatbot/domain/usecases/discard_context_usecase.dart';
 import 'package:rahhala_app/features/chatbot/presentation/cubit/chat_bot_cubit.dart';
 
 final sl = GetIt.instance;
@@ -102,12 +107,39 @@ Future<void> setupServiceLocator() async {
   );
   sl.registerLazySingleton<ChatBotRepository>(
     () => ChatBotRepositoryImpl(
-        apiService: sl<ChatBotApiService>(), apiConsumer: sl<ApiConsumer>()),
+      apiService: sl<ChatBotApiService>(),
+    ),
   );
+
+  // ChatBot Use Cases
   sl.registerLazySingleton<SendMessageUseCase>(
     () => SendMessageUseCase(sl<ChatBotRepository>()),
   );
+  sl.registerLazySingleton<StreamMessageUseCase>(
+    () => StreamMessageUseCase(sl<ChatBotRepository>()),
+  );
+  sl.registerLazySingleton<CreateContextUseCase>(
+    () => CreateContextUseCase(sl<ChatBotRepository>()),
+  );
+  sl.registerLazySingleton<UpdateContextItemsUseCase>(
+    () => UpdateContextItemsUseCase(sl<ChatBotRepository>()),
+  );
+  sl.registerLazySingleton<GetContextUseCase>(
+    () => GetContextUseCase(sl<ChatBotRepository>()),
+  );
+  sl.registerLazySingleton<DiscardContextUseCase>(
+    () => DiscardContextUseCase(sl<ChatBotRepository>()),
+  );
+
+  // ChatBot Cubit
   sl.registerFactory<ChatBotCubit>(
-    () => ChatBotCubit(repository: sl<ChatBotRepository>()),
+    () => ChatBotCubit(
+      sendMessageUseCase: sl<SendMessageUseCase>(),
+      streamMessageUseCase: sl<StreamMessageUseCase>(),
+      createContextUseCase: sl<CreateContextUseCase>(),
+      updateContextItemsUseCase: sl<UpdateContextItemsUseCase>(),
+      getContextUseCase: sl<GetContextUseCase>(),
+      discardContextUseCase: sl<DiscardContextUseCase>(),
+    ),
   );
 }

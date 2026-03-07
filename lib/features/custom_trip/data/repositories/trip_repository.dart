@@ -7,7 +7,6 @@ import '../../domain/entities/day_plan_entity.dart';
 import '../../domain/entities/trip_data_entity.dart';
 import '../../domain/entities/transportation_entity.dart';
 import '../../domain/repositories/trip_repository_interface.dart';
-import '../models/transportation_model.dart';
 import '../models/activity_model.dart';
 import '../models/day_plan_model.dart';
 import '../models/trip_data_model.dart';
