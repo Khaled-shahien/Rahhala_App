@@ -289,7 +289,7 @@ void main() {
           );
           expect(response.statusCode, inInclusiveRange(200, 500));
           print('✓ Empty prompt handled. Status: ${response.statusCode}');
-        } on DioException catch (e) {
+        } on DioException {
           print('✓ Empty prompt handled with DioException');
         }
       }, timeout: const Timeout(Duration(seconds: 30)));

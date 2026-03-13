@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rahhala_app/features/chatbot/domain/entities/chat_message.dart';
-import 'package:rahhala_app/features/chatbot/domain/repositories/chat_bot_repository.dart';
 import 'package:rahhala_app/features/chatbot/domain/usecases/send_message_usecase.dart';
 import 'package:rahhala_app/features/chatbot/domain/usecases/stream_message_usecase.dart';
 import 'package:rahhala_app/features/chatbot/domain/usecases/create_context_usecase.dart';

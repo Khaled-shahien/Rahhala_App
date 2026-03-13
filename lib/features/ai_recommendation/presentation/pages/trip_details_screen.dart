@@ -64,10 +64,12 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
         },
         (data) {
           if (data['success'] == true) {
+            final savedTripId = data['tripId'] ?? 'N/A';
             showAppNotification(
               context: context,
               title: 'Saved',
-              message: data['message'] ?? 'Trip saved successfully.',
+              message:
+                  '${data['message'] ?? 'Trip saved successfully.'}\nTrip ID: $savedTripId',
             );
           } else {
             HapticFeedback.mediumImpact();
@@ -130,6 +132,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                         icon: Icons.favorite_border,
                         title: "Travel tips",
                         content: plan.travelTips,
+                      ),
+                      _buildEmergencyContactSection(
+                        emergencyContact: plan.emergencyContact,
                       ),
                       SizedBox(height: 32.h),
                     ],
@@ -466,28 +471,131 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: Colors.black12)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: Colors.black12),
+      ),
       child: CustomExpansionTile(
-        leading: Icon(icon, color: lightBorderColor),
-        title: Text(
-          title,
-          style: const TextStyle(
-              color: primaryTextColor, fontWeight: FontWeight.bold),
+        tilePadding: EdgeInsets.all(16.w),
+        title: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Icon(
+                icon,
+                color: AppColors.primary,
+                size: 24.sp,
+              ),
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: primaryTextColor,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    content.isEmpty ? "No information available" : content,
+                    style: TextStyle(
+                      color: primaryTextColor.withOpacity(0.8),
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.keyboard_arrow_down,
+              color: primaryTextColor,
+              size: 20.sp,
+            ),
+          ],
         ),
-        iconColor: primaryTextColor,
-        collapsedIconColor: primaryTextColor,
+        iconColor: Colors.transparent,
+        collapsedIconColor: Colors.transparent,
         children: [
           Container(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.w),
             alignment: Alignment.centerLeft,
             child: Text(
-              content.isEmpty ? "No tips" : content,
+              content.isEmpty ? "No information available" : content,
               style: TextStyle(fontSize: 13.sp, color: primaryTextColor),
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Widget _buildEmergencyContactSection({required String emergencyContact}) {
+    if (emergencyContact.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: Colors.black12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16.w),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Icon(
+                Icons.emergency_outlined,
+                color: AppColors.primary,
+                size: 24.sp,
+              ),
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Emergency Contact",
+                    style: TextStyle(
+                      color: primaryTextColor,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    emergencyContact,
+                    style: TextStyle(
+                      color: primaryTextColor.withOpacity(0.8),
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

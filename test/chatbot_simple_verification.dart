@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
 
 /// Simple ChatBot API Endpoint Verification Script

@@ -41,6 +41,7 @@ class TripMapper {
       totalEstimatedCost: tripData.totalEstimatedCost,
       budgetTips: '', // Not provided in the response
       travelTips: tripData.travelTips,
+      emergencyContact: '', // Not provided in the response
     );
 
     // Create TripPlanResponse

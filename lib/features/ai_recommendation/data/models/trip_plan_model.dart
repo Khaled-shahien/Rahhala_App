@@ -4,11 +4,13 @@ class TripPlanResponse extends Equatable {
   final bool success;
   final TripPlan response;
   final int savedId;
+  final String? tripId; // New field to store the returned tripId from Save_Trip
 
   const TripPlanResponse({
     required this.success,
     required this.response,
     required this.savedId,
+    this.tripId,
   });
 
   factory TripPlanResponse.fromJson(Map<String, dynamic> json) {
@@ -16,11 +18,12 @@ class TripPlanResponse extends Equatable {
       success: json['success'] ?? false,
       response: TripPlan.fromJson(json['tripData'] ?? {}),
       savedId: json['savedId'] ?? 0,
+      tripId: json['tripId']?.toString(),
     );
   }
 
   @override
-  List<Object?> get props => [success, response, savedId];
+  List<Object?> get props => [success, response, savedId, tripId];
 }
 
 class TripPlan extends Equatable {
@@ -29,6 +32,7 @@ class TripPlan extends Equatable {
   final String totalEstimatedCost;
   final String budgetTips;
   final String travelTips;
+  final String emergencyContact;
 
   const TripPlan({
     required this.destination,
@@ -36,6 +40,7 @@ class TripPlan extends Equatable {
     required this.totalEstimatedCost,
     required this.budgetTips,
     required this.travelTips,
+    required this.emergencyContact,
   });
 
   factory TripPlan.fromJson(Map<String, dynamic> json) {
@@ -48,12 +53,19 @@ class TripPlan extends Equatable {
       totalEstimatedCost: json['totalEstimatedCost']?.toString() ?? "0",
       budgetTips: json['budgetTips'] ?? '',
       travelTips: json['travelTips'] ?? '',
+      emergencyContact: json['emergencycontact']?.toString() ?? '',
     );
   }
 
   @override
-  List<Object?> get props =>
-      [destination, days, totalEstimatedCost, budgetTips, travelTips];
+  List<Object?> get props => [
+        destination,
+        days,
+        totalEstimatedCost,
+        budgetTips,
+        travelTips,
+        emergencyContact
+      ];
 }
 
 class DailyPlan extends Equatable {

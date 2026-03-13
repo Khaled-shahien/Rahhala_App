@@ -145,6 +145,7 @@ class GeminiRepositoryImpl implements GeminiRepository {
             'totalEstimatedCost': tripPlan.response.totalEstimatedCost,
             'budgetTips': tripPlan.response.budgetTips,
             'travelTips': tripPlan.response.travelTips,
+            'emergencycontact': tripPlan.response.emergencyContact,
             'tripId': '00000000-0000-0000-0000-000000000000', // Default tripId
           },
           'geminiRequest': geminiRequest,
