@@ -119,6 +119,7 @@ class GeminiRepositoryImpl implements GeminiRepository {
           'success': tripPlan.success,
           'tripData': {
             'destination': tripPlan.response.destination,
+            'countryImage': tripPlan.response.countryImage,
             'days': tripPlan.response.days.map((day) {
               return {
                 'day': day.day,
@@ -138,6 +139,7 @@ class GeminiRepositoryImpl implements GeminiRepository {
                         'estimatedCost': transport.estimatedCost,
                       };
                     }).toList(),
+                    'image': activity.image,
                   };
                 }).toList(),
               };
@@ -146,7 +148,7 @@ class GeminiRepositoryImpl implements GeminiRepository {
             'budgetTips': tripPlan.response.budgetTips,
             'travelTips': tripPlan.response.travelTips,
             'emergencycontact': tripPlan.response.emergencyContact,
-            'tripId': '00000000-0000-0000-0000-000000000000', // Default tripId
+            'tripId': tripPlan.tripId ?? '00000000-0000-0000-0000-000000000000',
           },
           'geminiRequest': geminiRequest,
         },
@@ -161,7 +163,14 @@ class GeminiRepositoryImpl implements GeminiRepository {
         return Left(ServerFailure(message: "Unexpected response format"));
       }
 
-      return Right(jsonResponse);
+      // Validate the response structure
+      if (jsonResponse['success'] == true && jsonResponse['tripId'] != null) {
+        return Right(jsonResponse);
+      } else {
+        return Left(ServerFailure(
+          message: jsonResponse['message']?.toString() ?? 'Failed to save trip',
+        ));
+      }
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.errorModel.message));
     } on FormatException catch (e) {

@@ -101,8 +101,10 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: screenBackgroundColor,
+      extendBodyBehindAppBar: true,
       bottomNavigationBar: _buildBottomSaveButton(),
       body: SafeArea(
+        top: false,
         child: BackgroundDecorator(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,39 +151,115 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   }
 
   Widget _buildHeader() {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: headerBackgroundColor,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(35.r),
-          bottomRight: Radius.circular(35.r),
-        ),
-      ),
+      height: 380.h,
       child: Stack(
         children: [
+          // Display country image as full-bleed background
+          if (plan.countryImage != null && plan.countryImage!.isNotEmpty)
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(35.r),
+                  bottomRight: Radius.circular(35.r),
+                ),
+                child: Image.network(
+                  plan.countryImage!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: 380.h,
+                  errorBuilder: (context, error, stackTrace) {
+                    print('Error loading country image: $error');
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: headerBackgroundColor,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(35.r),
+                          bottomRight: Radius.circular(35.r),
+                        ),
+                      ),
+                    );
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      color: headerBackgroundColor.withOpacity(0.3),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                          valueColor:
+                              const AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          // Top overlay: Darker gradient for text readability
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.4),
+                    Colors.black.withOpacity(0.2),
+                    Colors.transparent,
+                    Colors.transparent,
+                  ],
+                  stops: const [0.0, 0.5, 0.7, 1.0],
+                ),
+              ),
+            ),
+          ),
+          // Bottom overlay: Smooth transition to screen background
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.transparent,
+                    screenBackgroundColor.withOpacity(0.3),
+                    screenBackgroundColor,
+                  ],
+                  stops: const [0.0, 0.5, 0.8, 1.0],
+                ),
+              ),
+            ),
+          ),
+          // Decorative assets in top-right corner
           Positioned(
-            top: 0,
-            right: 0,
+            top: -20.h,
+            right: -30.w,
             child: Image.asset(
               'assets/images/cover.png',
-              width: 350.w,
+              width: 400.w,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => const SizedBox(),
             ),
           ),
+          // Content padding with SafeArea consideration
           Padding(
             padding: EdgeInsets.only(
               left: 20.w,
               right: 20.w,
+              top: MediaQuery.of(context).padding.top + 20.h,
               bottom: 30.h,
-              top: 30.h,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildTitle(),
-                SizedBox(height: 20.h),
+                SizedBox(height: 24.h),
                 _buildModernPill(
                   icon: Icons.location_on_outlined,
                   text: plan.destination,
@@ -205,10 +283,17 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       child: Text(
         'Every place, every moment\nchosen just for you.',
         style: TextStyle(
-          color: brownTextColor,
+          color: Colors.white,
           fontSize: 22.sp,
           fontWeight: FontWeight.w900,
           height: 1.2,
+          shadows: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              offset: const Offset(0, 2),
+              blurRadius: 4,
+            ),
+          ],
         ),
       ),
     );
@@ -217,23 +302,31 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   Widget _buildModernPill(
       {IconData? icon, required String text, bool isCost = false}) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
       decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(30.r),
-        border: Border.all(color: brownTextColor, width: 2.2),
+        border: Border.all(color: Colors.white.withOpacity(0.9), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, color: brownTextColor, size: 20.sp),
+            Icon(icon, color: Colors.white, size: 20.sp),
             SizedBox(width: 8.w),
           ],
           Flexible(
             child: Text(
               text,
               style: TextStyle(
-                color: brownTextColor,
+                color: Colors.white,
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w800,
               ),
@@ -349,6 +442,43 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                 iconColor: primaryTextColor,
                 collapsedIconColor: primaryTextColor,
                 children: [
+                  // Activity image if available
+                  if (act.image != null && act.image!.isNotEmpty)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12.r),
+                      child: Image.network(
+                        act.image!,
+                        width: double.infinity,
+                        height: 180.h,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          print('Error loading activity image: $error');
+                          return const SizedBox.shrink();
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            width: double.infinity,
+                            height: 180.h,
+                            color: Colors.grey[200],
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                    primaryTextColor),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  if (act.image != null && act.image!.isNotEmpty)
+                    SizedBox(height: 12.h),
+                  // Activity description
                   Padding(
                     padding:
                         EdgeInsets.only(left: 45.w, right: 12.w, bottom: 12.h),
@@ -357,7 +487,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                       style:
                           TextStyle(color: primaryTextColor, fontSize: 13.sp),
                     ),
-                  )
+                  ),
                 ],
               ),
             );
