@@ -9,7 +9,6 @@ import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_mod
 import 'package:rahhala_app/features/ai_recommendation/data/repositories/gemini_repository.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/expansion_tile_components.dart';
 
-// الألوان والثوابت
 const Color headerBackgroundColor = Color(0xFFF2E7D5);
 const Color brownTextColor = Color(0xFF3E3431);
 const Color primaryTextColor = AppColors.darkBrown;
@@ -200,7 +199,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                 ),
               ),
             ),
-          // Top overlay: Darker gradient for text readability
+
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -208,17 +207,18 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.4),
-                    Colors.black.withOpacity(0.2),
                     Colors.transparent,
                     Colors.transparent,
+                    screenBackgroundColor.withOpacity(0.15),
+                    screenBackgroundColor.withOpacity(0.5),
+                    screenBackgroundColor,
                   ],
-                  stops: const [0.0, 0.5, 0.7, 1.0],
+                  stops: const [0.0, 0.45, 0.7, 0.85, 1.0],
                 ),
               ),
             ),
           ),
-          // Bottom overlay: Smooth transition to screen background
+
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -229,7 +229,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                     Colors.transparent,
                     Colors.transparent,
                     screenBackgroundColor.withOpacity(0.3),
-                    screenBackgroundColor,
+
+                    /// screenBackgroundColor,
+                    Color(0xFFF3E5D8).withOpacity(0.8)
                   ],
                   stops: const [0.0, 0.5, 0.8, 1.0],
                 ),
@@ -247,7 +249,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
               errorBuilder: (context, error, stackTrace) => const SizedBox(),
             ),
           ),
-          // Content padding with SafeArea consideration
+
           Padding(
             padding: EdgeInsets.only(
               left: 20.w,
@@ -258,8 +260,11 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(
+                  height: 20.h,
+                ),
                 _buildTitle(),
-                SizedBox(height: 24.h),
+                SizedBox(height: 30.h),
                 _buildModernPill(
                   icon: Icons.location_on_outlined,
                   text: plan.destination,
@@ -283,15 +288,20 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       child: Text(
         'Every place, every moment\nchosen just for you.',
         style: TextStyle(
-          color: Colors.white,
-          fontSize: 22.sp,
-          fontWeight: FontWeight.w900,
-          height: 1.2,
+          color: Color(0xFFF3E5D8),
+          fontSize: 25.sp,
+          fontWeight: FontWeight.w800,
+          height: 1.4,
           shadows: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+            Shadow(
+              color: Colors.black.withOpacity(1.0),
               offset: const Offset(0, 2),
-              blurRadius: 4,
+              blurRadius: 255,
+            ),
+            Shadow(
+              color: Colors.black.withOpacity(1.0),
+              offset: const Offset(0, 4),
+              blurRadius: 100,
             ),
           ],
         ),
@@ -304,32 +314,28 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: const Color(0xFFF3E5D8).withOpacity(0.5),
         borderRadius: BorderRadius.circular(30.r),
-        border: Border.all(color: Colors.white.withOpacity(0.9), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(
+          color: const Color(0xFF8B6F5A),
+          width: 1.4,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) ...[
-            Icon(icon, color: Colors.white, size: 20.sp),
-            SizedBox(width: 8.w),
-          ],
-          Flexible(
-            child: Text(
-              text,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w800,
-              ),
+          Icon(
+            icon,
+            size: 18.sp,
+            color: const Color(0xFF5C4634),
+          ),
+          SizedBox(width: 8.w),
+          Text(
+            text,
+            style: TextStyle(
+              color: const Color(0xFF5C4634),
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],

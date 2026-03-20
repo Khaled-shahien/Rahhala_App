@@ -2,8 +2,10 @@ class AppAssets {
   AppAssets._();
 
   static const String imagesWelcomeImage = "assets/images/welcome_image.jpg";
+  static const String imagesWelcomerahhla = "assets/images/welcome_image2.jpeg";
 
   static const String imagesLogo = "assets/images/logo.svg";
+  static const String noplans = "assets/images/no_saved_plans.png";
 
   static const String imagesOnboarding1 = "assets/images/1.png";
 

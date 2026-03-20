@@ -4,6 +4,9 @@ import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/features/image_search/data/repositories/image_search_repository_impl.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_cubit.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_repository.dart';
+import 'package:rahhala_app/features/trip_history/data/repositories/trip_history_repository_impl.dart';
+import 'package:rahhala_app/features/trip_history/domain/cubits/trip_history_cubit.dart';
+import 'package:rahhala_app/features/trip_history/domain/trip_history_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:rahhala_app/core/network/api_consumer.dart';
@@ -151,6 +154,12 @@ Future<void> setupServiceLocator() async {
   );
   sl.registerLazySingleton<DiscardContextUseCase>(
     () => DiscardContextUseCase(sl<ChatBotRepository>()),
+  );
+  sl.registerLazySingleton<TripHistoryRepository>(
+    () => TripHistoryRepositoryImpl(dio: sl<Dio>()),
+  );
+  sl.registerFactory<TripHistoryCubit>(
+    () => TripHistoryCubit(repository: sl<TripHistoryRepository>()),
   );
 
   // ChatBot Cubit
