@@ -13,10 +13,12 @@ import 'package:rahhala_app/features/chatbot/presentation/pages/chat_bot_screen.
 
 class HomePage extends StatefulWidget {
   final bool isGuest;
+  final int initialIndex;
 
   const HomePage({
     super.key,
     this.isGuest = false,
+    this.initialIndex = 0,
   });
 
   @override
@@ -24,7 +26,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _currentIndex = 0;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+  }
+
+  //int _currentIndex = 0;
   final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
 
   void _notifyComingSoon(String text) {

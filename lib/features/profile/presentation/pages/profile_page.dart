@@ -20,6 +20,7 @@ import 'package:rahhala_app/features/profile/presentation/pages/edit_profile_pag
 
 import 'package:rahhala_app/core/widgets/rahhala_bottom_bar.dart';
 import 'package:rahhala_app/core/widgets/soft_arc_notch.dart';
+import 'package:rahhala_app/features/trip_history/presentation/pages/trip_history_screen.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool embedded;
@@ -390,6 +391,16 @@ class _ProfilePageState extends State<ProfilePage> {
                     );
                     _profileCubit.fetch();
                   },
+                ),
+                Divider(height: 1, color: Colors.grey[200]),
+                ProfileListTile(
+                  icon: Icons.history_rounded,
+                  title: 'Plan History',
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const TripHistoryScreen()),
+                  ),
                 ),
                 Divider(height: 1, color: Colors.grey[200]),
                 ProfileListTile(
