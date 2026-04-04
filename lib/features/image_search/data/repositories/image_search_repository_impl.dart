@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:rahhala_app/core/errors/failures.dart';
+import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/features/image_search/data/models/image_search_model.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_repository.dart';
@@ -24,8 +25,10 @@ class ImageSearchRepositoryImpl implements ImageSearchRepository {
         data: formData,
       );
 
-      print('Response data: ${response.data}');
-      print('Response type: ${response.data.runtimeType}');
+      AppLogger.instance.d(
+        'ImageSearchRepository.searchByImage response type: '
+        '${response.data.runtimeType}',
+      );
 
       final data =
           response.data is String ? jsonDecode(response.data) : response.data;

@@ -16,7 +16,7 @@ class BackgroundDecorator extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                ThemeColor.primaryColor.withOpacity(0.1),
+                ThemeColor.primaryColor.withValues(alpha: 0.1),
                 Colors.white,
               ],
               begin: Alignment.topLeft,
@@ -33,7 +33,7 @@ class BackgroundDecorator extends StatelessWidget {
             width: 280.w,
             height: 280.w,
             decoration: BoxDecoration(
-              color: ThemeColor.primaryColor.withOpacity(0.14),
+              color: ThemeColor.primaryColor.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(140.r),
             ),
           ),
@@ -47,7 +47,7 @@ class BackgroundDecorator extends StatelessWidget {
             width: 320.w,
             height: 320.w,
             decoration: BoxDecoration(
-              color: ThemeColor.primaryColor.withOpacity(0.1),
+              color: ThemeColor.primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(160.r),
             ),
           ),

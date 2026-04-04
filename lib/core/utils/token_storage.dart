@@ -1,7 +1,11 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TokenStorage {
-  final SharedPreferences _prefs;
+  final FlutterSecureStorage _secureStorage;
+  final SharedPreferences _legacyPrefs;
+  final Map<String, String> _cache = <String, String>{};
+  bool _initialized = false;
 
   static const String _tokenKey = 'auth_token';
   static const String _usernameKey = 'username';
@@ -9,42 +13,85 @@ class TokenStorage {
   static const String _fullNameKey = 'full_name';
   static const String _profileImageUrlKey = 'profile_image_url';
 
-  TokenStorage(this._prefs);
+  TokenStorage({
+    required FlutterSecureStorage secureStorage,
+    required SharedPreferences legacyPrefs,
+  })  : _secureStorage = secureStorage,
+        _legacyPrefs = legacyPrefs;
+
+  static const List<String> _allKeys = <String>[
+    _tokenKey,
+    _usernameKey,
+    _emailKey,
+    _fullNameKey,
+    _profileImageUrlKey,
+  ];
+
+  Future<void> initialize() async {
+    if (_initialized) {
+      return;
+    }
+
+    for (final key in _allKeys) {
+      final secureValue = await _secureStorage.read(key: key);
+      if (secureValue != null && secureValue.isNotEmpty) {
+        _cache[key] = secureValue;
+        continue;
+      }
+
+      final legacyValue = _legacyPrefs.getString(key);
+      if (legacyValue != null && legacyValue.isNotEmpty) {
+        await _secureStorage.write(key: key, value: legacyValue);
+        await _legacyPrefs.remove(key);
+        _cache[key] = legacyValue;
+      }
+    }
+
+    _initialized = true;
+  }
+
+  Future<void> _writeValue(String key, String value) async {
+    await _secureStorage.write(key: key, value: value);
+    _cache[key] = value;
+  }
+
+  Future<void> _clearValue(String key) async {
+    await _secureStorage.delete(key: key);
+    await _legacyPrefs.remove(key);
+    _cache.remove(key);
+  }
 
   Future<void> setToken(String token) async {
-    await _prefs.setString(_tokenKey, token);
+    await _writeValue(_tokenKey, token);
   }
 
-  String? get token => _prefs.getString(_tokenKey);
+  String? get token => _cache[_tokenKey];
 
-  bool get hasToken {
-    final token = _prefs.getString(_tokenKey);
-    return token != null && token.isNotEmpty;
-  }
+  bool get hasToken => (token?.isNotEmpty ?? false);
 
   Future<void> setUsername(String username) async {
-    await _prefs.setString(_usernameKey, username);
+    await _writeValue(_usernameKey, username);
   }
 
-  String? get username => _prefs.getString(_usernameKey);
+  String? get username => _cache[_usernameKey];
 
   Future<void> setEmail(String email) async {
-    await _prefs.setString(_emailKey, email);
+    await _writeValue(_emailKey, email);
   }
 
-  String? get email => _prefs.getString(_emailKey);
+  String? get email => _cache[_emailKey];
 
   Future<void> setFullName(String fullName) async {
-    await _prefs.setString(_fullNameKey, fullName);
+    await _writeValue(_fullNameKey, fullName);
   }
 
-  String? get fullName => _prefs.getString(_fullNameKey);
+  String? get fullName => _cache[_fullNameKey];
 
   Future<void> setProfileImageUrl(String imageUrl) async {
-    await _prefs.setString(_profileImageUrlKey, imageUrl);
+    await _writeValue(_profileImageUrlKey, imageUrl);
   }
 
-  String? get profileImageUrl => _prefs.getString(_profileImageUrlKey);
+  String? get profileImageUrl => _cache[_profileImageUrlKey];
 
   Future<void> setBasicInfo({
     required String fullName,
@@ -55,17 +102,17 @@ class TokenStorage {
   }
 
   String get displayName {
-    final name = _prefs.getString(_fullNameKey);
+    final name = _cache[_fullNameKey];
     if (name != null && name.isNotEmpty) {
       return name;
     }
 
-    final uname = _prefs.getString(_usernameKey);
+    final uname = _cache[_usernameKey];
     if (uname != null && uname.isNotEmpty) {
       return uname;
     }
 
-    final mail = _prefs.getString(_emailKey);
+    final mail = _cache[_emailKey];
     if (mail != null && mail.isNotEmpty) {
       return mail.split('@').first;
     }
@@ -74,31 +121,29 @@ class TokenStorage {
   }
 
   Future<void> clearToken() async {
-    await _prefs.remove(_tokenKey);
+    await _clearValue(_tokenKey);
   }
 
   Future<void> clearUsername() async {
-    await _prefs.remove(_usernameKey);
+    await _clearValue(_usernameKey);
   }
 
   Future<void> clearEmail() async {
-    await _prefs.remove(_emailKey);
+    await _clearValue(_emailKey);
   }
 
   Future<void> clearFullName() async {
-    await _prefs.remove(_fullNameKey);
+    await _clearValue(_fullNameKey);
   }
 
   Future<void> clearProfileImageUrl() async {
-    await _prefs.remove(_profileImageUrlKey);
+    await _clearValue(_profileImageUrlKey);
   }
 
   Future<void> clearAll() async {
-    await _prefs.remove(_tokenKey);
-    await _prefs.remove(_usernameKey);
-    await _prefs.remove(_emailKey);
-    await _prefs.remove(_fullNameKey);
-    await _prefs.remove(_profileImageUrlKey);
+    for (final key in _allKeys) {
+      await _clearValue(key);
+    }
   }
 
   Future<void> clear() async {

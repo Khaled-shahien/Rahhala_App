@@ -143,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                   );
                 }
 
-                var storedName = sl<TokenStorage>().fullName;
+                final storedName = sl<TokenStorage>().fullName;
                 if (storedName == null || storedName.trim().isEmpty) {
                   final local = email.split('@').first;
                   final cap = local.isNotEmpty
@@ -265,14 +265,14 @@ class _LoginPageState extends State<LoginPage> {
                                     borderRadius: BorderRadius.circular(28.r),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.06),
+                                        color: Colors.black.withValues(alpha: 0.06),
                                         blurRadius: 22,
                                         offset: const Offset(0, 12),
                                       ),
                                     ],
                                     border: Border.all(
                                       color: ThemeColor.primaryColor
-                                          .withOpacity(0.08),
+                                          .withValues(alpha: 0.08),
                                     ),
                                   ),
                                   child: Column(
@@ -421,7 +421,7 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.04),
+                                        color: Colors.black.withValues(alpha: 0.04),
                                         blurRadius: 18,
                                         offset: const Offset(0, 10),
                                       ),

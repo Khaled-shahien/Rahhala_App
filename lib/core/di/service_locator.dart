@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/features/image_search/data/repositories/image_search_repository_impl.dart';
@@ -21,6 +22,7 @@ import 'package:rahhala_app/features/auth/domain/verify_otp/verify_otp_cubit.dar
 import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/core/utils/user_session.dart';
 import 'package:rahhala_app/core/network/api_interceptors.dart';
+import 'package:rahhala_app/core/network/retry_interceptor.dart';
 
 import 'package:rahhala_app/features/profile/data/repositories/user_repository.dart';
 import 'package:rahhala_app/features/profile/data/repositories/user_repository_impl.dart';
@@ -54,11 +56,21 @@ final sl = GetIt.instance;
 
 Future<void> setupServiceLocator() async {
   final prefs = await SharedPreferences.getInstance();
-  sl.registerSingleton<TokenStorage>(TokenStorage(prefs));
+  const secureStorage = FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+  );
+  final tokenStorage = TokenStorage(
+    secureStorage: secureStorage,
+    legacyPrefs: prefs,
+  );
+  await tokenStorage.initialize();
+  sl.registerSingleton<TokenStorage>(tokenStorage);
   sl.registerLazySingleton<UserSession>(() => UserSession());
 
   final dio = Dio();
   dio.interceptors.add(ApiInterceptors());
+  dio.interceptors.add(RetryInterceptor(dio: dio));
   sl.registerLazySingleton<Dio>(() => dio);
   sl.registerLazySingleton<ApiConsumer>(() => DioConsumer(dio: sl<Dio>()));
 
@@ -73,14 +85,7 @@ Future<void> setupServiceLocator() async {
     receiveTimeout: const Duration(seconds: 60),
     responseType: ResponseType.json,
   ));
-  chatBotDio.interceptors.add(LogInterceptor(
-    request: true,
-    requestBody: true,
-    requestHeader: true,
-    error: true,
-    responseBody: true,
-    responseHeader: false,
-  ));
+  chatBotDio.interceptors.add(RetryInterceptor(dio: chatBotDio));
   sl.registerLazySingleton<Dio>(instanceName: 'chatbot', () => chatBotDio);
 
   sl.registerLazySingleton<AuthRepo>(

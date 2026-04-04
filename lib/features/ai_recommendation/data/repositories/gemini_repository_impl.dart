@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:rahhala_app/core/errors/exceptions.dart';
 import 'package:rahhala_app/core/errors/failures.dart';
+import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/core/network/api_consumer.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_model.dart';
@@ -74,8 +75,10 @@ class GeminiRepositoryImpl implements GeminiRepository {
             try {
               jsonResponse = jsonDecode(cleanResponse);
             } catch (parseError) {
-              print("Failed to parse JSON after cleanup: $parseError");
-              print("Original response: $response");
+              AppLogger.instance.e(
+                'GeminiRepository.getTripPlan failed to parse cleaned JSON',
+                error: parseError,
+              );
               return Left(ServerFailure(
                   message:
                       "Failed to parse server response: ${parseError.toString()}"));

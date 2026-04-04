@@ -97,19 +97,19 @@ class _HomePageState extends State<HomePage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              ThemeColor.primaryColor.withOpacity(0.1),
-              ThemeColor.primaryColor.withOpacity(0.15),
-              ThemeColor.primaryColor.withOpacity(0.18),
+              ThemeColor.primaryColor.withValues(alpha: 0.1),
+              ThemeColor.primaryColor.withValues(alpha: 0.15),
+              ThemeColor.primaryColor.withValues(alpha: 0.18),
             ],
           ),
           boxShadow: [
             BoxShadow(
-              color: ThemeColor.primaryColor.withOpacity(0.2),
+              color: ThemeColor.primaryColor.withValues(alpha: 0.2),
               blurRadius: 22,
               offset: const Offset(0, -4),
             ),
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 14,
               offset: const Offset(0, -3),
             ),
@@ -125,35 +125,35 @@ class _HomePageState extends State<HomePage> {
               size: 34,
               color: _currentIndex == 0
                   ? Colors.white
-                  : ThemeColor.charcoalColor.withOpacity(0.9),
+                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
             ),
             Icon(
               Icons.favorite_border,
               size: 34,
               color: _currentIndex == 1
                   ? Colors.white
-                  : ThemeColor.charcoalColor.withOpacity(0.9),
+                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
             ),
             Icon(
               Icons.search,
               size: 34,
               color: _currentIndex == 2
                   ? Colors.white
-                  : ThemeColor.charcoalColor.withOpacity(0.9),
+                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
             ),
             Icon(
               Icons.auto_awesome,
               size: 34,
               color: _currentIndex == 3
                   ? Colors.white
-                  : ThemeColor.charcoalColor.withOpacity(0.9),
+                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
             ),
             Icon(
               Icons.person_outline,
               size: 34,
               color: _currentIndex == 4
                   ? Colors.white
-                  : ThemeColor.charcoalColor.withOpacity(0.9),
+                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
             ),
           ],
           color: ThemeColor.primaryColor,
@@ -201,7 +201,7 @@ class _HomePageState extends State<HomePage> {
                       gradient: LinearGradient(
                         colors: [
                           ThemeColor.primaryColor,
-                          ThemeColor.primaryColor.withOpacity(0.8),
+                          ThemeColor.primaryColor.withValues(alpha: 0.8),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -209,7 +209,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(20.r),
                       boxShadow: [
                         BoxShadow(
-                          color: ThemeColor.primaryColor.withOpacity(0.4),
+                          color: ThemeColor.primaryColor.withValues(alpha: 0.4),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -291,7 +291,7 @@ class _HomeMainSection extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: ThemeColor.primaryColor.withOpacity(0.25),
+                        color: ThemeColor.primaryColor.withValues(alpha: 0.25),
                         blurRadius: 10,
                         spreadRadius: 3,
                       ),
@@ -299,7 +299,7 @@ class _HomeMainSection extends StatelessWidget {
                   ),
                   child: CircleAvatar(
                     radius: 30.r,
-                    backgroundColor: ThemeColor.primaryColor.withOpacity(0.15),
+                    backgroundColor: ThemeColor.primaryColor.withValues(alpha: 0.15),
                     backgroundImage:
                         (profileImageUrl != null && profileImageUrl!.isNotEmpty)
                             ? NetworkImage(profileImageUrl!)
@@ -330,8 +330,8 @@ class _HomeMainSection extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          ThemeColor.primaryColor.withOpacity(0.2),
-                          ThemeColor.primaryColor.withOpacity(0.08),
+                          ThemeColor.primaryColor.withValues(alpha: 0.2),
+                          ThemeColor.primaryColor.withValues(alpha: 0.08),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -341,7 +341,7 @@ class _HomeMainSection extends StatelessWidget {
                     child: Icon(
                       Icons.explore_outlined,
                       size: 65.sp,
-                      color: ThemeColor.primaryColor.withOpacity(0.8),
+                      color: ThemeColor.primaryColor.withValues(alpha: 0.8),
                     ),
                   ),
                   SizedBox(height: 28.h),

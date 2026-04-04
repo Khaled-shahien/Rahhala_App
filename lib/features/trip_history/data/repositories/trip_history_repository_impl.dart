@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:rahhala_app/core/errors/failures.dart';
+import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/features/trip_history/data/models/trip_history_model.dart';
 import 'package:rahhala_app/features/trip_history/domain/trip_history_repository.dart';
 
@@ -27,7 +28,7 @@ class TripHistoryRepositoryImpl implements TripHistoryRepository {
       return Left(
           ServerFailure(message: data['message'] ?? 'Something went wrong'));
     } catch (e) {
-      print('TripHistory error: $e');
+      AppLogger.instance.e('TripHistoryRepository.getMyTrips failed', error: e);
       return Left(ServerFailure(message: 'Failed to load trips'));
     }
   }
@@ -50,7 +51,8 @@ class TripHistoryRepositoryImpl implements TripHistoryRepository {
       return Left(
           ServerFailure(message: data['message'] ?? 'Something went wrong'));
     } catch (e) {
-      print('TripHistory detail error: $e');
+      AppLogger.instance
+          .e('TripHistoryRepository.getTripById failed', error: e);
       return Left(ServerFailure(message: 'Failed to load trip details'));
     }
   }
@@ -125,13 +127,19 @@ class TripHistoryRepositoryImpl implements TripHistoryRepository {
             return Left(ServerFailure(
                 message: data['message'] ?? 'Failed to regenerate trip'));
           } catch (e) {
-            print('Regenerate error: $e');
+            AppLogger.instance.e(
+              'TripHistoryRepository.regenerateTripPlan inner failed',
+              error: e,
+            );
             return Left(ServerFailure(message: 'Failed to regenerate trip'));
           }
         },
       );
     } catch (e) {
-      print('Regenerate trip plan error: $e');
+      AppLogger.instance.e(
+        'TripHistoryRepository.regenerateTripPlan failed',
+        error: e,
+      );
       return Left(ServerFailure(message: 'Failed to regenerate trip'));
     }
   }
