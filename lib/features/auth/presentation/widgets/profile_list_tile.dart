@@ -27,7 +27,7 @@ class ProfileListTile extends StatelessWidget {
         width: 42.w,
         height: 42.w,
         decoration: BoxDecoration(
-          color: c.withOpacity(0.9),
+          color: c.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(icon, color: ThemeColor.bgColor),

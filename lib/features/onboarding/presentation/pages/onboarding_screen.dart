@@ -90,7 +90,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           borderRadius: BorderRadius.circular(12.r),
                           boxShadow: [
                             BoxShadow(
-                              color: ThemeColor.primaryColor.withOpacity(0.14),
+                              color: ThemeColor.primaryColor
+                                  .withValues(alpha: 0.14),
                               blurRadius: 14,
                               offset: const Offset(0, 6),
                             ),
@@ -152,13 +153,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         borderRadius: BorderRadius.circular(28.r),
                         boxShadow: [
                           BoxShadow(
-                            color: ThemeColor.primaryColor.withOpacity(0.12),
+                            color:
+                                ThemeColor.primaryColor.withValues(alpha: 0.12),
                             blurRadius: 24,
                             offset: const Offset(0, 10),
                           ),
                         ],
                         border: Border.all(
-                          color: ThemeColor.primaryColor.withOpacity(0.08),
+                          color:
+                              ThemeColor.primaryColor.withValues(alpha: 0.08),
                         ),
                       ),
                       child: ClipRRect(
@@ -244,7 +247,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           gradient: LinearGradient(
             colors: [
               ThemeColor.primaryColor,
-              ThemeColor.primaryColor.withOpacity(0.8),
+              ThemeColor.primaryColor.withValues(alpha: 0.8),
             ],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
@@ -252,7 +255,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           borderRadius: BorderRadius.circular(18.r),
           boxShadow: [
             BoxShadow(
-              color: ThemeColor.primaryColor.withOpacity(0.28),
+              color: ThemeColor.primaryColor.withValues(alpha: 0.28),
               blurRadius: 18,
               offset: const Offset(0, 8),
             ),
@@ -274,7 +277,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               width: 28.w,
               height: 28.w,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.22),
+                color: Colors.white.withValues(alpha: 0.22),
                 shape: BoxShape.circle,
               ),
               child: Icon(

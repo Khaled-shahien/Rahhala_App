@@ -347,7 +347,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 18.h),
           decoration: BoxDecoration(
             color: isSelected
-                ? ThemeColor.charcoalColor.withOpacity(0.1)
+                ? ThemeColor.charcoalColor.withValues(alpha: 0.1)
                 : Colors.grey[50],
             borderRadius: BorderRadius.circular(14.r),
             border: Border.all(
@@ -430,7 +430,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: Colors.black.withValues(alpha: 0.04),
                           blurRadius: 12,
                           offset: const Offset(0, 2),
                         ),
@@ -505,7 +505,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         boxShadow: [
                                           BoxShadow(
                                             color: ThemeColor.charcoalColor
-                                                .withOpacity(0.15),
+                                                .withValues(alpha: 0.15),
                                             blurRadius: 16,
                                             spreadRadius: 4,
                                           ),
@@ -515,7 +515,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         radius: 60.r,
                                         backgroundColor: ThemeColor
                                             .charcoalColor
-                                            .withOpacity(0.12),
+                                            .withValues(alpha: 0.12),
                                         backgroundImage: (_profileImageUrl !=
                                                     null &&
                                                 _profileImageUrl!.isNotEmpty)
@@ -528,7 +528,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                                 Icons.person,
                                                 size: 55.sp,
                                                 color: ThemeColor.charcoalColor
-                                                    .withOpacity(0.7),
+                                                    .withValues(alpha: 0.7),
                                               )
                                             : null,
                                       ),
@@ -552,8 +552,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color:
-                                                  Colors.black.withOpacity(0.2),
+                                              color: Colors.black
+                                                  .withValues(alpha: 0.2),
                                               blurRadius: 8,
                                               offset: const Offset(0, 2),
                                             ),

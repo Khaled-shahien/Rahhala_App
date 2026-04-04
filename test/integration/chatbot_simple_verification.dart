@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 /// Simple ChatBot API Endpoint Verification Script
 /// This script tests if the /api/chat endpoint is accessible and working
 ///
-/// Usage: `dart test/chatbot_simple_verification.dart`
+/// Usage: `dart test/integration/chatbot_simple_verification.dart`
 void main() async {
   print('\n${'=' * 60}');
   print('CHATBOT API SIMPLE VERIFICATION');

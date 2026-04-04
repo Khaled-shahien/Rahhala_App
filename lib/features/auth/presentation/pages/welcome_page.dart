@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_assets.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
+import 'package:rahhala_app/features/auth/presentation/constants/auth_strings.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -10,7 +11,6 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // درجة الأزرق الغامق جداً المتناسقة مع اللوجو
     const Color brandDarkBlue = Color(0xFF0D1B2A);
 
     void navigateToLogin() {
@@ -41,38 +41,28 @@ class WelcomePage extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // الصورة اللي فيها اللوجو جاهز
             Image.asset(
               AppAssets.imagesWelcomerahhla,
               fit: BoxFit.cover,
             ),
-
             SafeArea(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 40.h),
                 child: Column(
                   children: [
-                    // مساحة اللوجو
                     SizedBox(height: 210.h),
-
-                    // النص الصغير تحت اللوجو
                     Text(
-                      'Every place has a story..Start yours today!',
-                      //'Every place, every moment..made for you',
+                      AuthStrings.welcomeSlogan,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: brandDarkBlue.withOpacity(0.8),
+                        color: brandDarkBlue.withValues(alpha: 0.8),
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-
                     const Spacer(),
-
-                    // صف الزراير (Side by Side)
                     Row(
                       children: [
-                        // زر الدخول (Get Started)
                         Expanded(
                           child: ElevatedButton(
                             onPressed: navigateToLogin,
@@ -93,16 +83,13 @@ class WelcomePage extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              'Get Started',
+                              AuthStrings.getStarted,
                               style: TextStyle(
                                   fontSize: 23.sp, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
-
-                        SizedBox(width: 30.w), // مسافة بين الزرارين
-
-                        // زر الزائر (Guest)
+                        SizedBox(width: 30.w),
                         Expanded(
                           child: OutlinedButton(
                             onPressed: continueAsGuest,
@@ -110,14 +97,14 @@ class WelcomePage extends StatelessWidget {
                               padding: EdgeInsets.symmetric(vertical: 10.h),
                               side: const BorderSide(
                                   color: brandDarkBlue, width: 1.5),
-                              backgroundColor: Colors.white
-                                  .withOpacity(0.5), // خلفية شفافة بسيطة
+                              backgroundColor:
+                                  Colors.white.withValues(alpha: 0.5),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30.r),
                               ),
                             ),
                             child: Text(
-                              'Guest',
+                              AuthStrings.guest,
                               style: TextStyle(
                                 color: brandDarkBlue,
                                 fontSize: 26.sp,
@@ -128,8 +115,6 @@ class WelcomePage extends StatelessWidget {
                         ),
                       ],
                     ),
-
-                    // SizedBox(height: 5.h),
                   ],
                 ),
               ),

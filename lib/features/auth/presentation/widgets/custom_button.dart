@@ -20,14 +20,14 @@ class CustomButton extends StatelessWidget {
       onPressed: isLoading ? null : onTap,
       style: ElevatedButton.styleFrom(
         backgroundColor: ThemeColor.primaryColor,
-        disabledBackgroundColor: ThemeColor.primaryColor.withOpacity(0.7),
+        disabledBackgroundColor: ThemeColor.primaryColor.withValues(alpha: 0.7),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
         padding: EdgeInsets.symmetric(vertical: 18.h),
         minimumSize: Size(double.infinity, 56.h),
         elevation: 4,
-        shadowColor: ThemeColor.primaryColor.withOpacity(0.3),
+        shadowColor: ThemeColor.primaryColor.withValues(alpha: 0.3),
         animationDuration: const Duration(milliseconds: 200),
       ),
       child: isLoading
