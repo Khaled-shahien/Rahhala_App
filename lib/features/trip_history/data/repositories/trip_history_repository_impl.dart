@@ -54,4 +54,85 @@ class TripHistoryRepositoryImpl implements TripHistoryRepository {
       return Left(ServerFailure(message: 'Failed to load trip details'));
     }
   }
+
+  @override
+  Future<Either<Failure, TripHistoryDetailResponse>> regenerateTripPlan(
+    String tripId,
+    String destination,
+    int numberOfDays,
+    String budget,
+    List<String> interests,
+    String season,
+  ) async {
+    try {
+      // First, get the current trip data
+      final getTripResult = await getTripById(tripId);
+
+      return await getTripResult.fold(
+        (failure) async => Left(failure),
+        (currentTrip) async {
+          try {
+            // Prepare the request body with current trip data
+            final requestBody = {
+              'success': true,
+              'tripData': {
+                'destination': currentTrip.trip.destination,
+                'days': currentTrip.trip.days
+                    .map((day) => {
+                          'day': day.day,
+                          'title': day.title,
+                          'estimatedDayCost': day.estimatedDayCost,
+                          'activities': day.activities
+                              .map((activity) => {
+                                    'time': activity.time,
+                                    'place': activity.place,
+                                    'description': activity.description,
+                                    'estimatedCost': activity.estimatedCost,
+                                    'image': activity.image,
+                                    'transportation': [], // Empty for now
+                                  })
+                              .toList(),
+                        })
+                    .toList(),
+                'totalEstimatedCost': currentTrip.trip.totalEstimatedCost,
+                'budgetTips': currentTrip.trip.budgetTips,
+                'travelTips': currentTrip.trip.travelTips,
+                'emergencycontact': currentTrip.trip.emergencyContact,
+                'tripId': tripId,
+              },
+              'geminiRequest': {
+                'country': destination,
+                'numberOfDays': numberOfDays,
+                'budget': budget,
+                'interestTypes': interests,
+                'season': season,
+              }
+            };
+
+            final response = await dio.post(
+              '/api/gemini/Regenerate_Trip',
+              data: requestBody,
+            );
+
+            final data = response.data is String
+                ? jsonDecode(response.data)
+                : response.data;
+
+            if (data['success'] == true) {
+              return Right(TripHistoryDetailResponse.fromJson(data));
+            }
+
+            return Left(ServerFailure(
+                message: data['message'] ?? 'Failed to regenerate trip'));
+          } catch (e) {
+            print('Regenerate error: $e');
+            return Left(ServerFailure(message: 'Failed to regenerate trip'));
+          }
+        },
+      );
+    } catch (e) {
+      print('Regenerate trip plan error: $e');
+      return Left(ServerFailure(message: 'Failed to regenerate trip'));
+    }
+  }
 }

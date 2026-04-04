@@ -35,8 +35,16 @@ class TripDetailsScreen extends StatefulWidget {
 
 class _TripDetailsScreenState extends State<TripDetailsScreen> {
   bool _isSaving = false;
+  bool _isRegenerating = false;
+  late TripPlanResponse _currentTripPlan;
 
-  TripPlan get plan => widget.tripPlan.response;
+  @override
+  void initState() {
+    super.initState();
+    _currentTripPlan = widget.tripPlan;
+  }
+
+  TripPlan get plan => _currentTripPlan.response;
 
   Future<void> _saveTrip() async {
     if (_isSaving) return;
@@ -45,7 +53,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     try {
       final repo = sl<GeminiRepository>();
       final result = await repo.saveTripPlan(
-        tripPlan: widget.tripPlan,
+        tripPlan: _currentTripPlan,
         geminiRequest: widget.geminiRequest,
       );
 
@@ -94,6 +102,170 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
+  }
+
+  Future<void> _regenerateTrip() async {
+    if (_isRegenerating) return;
+    setState(() => _isRegenerating = true);
+
+    try {
+      final repo = sl<GeminiRepository>();
+
+      // Build regenerate request body
+      final requestBody = {
+        'success': true,
+        'tripData': {
+          'destination': plan.destination,
+          'days': plan.days
+              .map((day) => {
+                    'day': day.day,
+                    'title': day.title,
+                    'estimatedDayCost': day.estimatedDayCost,
+                    'activities': day.activities
+                        .map((activity) => {
+                              'time': activity.time,
+                              'place': activity.place,
+                              'description': activity.description,
+                              'estimatedCost': activity.estimatedCost,
+                              'image': activity.image,
+                              'transportation': [],
+                            })
+                        .toList(),
+                  })
+              .toList(),
+          'totalEstimatedCost': plan.totalEstimatedCost,
+          'budgetTips': plan.budgetTips,
+          'travelTips': plan.travelTips,
+          'emergencycontact': plan.emergencyContact,
+          'tripId': '00000000-0000-0000-0000-000000000000',
+        },
+        'geminiRequest': widget.geminiRequest,
+      };
+
+      final result = await repo.regenerateTripPlan(requestBody);
+
+      if (!mounted) return;
+
+      result.fold(
+        (failure) {
+          HapticFeedback.mediumImpact();
+          showAppNotification(
+            context: context,
+            title: 'Error',
+            message: failure.message,
+            isError: true,
+          );
+        },
+        (data) {
+          if (data['success'] == true && data['tripData'] != null) {
+            // Update the trip plan with new data
+            final newTripData = data['tripData'];
+            final newPlan = TripPlan.fromJson(newTripData);
+
+            // Create new response
+            final newResponse = TripPlanResponse(
+              success: true,
+              response: newPlan,
+              savedId: 0,
+              tripId: _currentTripPlan.tripId,
+              message: 'Trip regenerated successfully',
+              geminiRequest: widget.geminiRequest,
+            );
+
+            // Show success notification
+            showAppNotification(
+              context: context,
+              title: 'Success',
+              message: 'Trip plan regenerated successfully!',
+            );
+
+            // Rebuild the screen with new data
+            setState(() {
+              _currentTripPlan = newResponse;
+            });
+          } else {
+            HapticFeedback.mediumImpact();
+            showAppNotification(
+              context: context,
+              title: 'Error',
+              message: data['message'] ?? 'Failed to regenerate trip',
+              isError: true,
+            );
+          }
+        },
+      );
+    } catch (e) {
+      if (mounted) {
+        HapticFeedback.mediumImpact();
+        showAppNotification(
+          context: context,
+          title: 'Error',
+          message: 'Failed to regenerate trip.',
+          isError: true,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isRegenerating = false);
+    }
+  }
+
+  void _showRegenerateDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          title: Text(
+            'Regenerate Trip Plan',
+            style: TextStyle(
+              color: primaryTextColor,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            'Would you like to regenerate the entire trip plan with new suggestions for all days and activities?',
+            style: TextStyle(
+              color: primaryTextColor,
+              fontSize: 14.sp,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 14.sp,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                _regenerateTrip();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+              child: Text(
+                'Regenerate',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -231,7 +403,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                     screenBackgroundColor.withOpacity(0.3),
 
                     /// screenBackgroundColor,
-                    Color(0xFFF3E5D8).withOpacity(0.8)
+                    const Color(0xFFF3E5D8).withOpacity(0.8)
                   ],
                   stops: const [0.0, 0.5, 0.8, 1.0],
                 ),
@@ -247,6 +419,59 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
               width: 400.w,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => const SizedBox(),
+            ),
+          ),
+
+          // Back and Regenerate buttons
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 12.h,
+            left: 16.w,
+            right: 16.w,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: EdgeInsets.all(8.r),
+                    decoration: const BoxDecoration(
+                      color: Colors.black38,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white, size: 20.sp),
+                  ),
+                ),
+                _isRegenerating
+                    ? Container(
+                        padding: EdgeInsets.all(8.r),
+                        decoration: const BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: SizedBox(
+                          width: 20.sp,
+                          height: 20.sp,
+                          child: const CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: _showRegenerateDialog,
+                        child: Container(
+                          padding: EdgeInsets.all(8.r),
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(Icons.refresh_rounded,
+                              color: Colors.white, size: 20.sp),
+                        ),
+                      ),
+              ],
             ),
           ),
 
@@ -288,7 +513,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       child: Text(
         'Every place, every moment\nchosen just for you.',
         style: TextStyle(
-          color: Color(0xFFF3E5D8),
+          color: const Color(0xFFF3E5D8),
           fontSize: 25.sp,
           fontWeight: FontWeight.w800,
           height: 1.4,

@@ -49,3 +49,23 @@ class TripHistoryDetailFailure extends TripHistoryState {
   @override
   List<Object?> get props => [message];
 }
+
+class TripRegenerateLoading extends TripHistoryState {}
+
+class TripRegenerateSuccess extends TripHistoryState {
+  final TripHistoryDetailResponse response;
+
+  const TripRegenerateSuccess(this.response);
+
+  @override
+  List<Object?> get props => [response];
+}
+
+class TripRegenerateFailure extends TripHistoryState {
+  final String message;
+
+  const TripRegenerateFailure(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

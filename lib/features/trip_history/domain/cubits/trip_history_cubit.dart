@@ -24,4 +24,27 @@ class TripHistoryCubit extends Cubit<TripHistoryState> {
       (response) => emit(TripHistoryDetailLoaded(response)),
     );
   }
+
+  Future<void> regenerateTripPlan(
+    String tripId,
+    String destination,
+    int numberOfDays,
+    String budget,
+    List<String> interests,
+    String season,
+  ) async {
+    emit(TripRegenerateLoading());
+    final result = await repository.regenerateTripPlan(
+      tripId,
+      destination,
+      numberOfDays,
+      budget,
+      interests,
+      season,
+    );
+    result.fold(
+      (failure) => emit(TripRegenerateFailure(failure.message)),
+      (response) => emit(TripRegenerateSuccess(response)),
+    );
+  }
 }

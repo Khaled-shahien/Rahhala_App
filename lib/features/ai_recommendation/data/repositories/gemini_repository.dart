@@ -15,4 +15,8 @@ abstract class GeminiRepository {
     required TripPlanResponse tripPlan,
     required Map<String, dynamic> geminiRequest,
   });
+
+  Future<Either<Failure, Map<String, dynamic>>> regenerateTripPlan(
+    Map<String, dynamic> requestBody,
+  );
 }

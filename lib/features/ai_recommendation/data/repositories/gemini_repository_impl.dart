@@ -183,4 +183,47 @@ class GeminiRepositoryImpl implements GeminiRepository {
           ServerFailure(message: "An unknown error occurred: ${e.toString()}"));
     }
   }
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> regenerateTripPlan(
+    Map<String, dynamic> requestBody,
+  ) async {
+    try {
+      const String regenerateEndpoint = '/api/gemini/Regenerate_Trip';
+
+      final response = await apiConsumer.post(
+        regenerateEndpoint,
+        data: requestBody,
+      );
+
+      Map<String, dynamic> jsonResponse;
+      if (response is String) {
+        jsonResponse = jsonDecode(response);
+      } else if (response is Map<String, dynamic>) {
+        jsonResponse = response;
+      } else {
+        return Left(ServerFailure(message: "Unexpected response format"));
+      }
+
+      // Validate the response structure
+      if (jsonResponse['success'] == true && jsonResponse['tripData'] != null) {
+        return Right(jsonResponse);
+      } else {
+        return Left(ServerFailure(
+          message: jsonResponse['message']?.toString() ??
+              'Failed to regenerate trip',
+        ));
+      }
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.errorModel.message));
+    } on FormatException catch (e) {
+      return Left(ServerFailure(
+          message: "Error parsing server response: ${e.message}"));
+    } on TypeError catch (e) {
+      return Left(ServerFailure(message: "Error interpreting server data: $e"));
+    } catch (e) {
+      return Left(
+          ServerFailure(message: "An unknown error occurred: ${e.toString()}"));
+    }
+  }
 }

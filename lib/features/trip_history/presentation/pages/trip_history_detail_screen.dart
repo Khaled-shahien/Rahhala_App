@@ -39,13 +39,45 @@ class _TripHistoryDetailView extends StatelessWidget {
       builder: (context, state) {
         if (state is TripHistoryDetailLoading) {
           return _buildLoading();
+        } else if (state is TripRegenerateLoading) {
+          return _buildRegenerateLoading();
         } else if (state is TripHistoryDetailLoaded) {
           return _buildContent(context, state.response.trip);
+        } else if (state is TripRegenerateSuccess) {
+          return _buildContent(context, state.response.trip);
         } else if (state is TripHistoryDetailFailure) {
+          return _buildError(context, state.message);
+        } else if (state is TripRegenerateFailure) {
           return _buildError(context, state.message);
         }
         return const SizedBox.shrink();
       },
+    );
+  }
+
+  Widget _buildRegenerateLoading() {
+    return Scaffold(
+      backgroundColor: _screenBgColor,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(
+              color: AppColors.primary,
+              strokeWidth: 3,
+            ),
+            SizedBox(height: 24.h),
+            Text(
+              'Regenerating your trip plan...',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+                color: _primaryTextColor,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -221,17 +253,36 @@ class _TripHistoryDetailView extends StatelessWidget {
           Positioned(
             top: MediaQuery.of(context).padding.top + 12.h,
             left: 16.w,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                padding: EdgeInsets.all(8.r),
-                decoration: BoxDecoration(
-                  color: Colors.black38,
-                  shape: BoxShape.circle,
+            right: 16.w,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: EdgeInsets.all(8.r),
+                    decoration: const BoxDecoration(
+                      color: Colors.black38,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white, size: 20.sp),
+                  ),
                 ),
-                child: Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white, size: 20.sp),
-              ),
+                GestureDetector(
+                  onTap: () => _showRegenerateDialog(context, trip),
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.r),
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.refresh_rounded,
+                        color: Colors.white, size: 20.sp),
+                  ),
+                ),
+              ],
             ),
           ),
           Padding(
@@ -531,6 +582,87 @@ class _TripHistoryDetailView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showRegenerateDialog(BuildContext context, TripHistoryDetail trip) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          title: Text(
+            'Regenerate Trip Plan',
+            style: TextStyle(
+              color: _primaryTextColor,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            'Would you like to regenerate the entire trip plan with new suggestions for all days and activities?',
+            style: TextStyle(
+              color: _primaryTextColor,
+              fontSize: 14.sp,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 14.sp,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                _regenerateTrip(context, trip);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+              child: Text(
+                'Regenerate',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _regenerateTrip(BuildContext context, TripHistoryDetail trip) {
+    final cubit = context.read<TripHistoryCubit>();
+
+    // Prepare parameters from the current trip data
+    final destination = trip.country;
+    final numberOfDays = trip.numberOfDays;
+    final budget = trip.budgetRange;
+    final interests = trip.interests;
+    final season = trip.season;
+    final tripId = trip.tripId;
+
+    // Call the regenerate method
+    cubit.regenerateTripPlan(
+      tripId,
+      destination,
+      numberOfDays,
+      budget,
+      interests,
+      season,
     );
   }
 }
