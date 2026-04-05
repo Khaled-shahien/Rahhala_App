@@ -127,7 +127,7 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, -5),
                       ),
@@ -169,7 +169,7 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
         children: [
           CircleAvatar(
             radius: 18.r,
-            backgroundColor: ThemeColor.primaryColor.withOpacity(0.1),
+            backgroundColor: ThemeColor.primaryColor.withValues(alpha: 0.1),
             child: Icon(
               Icons.smart_toy_outlined,
               color: ThemeColor.primaryColor,
@@ -229,7 +229,7 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
             Container(
               padding: EdgeInsets.all(25.r),
               decoration: BoxDecoration(
-                color: ThemeColor.primaryColor.withOpacity(0.05),
+                color: ThemeColor.primaryColor.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
               child: Icon(

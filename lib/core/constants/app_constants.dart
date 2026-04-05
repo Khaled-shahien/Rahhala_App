@@ -20,8 +20,7 @@ class AppConstants {
   // ==================== API ====================
 
   /// API Base URL
-  static const String baseUrl =
-      'https://rahhallaweb2026.runasp.net';
+  static const String baseUrl = 'https://rahhallaweb2026.runasp.net';
 
   /// Request timeout
   static const Duration apiTimeout = Duration(seconds: 30);
@@ -31,7 +30,7 @@ class AppConstants {
 
   // ==================== Storage Keys ====================
 
-  /// Auth token key in SharedPreferences
+  /// Auth token storage key
   static const String tokenKey = 'auth_token';
 
   /// Refresh token key

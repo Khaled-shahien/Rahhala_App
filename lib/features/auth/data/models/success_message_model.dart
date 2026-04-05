@@ -5,7 +5,7 @@ class SuccessMessageModel {
   SuccessMessageModel({required this.message});
 
   factory SuccessMessageModel.fromJson(Map<String, dynamic> json) {
-    String? m = json[ApiKey.message] ??
+    final String? m = json[ApiKey.message] ??
         json[ApiKey.Message] ??
         json[ApiKey.msg] ??
         json[ApiKey.detail] ??

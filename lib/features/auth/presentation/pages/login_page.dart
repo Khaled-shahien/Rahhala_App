@@ -12,6 +12,7 @@ import 'package:rahhala_app/core/utils/user_session.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/auth/domain/login/login_cubit.dart';
 import 'package:rahhala_app/features/auth/domain/login/login_state.dart';
+import 'package:rahhala_app/features/auth/presentation/constants/auth_strings.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/signup_page.dart';
@@ -85,6 +86,81 @@ class _LoginPageState extends State<LoginPage> {
     context.read<LoginCubit>().loginUser(email: email, password: password);
   }
 
+  Future<void> _handleLoginSuccess(
+    BuildContext listenerContext,
+    LoginSuccess state,
+  ) async {
+    final token = state.loginModel.token;
+    final displayFromLogin = state.loginModel.username;
+    final email = _emailController.text.trim().toLowerCase();
+
+    if (token != null && token.isNotEmpty) {
+      await sl<TokenStorage>().setToken(token);
+    }
+    await sl<TokenStorage>().setEmail(email);
+
+    if (displayFromLogin != null && displayFromLogin.trim().isNotEmpty) {
+      await sl<TokenStorage>().setFullName(displayFromLogin.trim());
+    }
+
+    try {
+      final userRepo = sl<UserRepo>();
+      final detailsEither = await userRepo.getDetails();
+      await detailsEither.fold((f) async {
+        final stored = sl<TokenStorage>().fullName;
+        sl<UserSession>().setFromLogin(
+          email: email,
+          displayName: stored ?? '',
+        );
+      }, (details) async {
+        if (details.fullName.trim().isNotEmpty) {
+          await sl<TokenStorage>().setFullName(details.fullName.trim());
+        }
+        if (details.email.trim().isNotEmpty) {
+          await sl<TokenStorage>().setEmail(details.email.trim().toLowerCase());
+        }
+        sl<UserSession>().setFromLogin(
+          email: details.email.isNotEmpty
+              ? details.email.trim().toLowerCase()
+              : email,
+          displayName: details.fullName.trim().isNotEmpty
+              ? details.fullName.trim()
+              : (sl<TokenStorage>().fullName ?? ''),
+        );
+      });
+    } catch (_) {
+      sl<UserSession>().setFromLogin(
+        email: email,
+        displayName: sl<TokenStorage>().fullName ?? '',
+      );
+    }
+
+    final storedName = sl<TokenStorage>().fullName;
+    if (storedName == null || storedName.trim().isEmpty) {
+      final local = email.split('@').first;
+      final cap = local.isNotEmpty
+          ? local[0].toUpperCase() + local.substring(1)
+          : 'User';
+      await sl<TokenStorage>().setFullName(cap);
+      sl<UserSession>().setFromLogin(email: email, displayName: cap);
+    }
+
+    if (!mounted || !listenerContext.mounted) return;
+
+    showAppNotification(
+      context: listenerContext,
+      title: AuthStrings.welcomeBackNotificationTitle,
+      message: AuthStrings.welcomeBackNotificationMessage,
+    );
+
+    if (!mounted || !listenerContext.mounted) return;
+    Navigator.pushAndRemoveUntil(
+      listenerContext,
+      MaterialPageRoute(builder: (_) => const HomePage(isGuest: false)),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -95,85 +171,15 @@ class _LoginPageState extends State<LoginPage> {
           child: BlocConsumer<LoginCubit, LoginState>(
             listener: (context, state) async {
               if (state is LoginSuccess) {
-                final token = state.loginModel.token;
-                final displayFromLogin = state.loginModel.username;
-                final email = _emailController.text.trim().toLowerCase();
 
-                if (token != null && token.isNotEmpty) {
-                  await sl<TokenStorage>().setToken(token);
-                }
-                await sl<TokenStorage>().setEmail(email);
+                final listenerContext = context;
+                await _handleLoginSuccess(listenerContext, state);
 
-                if (displayFromLogin != null &&
-                    displayFromLogin.trim().isNotEmpty) {
-                  await sl<TokenStorage>().setFullName(displayFromLogin.trim());
-                }
-
-                try {
-                  final userRepo = sl<UserRepo>();
-                  final detailsEither = await userRepo.getDetails();
-                  await detailsEither.fold((f) async {
-                    final stored = sl<TokenStorage>().fullName;
-                    sl<UserSession>().setFromLogin(
-                      email: email,
-                      displayName: stored ?? '',
-                    );
-                  }, (details) async {
-                    if (details.fullName.trim().isNotEmpty) {
-                      await sl<TokenStorage>()
-                          .setFullName(details.fullName.trim());
-                    }
-                    if (details.email.trim().isNotEmpty) {
-                      await sl<TokenStorage>()
-                          .setEmail(details.email.trim().toLowerCase());
-                    }
-                    sl<UserSession>().setFromLogin(
-                      email: (details.email.isNotEmpty
-                          ? details.email.trim().toLowerCase()
-                          : email),
-                      displayName: (details.fullName.trim().isNotEmpty
-                          ? details.fullName.trim()
-                          : (sl<TokenStorage>().fullName ?? '')),
-                    );
-                  });
-                } catch (_) {
-                  sl<UserSession>().setFromLogin(
-                    email: email,
-                    displayName: sl<TokenStorage>().fullName ?? '',
-                  );
-                }
-
-                var storedName = sl<TokenStorage>().fullName;
-                if (storedName == null || storedName.trim().isEmpty) {
-                  final local = email.split('@').first;
-                  final cap = local.isNotEmpty
-                      ? local[0].toUpperCase() + local.substring(1)
-                      : 'User';
-                  await sl<TokenStorage>().setFullName(cap);
-                  sl<UserSession>()
-                      .setFromLogin(email: email, displayName: cap);
-                }
-
-                showAppNotification(
-                  context: context,
-                  title:
-                      'Welcome Back.. ${sl<TokenStorage>().fullName ?? email.split('@').first}!',
-                  //You have been successfully logged in.
-                  message: 'Let’s explore something new today.',
-                );
-
-                if (!mounted) return;
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => const HomePage(isGuest: false)),
-                  (route) => false,
-                );
               } else if (state is LoginFailure) {
                 HapticFeedback.mediumImpact();
                 showAppNotification(
                   context: context,
-                  title: 'Error',
+                  title: AuthStrings.errorTitle,
                   message: state.errorMessage,
                   isError: true,
                 );
@@ -267,14 +273,15 @@ class _LoginPageState extends State<LoginPage> {
                                     borderRadius: BorderRadius.circular(28.r),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.06),
+                                        color: Colors.black
+                                            .withValues(alpha: 0.06),
                                         blurRadius: 22,
                                         offset: const Offset(0, 12),
                                       ),
                                     ],
                                     border: Border.all(
                                       color: ThemeColor.primaryColor
-                                          .withOpacity(0.08),
+                                          .withValues(alpha: 0.08),
                                     ),
                                   ),
                                   child: Column(
@@ -291,7 +298,7 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                       SizedBox(height: 10.h),
                                       Text(
-                                        'Welcome Back',
+                                        AuthStrings.welcomeBackTitle,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 24.sp,
@@ -301,7 +308,7 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                       SizedBox(height: 6.h),
                                       Text(
-                                        'Log in to continue exploring curated trips.',
+                                        AuthStrings.welcomeBackSubtitle,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 14.sp,
@@ -319,8 +326,8 @@ class _LoginPageState extends State<LoginPage> {
                                               CrossAxisAlignment.stretch,
                                           children: [
                                             CustomFormTextField(
-                                              labelText: 'Email',
-                                              hintText: 'Enter your email',
+                                              labelText: AuthStrings.emailLabel,
+                                              hintText: AuthStrings.emailHint,
                                               controller: _emailController,
                                               keyboardType:
                                                   TextInputType.emailAddress,
@@ -335,8 +342,10 @@ class _LoginPageState extends State<LoginPage> {
                                             ),
                                             SizedBox(height: 16.h),
                                             CustomFormTextField(
-                                              labelText: 'Password',
-                                              hintText: 'Enter your password',
+                                              labelText:
+                                                  AuthStrings.passwordLabel,
+                                              hintText:
+                                                  AuthStrings.passwordHint,
                                               controller: _passwordController,
                                               obscureText: !_isPasswordVisible,
                                               prefixIcon: Icons.lock_outline,
@@ -352,8 +361,10 @@ class _LoginPageState extends State<LoginPage> {
                                                 ),
                                                 color: ThemeColor.primaryColor,
                                                 tooltip: _isPasswordVisible
-                                                    ? 'Hide password'
-                                                    : 'Show password',
+                                                    ? AuthStrings
+                                                        .hidePasswordTooltip
+                                                    : AuthStrings
+                                                        .showPasswordTooltip,
                                               ),
                                               validator: AppValidators
                                                   .validateLoginPassword,
@@ -382,7 +393,7 @@ class _LoginPageState extends State<LoginPage> {
                                                   onPressed:
                                                       _navigateToForgotPassword,
                                                   child: const Text(
-                                                    'Forgot Password?',
+                                                    AuthStrings.forgotPassword,
                                                     style: TextStyle(
                                                       color: ThemeColor
                                                           .primaryColor,
@@ -400,8 +411,8 @@ class _LoginPageState extends State<LoginPage> {
                                                   : () =>
                                                       _submit(context, state),
                                               text: isLoading
-                                                  ? 'Logging In...'
-                                                  : 'Log In',
+                                                  ? AuthStrings.loggingIn
+                                                  : AuthStrings.logIn,
                                             ),
                                           ],
                                         ),
@@ -423,7 +434,8 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.04),
+                                        color: Colors.black
+                                            .withValues(alpha: 0.04),
                                         blurRadius: 18,
                                         offset: const Offset(0, 10),
                                       ),
@@ -431,11 +443,12 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   child: Column(
                                     children: [
-                                      const OrDivider(text: "Or"),
+                                      const OrDivider(
+                                          text: AuthStrings.orDivider),
                                       SizedBox(height: 18.h),
                                       SocialLoginSection(
-                                        promptText: "Don't have an account?",
-                                        actionText: "Sign Up",
+                                        promptText: AuthStrings.dontHaveAccount,
+                                        actionText: AuthStrings.signUp,
                                         onActionTap: _navigateToSignUp,
                                       ),
                                     ],

@@ -70,15 +70,15 @@ class AppColors {
 
   static const Color navBarIconActive = Color(0xFFFFFFFF);
 
-  static Color navBarIconInactive = charcoal.withOpacity(0.85);
+  static Color navBarIconInactive = charcoal.withValues(alpha: 0.85);
 
-  static Color shadowLight = Colors.black.withOpacity(0.05);
+  static Color shadowLight = Colors.black.withValues(alpha: 0.05);
 
-  static Color shadowMedium = Colors.black.withOpacity(0.1);
+  static Color shadowMedium = Colors.black.withValues(alpha: 0.1);
 
-  static Color shadowDark = Colors.black.withOpacity(0.2);
+  static Color shadowDark = Colors.black.withValues(alpha: 0.2);
 
-  static Color shadowPrimary = primary.withOpacity(0.3);
+  static Color shadowPrimary = primary.withValues(alpha: 0.3);
 
   static const Color inputBackground = Color(0xFFF5F5F5);
 
@@ -104,5 +104,5 @@ class AppColors {
 
   static const Color black = Color(0xFF000000);
 
-  static get lightBackground => null;
+  static Null get lightBackground => null;
 }

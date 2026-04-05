@@ -224,7 +224,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.04),
+                                        color: Colors.black.withValues(alpha: 0.04),
                                         blurRadius: 20, // Reduced blur
                                         offset: const Offset(
                                             0, 10), // Reduced offset

@@ -42,7 +42,7 @@ class ErrorModel {
     }
 
     // Fallback for normal error responses
-    String? m = json[ApiKey.message] ??
+    final String? m = json[ApiKey.message] ??
         json[ApiKey.Message] ??
         json[ApiKey.error] ??
         json['error_description'] ??

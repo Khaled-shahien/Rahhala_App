@@ -82,8 +82,8 @@ class _TripSplashScreenState extends State<TripSplashScreen> {
               end: Alignment.bottomCenter,
               colors: [
                 topColor,
-                topColor.withOpacity(0.9),
-                bottomColor.withOpacity(0.8),
+                topColor.withValues(alpha: 0.9),
+                bottomColor.withValues(alpha: 0.8),
                 bottomColor,
               ],
               stops: const [0.0, 0.4, 0.8, 1.0],
@@ -113,7 +113,7 @@ class _TripSplashScreenState extends State<TripSplashScreen> {
                   "Crafting your unique travel experience...",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w500,
                   ),
@@ -128,7 +128,7 @@ class _TripSplashScreenState extends State<TripSplashScreen> {
                     key: ValueKey<int>(_messageIndex),
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.85),
+                      color: Colors.white.withValues(alpha: 0.85),
                       fontSize: 14.sp,
                       fontStyle: FontStyle.italic,
                     ),
@@ -140,7 +140,7 @@ class _TripSplashScreenState extends State<TripSplashScreen> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10.r),
                     child: LinearProgressIndicator(
-                      backgroundColor: Colors.white.withOpacity(0.2),
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
                       valueColor:
                           const AlwaysStoppedAnimation<Color>(Colors.white),
                       minHeight: 6.h,

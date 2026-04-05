@@ -99,8 +99,8 @@ class TripInterestsScreen extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: isSelected
-                ? AppColors.primary.withOpacity(0.3)
-                : Colors.black.withOpacity(0.05),
+                ? AppColors.primary.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

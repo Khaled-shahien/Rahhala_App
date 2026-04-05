@@ -14,6 +14,7 @@ import 'package:rahhala_app/core/utils/token_storage.dart';
 
 import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/otp_verification_page.dart';
+import 'package:rahhala_app/features/auth/presentation/constants/auth_strings.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_button.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_form_text_field.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/or_divider.dart';
@@ -70,6 +71,41 @@ class _SignUpPageState extends State<SignUpPage> {
         context, MaterialPageRoute(builder: (_) => const LoginPage()));
   }
 
+  Future<void> _handleRegisterSuccess(
+    BuildContext listenerContext,
+    RegisterSuccess state,
+  ) async {
+    final fullName = _nameController.text.trim();
+    final email = _emailController.text.trim().toLowerCase();
+
+    await sl<TokenStorage>().setFullName(fullName);
+    await sl<TokenStorage>().setEmail(email);
+
+    sl<UserSession>().setFromRegister(
+      fullName: fullName,
+      email: email,
+    );
+
+    if (!mounted || !listenerContext.mounted) return;
+
+    showAppNotification(
+      context: listenerContext,
+      title: AuthStrings.successTitle,
+      message: state.model.message,
+    );
+
+    if (!mounted || !listenerContext.mounted) return;
+    Navigator.pushReplacement(
+      listenerContext,
+      MaterialPageRoute(
+        builder: (_) => OtpVerificationPage(
+          email: email,
+          flow: VerifyFlow.signUp,
+        ),
+      ),
+    );
+  }
+
   String _deriveUsername({required String fullName, required String email}) {
     String cleaned = fullName
         .trim()
@@ -99,37 +135,13 @@ class _SignUpPageState extends State<SignUpPage> {
           child: BlocConsumer<RegisterCubit, RegisterState>(
             listener: (context, state) async {
               if (state is RegisterSuccess) {
-                final fullName = _nameController.text.trim();
-                final email = _emailController.text.trim().toLowerCase();
-
-                await sl<TokenStorage>().setFullName(fullName);
-                await sl<TokenStorage>().setEmail(email);
-
-                sl<UserSession>().setFromRegister(
-                  fullName: fullName,
-                  email: email,
-                );
-
-                showAppNotification(
-                  context: context,
-                  title: 'Success',
-                  message: state.model.message,
-                );
-
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => OtpVerificationPage(
-                      email: email,
-                      flow: VerifyFlow.signUp,
-                    ),
-                  ),
-                );
+                final listenerContext = context;
+                await _handleRegisterSuccess(listenerContext, state);
               } else if (state is RegisterFailure) {
                 HapticFeedback.mediumImpact();
                 showAppNotification(
                   context: context,
-                  title: 'Error',
+                  title: AuthStrings.errorTitle,
                   message: state.errorMessage,
                   isError: true,
                 );
@@ -193,7 +205,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.04),
+                                          color: Colors.black
+                                              .withValues(alpha: 0.04),
                                           blurRadius: 22,
                                           offset: const Offset(0, 12),
                                         ),
@@ -211,7 +224,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 10.h),
                                         const Text(
-                                          'Create Account',
+                                          AuthStrings.createAccountTitle,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 28,
@@ -221,7 +234,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 6.h),
                                         const Text(
-                                          'Fill in your information below to sign up',
+                                          AuthStrings.createAccountSubtitle,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 16,
@@ -230,8 +243,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 24.h),
                                         CustomFormTextField(
-                                          labelText: 'Full Name',
-                                          hintText: 'Enter your full name',
+                                          labelText: AuthStrings.fullNameLabel,
+                                          hintText: AuthStrings.fullNameHint,
                                           controller: _nameController,
                                           prefixIcon: Icons.person_outline,
                                           validator: AppValidators.validateName,
@@ -239,8 +252,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
-                                          labelText: 'Email',
-                                          hintText: 'Enter your email',
+                                          labelText: AuthStrings.emailLabel,
+                                          hintText: AuthStrings.emailHint,
                                           controller: _emailController,
                                           keyboardType:
                                               TextInputType.emailAddress,
@@ -254,8 +267,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
-                                          labelText: 'Phone Number',
-                                          hintText: 'Enter your phone number',
+                                          labelText:
+                                              AuthStrings.phoneNumberLabel,
+                                          hintText: AuthStrings.phoneNumberHint,
                                           controller: _phoneController,
                                           keyboardType: TextInputType.phone,
                                           prefixIcon: Icons.phone_outlined,
@@ -272,8 +286,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
-                                          labelText: 'Password',
-                                          hintText: 'Enter your password',
+                                          labelText: AuthStrings.passwordLabel,
+                                          hintText: AuthStrings.passwordHint,
                                           controller: _passwordController,
                                           obscureText: _obscurePassword,
                                           prefixIcon: Icons.lock_outline,
@@ -297,8 +311,10 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
-                                          labelText: 'Confirm Password',
-                                          hintText: 'Re-enter your password',
+                                          labelText:
+                                              AuthStrings.confirmPasswordLabel,
+                                          hintText:
+                                              AuthStrings.confirmPasswordHint,
                                           controller:
                                               _confirmPasswordController,
                                           obscureText: _obscureConfirmPassword,
@@ -339,8 +355,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                           },
                                           child: AbsorbPointer(
                                             child: CustomFormTextField(
-                                              labelText: 'Country',
-                                              hintText: 'Select your country',
+                                              labelText:
+                                                  AuthStrings.countryLabel,
+                                              hintText: AuthStrings.countryHint,
                                               controller:
                                                   _countryController, // 5. . "ŝ^" "S
                                               prefixIcon: Icons.public,
@@ -393,8 +410,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                                   }
                                                 },
                                           text: isLoading
-                                              ? 'Creating...'
-                                              : 'Create Account',
+                                              ? AuthStrings.createAccountLoading
+                                              : AuthStrings.createAccount,
                                         ),
                                       ],
                                     ),
@@ -413,7 +430,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.03),
+                                          color: Colors.black
+                                              .withValues(alpha: 0.03),
                                           blurRadius: 18,
                                           offset: const Offset(0, 10),
                                         ),
@@ -421,7 +439,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                     ),
                                     child: Column(
                                       children: [
-                                        const OrDivider(text: "Or"),
+                                        const OrDivider(
+                                            text: AuthStrings.orDivider),
                                         SizedBox(height: 18.h),
                                         _buildSocialLoginSection(),
                                       ],
@@ -459,13 +478,13 @@ class _SignUpPageState extends State<SignUpPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              'Already have an account?',
+              AuthStrings.alreadyHaveAccount,
               style: TextStyle(fontSize: 14),
             ),
             TextButton(
               onPressed: _navigateToLogin,
               child: const Text(
-                'Log In',
+                AuthStrings.logIn,
                 style: TextStyle(
                   color: ThemeColor.primaryColor,
                   fontWeight: FontWeight.bold,

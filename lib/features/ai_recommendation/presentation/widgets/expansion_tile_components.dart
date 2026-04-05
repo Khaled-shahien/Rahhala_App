@@ -65,12 +65,12 @@ class CostBadge extends StatelessWidget {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: borderColor.withOpacity(0.3),
+          color: borderColor.withValues(alpha: 0.3),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -167,7 +167,7 @@ class NumberCircle extends StatelessWidget {
         color: backgroundColor,
         boxShadow: [
           BoxShadow(
-            color: backgroundColor.withOpacity(0.3),
+            color: backgroundColor.withValues(alpha: 0.3),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

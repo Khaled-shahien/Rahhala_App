@@ -3,6 +3,7 @@ import 'package:rahhala_app/core/network/api_consumer.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/core/errors/exceptions.dart';
 import 'package:rahhala_app/core/network/api_interceptors.dart';
+import 'package:rahhala_app/core/network/retry_interceptor.dart';
 
 class DioConsumer extends ApiConsumer {
   final Dio dio;
@@ -13,7 +14,7 @@ class DioConsumer extends ApiConsumer {
       connectTimeout: const Duration(seconds: 60),
       receiveTimeout: const Duration(seconds: 60),
       responseType: ResponseType.json,
-      validateStatus: (code) => true,
+      validateStatus: (code) => code != null && code < 400,
       headers: {
         'Accept': 'application/json',
         'Accept-Encoding': 'gzip',
@@ -22,14 +23,7 @@ class DioConsumer extends ApiConsumer {
 
     dio.interceptors.clear();
     dio.interceptors.add(ApiInterceptors());
-    dio.interceptors.add(LogInterceptor(
-      request: true,
-      requestBody: true,
-      requestHeader: true,
-      error: true,
-      responseBody: true,
-      responseHeader: false,
-    ));
+    dio.interceptors.add(RetryInterceptor(dio: dio));
   }
 
   @override

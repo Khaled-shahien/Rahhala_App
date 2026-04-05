@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_cubit.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_state.dart';
 import 'package:rahhala_app/features/image_search/presentation/pages/image_search_results_screen.dart';
@@ -101,7 +102,8 @@ class _PinterestCameraScreenState extends State<PinterestCameraScreen>
       if (!mounted) return;
       _searchWithFile(file.path);
     } catch (e) {
-      debugPrint('Error taking picture: $e');
+      AppLogger.instance
+          .e('PinterestCameraScreen failed taking picture', error: e);
     }
   }
 
@@ -174,7 +176,7 @@ class _PinterestCameraScreenState extends State<PinterestCameraScreen>
               builder: (_, scrollController) {
                 return Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.85),
+                    color: Colors.black.withValues(alpha: 0.85),
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(20.r)),
                   ),

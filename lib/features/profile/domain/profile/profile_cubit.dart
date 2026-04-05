@@ -11,18 +11,18 @@ class ProfileCubit extends Cubit<ProfileState> {
   Future<void> fetch() async {
     emit(ProfileLoading());
     final res = await repo.getDetails();
-    res.fold(
-      (failure) => emit(ProfileFailure(failure.message)),
-      (details) {
+    await res.fold(
+      (failure) async => emit(ProfileFailure(failure.message)),
+      (details) async {
         if (details.fullName.trim().isNotEmpty) {
-          sl<TokenStorage>().setFullName(details.fullName.trim());
+          await sl<TokenStorage>().setFullName(details.fullName.trim());
         }
         if (details.email.trim().isNotEmpty) {
-          sl<TokenStorage>().setEmail(details.email.trim().toLowerCase());
+          await sl<TokenStorage>().setEmail(details.email.trim().toLowerCase());
         }
         if (details.profileImageUrl != null &&
             details.profileImageUrl!.isNotEmpty) {
-          sl<TokenStorage>().setProfileImageUrl(details.profileImageUrl!);
+          await sl<TokenStorage>().setProfileImageUrl(details.profileImageUrl!);
         }
         emit(ProfileLoaded(details));
       },
@@ -41,24 +41,26 @@ class ProfileCubit extends Cubit<ProfileState> {
   Future<void> uploadPhoto(String filePath) async {
     emit(ProfileActionLoading());
     final res = await repo.uploadPhoto(filePath: filePath);
-    res.fold(
-      (failure) {
+    await res.fold(
+      (failure) async {
         emit(ProfileFailure(failure.message));
       },
       (success) async {
         final detailsRes = await repo.getDetails();
-        detailsRes.fold(
-          (failure) {
+        await detailsRes.fold(
+          (failure) async {
             emit(ProfileActionSuccess(success));
           },
-          (details) {
+          (details) async {
             if (details.profileImageUrl != null &&
                 details.profileImageUrl!.isNotEmpty) {
-              sl<TokenStorage>().setProfileImageUrl(details.profileImageUrl!);
+              await sl<TokenStorage>().setProfileImageUrl(
+                details.profileImageUrl!,
+              );
             }
 
             if (details.fullName.trim().isNotEmpty) {
-              sl<TokenStorage>().setFullName(details.fullName.trim());
+              await sl<TokenStorage>().setFullName(details.fullName.trim());
             }
 
             emit(ProfileActionSuccess(success));
@@ -84,8 +86,8 @@ class ProfileCubit extends Cubit<ProfileState> {
       birthDate: birthDate,
       gender: gender,
     );
-    res.fold(
-      (failure) => emit(ProfileFailure(failure.message)),
+    await res.fold(
+      (failure) async => emit(ProfileFailure(failure.message)),
       (success) async {
         await sl<TokenStorage>().setFullName(fullName);
         emit(ProfileActionSuccess(success));

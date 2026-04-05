@@ -65,10 +65,10 @@ class _AIRecommendationTabFlowState extends State<AIRecommendationTabFlow> {
 
   Widget _buildDashedProgress(int currentStep) {
     const int totalSteps = 3;
-    List<Widget> dashes = [];
+    final List<Widget> dashes = [];
 
     for (int i = 0; i < totalSteps; i++) {
-      bool isActive = i <= currentStep;
+      final bool isActive = i <= currentStep;
       dashes.add(
         Expanded(
           child: AnimatedContainer(

@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 /// Manual integration test for ChatBot API endpoints
 /// Run this test to verify all chatbot endpoints are working correctly
 ///
-/// Usage: `flutter test test/chatbot_manual_integration_test.dart`
+/// Usage: `flutter test test/integration/chatbot_manual_integration_test.dart`
 void main() async {
   final dio = Dio(BaseOptions(
     baseUrl: 'https://express-js-on-vercel-ten-roan-21.vercel.app',

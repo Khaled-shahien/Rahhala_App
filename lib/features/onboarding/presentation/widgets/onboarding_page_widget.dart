@@ -137,7 +137,7 @@ class OnboardingPageWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(22.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 18,
             offset: const Offset(0, 8),
             spreadRadius: 0,
@@ -175,8 +175,8 @@ class OnboardingPageWidget extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFFC19A6B).withOpacity(0.6),
-            const Color(0xFF8B7355).withOpacity(0.6),
+            const Color(0xFFC19A6B).withValues(alpha: 0.6),
+            const Color(0xFF8B7355).withValues(alpha: 0.6),
           ],
         ),
         borderRadius: BorderRadius.circular(22.r),
@@ -185,7 +185,7 @@ class OnboardingPageWidget extends StatelessWidget {
         child: Icon(
           Icons.image_outlined,
           size: 30.sp,
-          color: Colors.white.withOpacity(0.7),
+          color: Colors.white.withValues(alpha: 0.7),
         ),
       ),
     );
