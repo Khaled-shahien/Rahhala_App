@@ -171,8 +171,10 @@ class _LoginPageState extends State<LoginPage> {
           child: BlocConsumer<LoginCubit, LoginState>(
             listener: (context, state) async {
               if (state is LoginSuccess) {
+
                 final listenerContext = context;
                 await _handleLoginSuccess(listenerContext, state);
+
               } else if (state is LoginFailure) {
                 HapticFeedback.mediumImpact();
                 showAppNotification(
