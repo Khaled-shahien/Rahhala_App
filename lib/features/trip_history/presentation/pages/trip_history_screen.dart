@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_assets.dart';
+import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
 import 'package:shimmer/shimmer.dart';
@@ -64,10 +65,17 @@ class _TripHistoryView extends StatelessWidget {
         right: 20.w,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFF6A4D3B),
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            AppColors.lightBrown,
+            const Color(0xFF96785A),
+          ],
+        ),
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(28.r),
-          bottomRight: Radius.circular(28.r),
+          bottomLeft: Radius.circular(50.r),
+          bottomRight: Radius.circular(50.r),
         ),
       ),
       child: Row(
@@ -99,8 +107,8 @@ class _TripHistoryView extends StatelessWidget {
               Text(
                 'Plan History',
                 style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20.sp,
+                  color: AppColors.backgroundGray,
+                  fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -190,7 +198,7 @@ class _TripHistoryView extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6A4D3B),
+                backgroundColor: AppColors.lightBrown,
                 padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 14.h),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14.r),
@@ -236,14 +244,19 @@ class _TripHistoryView extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6A4D3B),
+                backgroundColor: AppColors.lightBrown,
+                elevation: 8, // 👈 الشادو
+                shadowColor: Colors.black,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r)),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
                 padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 14.h),
               ),
-              child: Text('Login Now',
-                  style: TextStyle(color: Colors.white, fontSize: 15.sp)),
-            ),
+              child: Text(
+                'Login Now',
+                style: TextStyle(color: Colors.white, fontSize: 15.sp),
+              ),
+            )
           ],
         ),
       ),
@@ -340,7 +353,7 @@ class _TripHistoryCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF3E3431),
+                        color: AppColors.primaryDark,
                       ),
                     ),
                     SizedBox(height: 4.h),

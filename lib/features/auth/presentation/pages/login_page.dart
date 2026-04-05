@@ -156,8 +156,10 @@ class _LoginPageState extends State<LoginPage> {
 
                 showAppNotification(
                   context: context,
-                  title: 'Welcome Back',
-                  message: 'You have been successfully logged in.',
+                  title:
+                      'Welcome Back.. ${sl<TokenStorage>().fullName ?? email.split('@').first}!',
+                  //You have been successfully logged in.
+                  message: 'Let’s explore something new today.',
                 );
 
                 if (!mounted) return;

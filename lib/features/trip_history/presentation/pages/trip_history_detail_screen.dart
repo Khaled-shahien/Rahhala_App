@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/features/ai_recommendation/presentation/pages/trip_details_screen.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
@@ -170,7 +171,8 @@ class _TripHistoryDetailView extends StatelessWidget {
                           content: trip.travelTips,
                         ),
                       if (trip.emergencyContact.isNotEmpty)
-                        _buildEmergencySection(trip.emergencyContact),
+                        _buildEmergencySection(
+                            emergencyContact: trip.emergencyContact),
                       SizedBox(height: 32.h),
                     ],
                   ),
@@ -540,44 +542,92 @@ class _TripHistoryDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildEmergencySection(String emergencyContact) {
+  Widget _buildEmergencySection({required String emergencyContact}) {
+    if (emergencyContact.isEmpty) return const SizedBox.shrink();
+
+    final contacts = emergencyContact.split(',');
+
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(18.r),
         border: Border.all(color: Colors.black12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Padding(
         padding: EdgeInsets.all(16.w),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Icon(Icons.emergency_outlined,
-                  color: AppColors.primary, size: 24.sp),
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(12.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Icon(Icons.emergency_outlined,
+                      color: Colors.red.shade400, size: 24.sp),
+                ),
+                SizedBox(width: 16.w),
+                Text(
+                  'Emergency Contacts',
+                  style: TextStyle(
+                    color: _primaryTextColor,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Emergency Contact',
-                      style: TextStyle(
-                          color: _primaryTextColor,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.bold)),
-                  SizedBox(height: 4.h),
-                  Text(emergencyContact,
-                      style: TextStyle(
-                          color: _primaryTextColor.withOpacity(0.8),
-                          fontSize: 13.sp)),
-                ],
-              ),
+            SizedBox(height: 14.h),
+            Wrap(
+              spacing: 10.w,
+              runSpacing: 10.h,
+              children: contacts.map((contact) {
+                final parts = contact.trim().split(':');
+                final label = parts.isNotEmpty ? parts[0].trim() : '';
+                final number = parts.length > 1 ? parts[1].trim() : '';
+                return Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                  decoration: BoxDecoration(
+                    color: lightBorderColor.withOpacity(0.06),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                        color: lightBorderColor.withOpacity(0.2), width: 1),
+                  ),
+                  child: IntrinsicWidth(
+                    child: Row(
+                      children: [
+                        Icon(Icons.phone_outlined,
+                            size: 14.sp, color: Colors.red.shade400),
+                        SizedBox(width: 6.w),
+                        Flexible(
+                          child: Text(
+                            '$label${number.isNotEmpty ? ': $number' : ''}',
+                            style: TextStyle(
+                              color: _primaryTextColor,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
           ],
         ),
