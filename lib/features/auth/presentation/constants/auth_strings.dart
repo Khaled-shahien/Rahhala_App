@@ -13,7 +13,7 @@ class AuthStrings {
   static const String logIn = 'Log In';
   static const String welcomeBackNotificationTitle = 'Welcome Back';
   static const String welcomeBackNotificationMessage =
-      'You have been successfully logged in.';
+      'Let’s explore something new today.';
   static const String createAccountTitle = 'Create Account';
   static const String createAccountSubtitle =
       'Fill in your information below to sign up';

@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/utils/app_notifications.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
 import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_model.dart';
 import 'package:rahhala_app/features/ai_recommendation/data/repositories/gemini_repository.dart';
+import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/expansion_tile_components.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_day_section.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_details_header.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_details_theme.dart';
@@ -305,7 +307,6 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       ),
     );
   }
-
 
   Widget _buildHeader() {
     return SizedBox(
@@ -1055,5 +1056,4 @@ class TimelineWrapper extends StatelessWidget {
       ),
     );
   }
-
 }
