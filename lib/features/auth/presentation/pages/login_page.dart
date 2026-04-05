@@ -149,7 +149,8 @@ class _LoginPageState extends State<LoginPage> {
 
     showAppNotification(
       context: listenerContext,
-      title: AuthStrings.welcomeBackNotificationTitle,
+      title:
+          'Welcome Back, ${sl<TokenStorage>().fullName ?? email.split('@').first}!',
       message: AuthStrings.welcomeBackNotificationMessage,
     );
 
