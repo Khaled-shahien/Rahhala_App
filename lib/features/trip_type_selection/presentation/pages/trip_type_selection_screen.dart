@@ -106,12 +106,12 @@ class TripTypeSelectionScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
-              color: ThemeColor.primaryColor.withOpacity(0.08),
+              color: ThemeColor.primaryColor.withValues(alpha: 0.08),
               blurRadius: 16,
               offset: const Offset(0, 4),
             ),
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -126,8 +126,8 @@ class TripTypeSelectionScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    ThemeColor.primaryColor.withOpacity(0.2),
-                    ThemeColor.primaryColor.withOpacity(0.1),
+                    ThemeColor.primaryColor.withValues(alpha: 0.2),
+                    ThemeColor.primaryColor.withValues(alpha: 0.1),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,

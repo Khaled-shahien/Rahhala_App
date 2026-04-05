@@ -84,11 +84,11 @@ class _SplashScreenState extends State<SplashScreen> {
                 width: 140.w,
                 height: 140.w,
                 decoration: BoxDecoration(
-                  color: ThemeColor.primaryColor.withOpacity(0.15),
+                  color: ThemeColor.primaryColor.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: ThemeColor.primaryColor.withOpacity(0.2),
+                      color: ThemeColor.primaryColor.withValues(alpha: 0.2),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
