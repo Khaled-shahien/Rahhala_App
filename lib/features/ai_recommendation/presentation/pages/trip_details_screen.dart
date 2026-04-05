@@ -291,11 +291,14 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                       SizedBox(height: 16.h),
                       ...plan.days.map((day) => TripDaySection(day: day)),
                       SizedBox(height: 16.h),
-                      TripInfoSections(
-                        budgetTips: plan.budgetTips,
-                        travelTips: plan.travelTips,
-                        emergencyContact: plan.emergencyContact,
+                      _buildEmergencyContactSection(
+                        emergencyContact: plan.emergencyContact ?? '',
                       ),
+                      // TripInfoSections(
+                      //   budgetTips: plan.budgetTips,
+                      //   travelTips: plan.travelTips,
+                      //   emergencyContact: plan.emergencyContact,
+                      // ),
                       SizedBox(height: 32.h),
                     ],
                   ),
