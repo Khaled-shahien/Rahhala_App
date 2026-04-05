@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 
 class RahhalaBottomBar extends StatelessWidget {
@@ -15,6 +16,7 @@ class RahhalaBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
     final barHeight = 66.0 + (bottomInset > 0 ? bottomInset * 0.4 : 6.0);
 
@@ -45,7 +47,7 @@ class RahhalaBottomBar extends StatelessWidget {
                   Expanded(
                     child: _NavItem(
                       icon: Icons.home_outlined,
-                      label: 'Home',
+                      label: l10n.navHome,
                       selected: currentIndex == 0,
                       onTap: () => onTap(0),
                     ),
@@ -53,7 +55,7 @@ class RahhalaBottomBar extends StatelessWidget {
                   Expanded(
                     child: _NavItem(
                       icon: Icons.favorite_border,
-                      label: 'Wish list',
+                      label: l10n.navWishlist,
                       selected: currentIndex == 1,
                       onTap: () => onTap(1),
                     ),
@@ -62,7 +64,7 @@ class RahhalaBottomBar extends StatelessWidget {
                   Expanded(
                     child: _NavItem(
                       icon: Icons.person_outline,
-                      label: 'Profile',
+                      label: l10n.navProfile,
                       selected: currentIndex == 2,
                       onTap: () => onTap(2),
                     ),

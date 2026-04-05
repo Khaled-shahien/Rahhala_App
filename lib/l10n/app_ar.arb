@@ -1,0 +1,80 @@
+{
+  "@@locale": "ar",
+  "appTitle": "رحالة",
+  "commonCancel": "إلغاء",
+  "commonBack": "رجوع",
+  "commonError": "خطأ",
+  "commonSuccess": "نجاح",
+  "commonComingSoon": "قريباً...",
+  "commonGotIt": "تم",
+  "commonUnknownError": "خطأ غير معروف",
+  "routerPageNotFound": "الصفحة غير موجودة",
+  "routerGoHome": "الصفحة الرئيسية",
+  "routerFeatureTitle": "{featureName}",
+  "@routerFeatureTitle": {
+    "placeholders": {
+      "featureName": {}
+    }
+  },
+  "routerFeatureUnderDevelopment": "{featureName} - قريباً!",
+  "@routerFeatureUnderDevelopment": {
+    "placeholders": {
+      "featureName": {}
+    }
+  },
+  "routerTripPlanner": "مخطط الرحلة",
+  "routerDestinations": "الوجهات",
+  "routerDestinationDetails": "تفاصيل الوجهة ({id})",
+  "@routerDestinationDetails": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "profileTitle": "الملف الشخصي",
+  "profileNoEmail": "لا يوجد بريد إلكتروني",
+  "profileAccount": "الحساب",
+  "profilePreferences": "التفضيلات",
+  "profileSupport": "الدعم",
+  "profileDangerZone": "منطقة خطرة",
+  "profileEdit": "تعديل الملف الشخصي",
+  "profilePlanHistory": "سجل الخطط",
+  "profileChangePassword": "تغيير كلمة المرور",
+  "profileNotification": "الإشعارات",
+  "profileLanguage": "اللغة",
+  "profilePlans": "الخطط",
+  "profileAppearance": "المظهر",
+  "profileHelpSupport": "المساعدة والدعم",
+  "profileLogout": "تسجيل الخروج",
+  "profileDeleteAccount": "حذف الحساب",
+  "profileDeleteAccountConfirm": "هل تريد حذف حسابك نهائياً؟",
+  "profileLogoutConfirm": "هل تريد تسجيل الخروج؟",
+  "profileDeleteAction": "حذف",
+  "profileLogoutAction": "تسجيل الخروج",
+  "profileLanguageBottomSheetTitle": "اختر لغة التطبيق",
+  "profileLanguageBottomSheetSubtitle": "سيتم تطبيق التغييرات فوراً",
+  "languageEnglish": "الإنجليزية",
+  "languageArabic": "العربية",
+  "homeWelcomeGuest": "مرحباً، زائرنا!",
+  "homeWelcomeUser": "مرحباً، {name}!",
+  "@homeWelcomeUser": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "homeExploreDestinations": "اكتشف وجهات رائعة",
+  "homeWishlist": "المفضلة",
+  "homeSearch": "البحث",
+  "homeWishlistSoon": "صفحة المفضلة - قريباً!",
+  "homeSearchSoon": "البحث - قريباً!",
+  "navHome": "الرئيسية",
+  "navWishlist": "المفضلة",
+  "navProfile": "الملف الشخصي",
+  "homePageContent": "محتوى الصفحة الرئيسية",
+  "homeComingSoonShort": "{title} - قريباً",
+  "@homeComingSoonShort": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "splashSubtitle": "رفيقك في السفر"
+}

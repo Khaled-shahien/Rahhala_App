@@ -9,6 +9,7 @@ import 'package:rahhala_app/features/trip_history/data/repositories/trip_history
 import 'package:rahhala_app/features/trip_history/domain/cubits/trip_history_cubit.dart';
 import 'package:rahhala_app/features/trip_history/domain/trip_history_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rahhala_app/core/localization/app_locale_controller.dart';
 
 import 'package:rahhala_app/core/network/api_consumer.dart';
 import 'package:rahhala_app/core/network/dio_consumer.dart';
@@ -65,6 +66,9 @@ Future<void> setupServiceLocator() async {
     legacyPrefs: prefs,
   );
   await tokenStorage.initialize();
+  sl.registerSingleton<AppLocaleController>(
+    AppLocaleController(preferences: prefs),
+  );
   sl.registerSingleton<TokenStorage>(tokenStorage);
   sl.registerLazySingleton<UserSession>(() => UserSession());
 

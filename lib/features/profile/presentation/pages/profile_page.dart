@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/utils/app_notifications.dart';
@@ -17,6 +18,7 @@ import 'package:rahhala_app/features/auth/presentation/widgets/profile_list_tile
 import 'package:rahhala_app/features/profile/domain/profile/profile_cubit.dart';
 import 'package:rahhala_app/features/profile/domain/profile/profile_state.dart';
 import 'package:rahhala_app/features/profile/presentation/pages/edit_profile_page.dart';
+import 'package:rahhala_app/features/profile/presentation/widgets/language_picker_bottom_sheet.dart';
 
 import 'package:rahhala_app/core/widgets/rahhala_bottom_bar.dart';
 import 'package:rahhala_app/core/widgets/soft_arc_notch.dart';
@@ -50,6 +52,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showComingSoon(String featureName) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -76,7 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               SizedBox(height: 24.h),
               Text(
-                'Coming Soon!',
+                l10n.commonComingSoon,
                 style: TextStyle(
                   fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
@@ -85,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               SizedBox(height: 16.h),
               Text(
-                '$featureName feature is under development.',
+                l10n.routerFeatureUnderDevelopment(featureName),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16.sp,
@@ -107,7 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   child: Text(
-                    'Got it',
+                    l10n.commonGotIt,
                     style: TextStyle(
                       fontSize: 17.sp,
                       fontWeight: FontWeight.w600,
@@ -127,6 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
     required String okLabel,
     required Color okColor,
   }) {
+    final l10n = context.l10n;
     return showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -135,7 +139,7 @@ class _ProfilePageState extends State<ProfilePage> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('CANCEL')),
+              child: Text(l10n.commonCancel)),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: okColor,
@@ -152,9 +156,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> deleteAccount() async {
+    final l10n = context.l10n;
     final confirm = await _confirm(
-      title: 'Delete your account permanently?',
-      okLabel: 'DELETE',
+      title: l10n.profileDeleteAccountConfirm,
+      okLabel: l10n.profileDeleteAction,
       okColor: Colors.red,
     );
     if (confirm != true) return;
@@ -163,9 +168,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> logout() async {
+    final l10n = context.l10n;
     final confirm = await _confirm(
-      title: 'Log out from your account?',
-      okLabel: 'LOGOUT',
+      title: l10n.profileLogoutConfirm,
+      okLabel: l10n.profileLogoutAction,
       okColor: ThemeColor.primaryColor,
     );
     if (confirm != true) return;
@@ -180,11 +186,23 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Future<void> _showLanguagePicker() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => const LanguagePickerBottomSheet(),
+    );
+  }
+
   Widget buildContent(ProfileState state) {
+    final l10n = context.l10n;
     final storage = sl<TokenStorage>();
 
     String displayName = storage.displayName;
-    String displayEmail = storage.email ?? 'No email';
+    String displayEmail = storage.email ?? l10n.profileNoEmail;
     String? profileImageUrl = storage.profileImageUrl;
 
     if (state is ProfileLoaded) {
@@ -235,7 +253,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       SizedBox(width: 16.w),
                       Text(
-                        'Profile',
+                        l10n.profileTitle,
                         style: TextStyle(
                           fontSize: 20.sp,
                           fontWeight: FontWeight.w700,
@@ -377,12 +395,12 @@ class _ProfilePageState extends State<ProfilePage> {
           sliver: SliverList(
             delegate: SliverChildListDelegate([
               SizedBox(height: 16.h),
-              _sectionTitle('Account'),
+              _sectionTitle(l10n.profileAccount),
               SizedBox(height: 12.h),
               _sectionCard([
                 ProfileListTile(
                   icon: Icons.edit_outlined,
-                  title: 'Edit profile',
+                  title: l10n.profileEdit,
                   onTap: () async {
                     await Navigator.push(
                       context,
@@ -396,7 +414,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Divider(height: 1, color: Colors.grey[200]),
                 ProfileListTile(
                   icon: Icons.history_rounded,
-                  title: 'Plan History',
+                  title: l10n.profilePlanHistory,
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -406,7 +424,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Divider(height: 1, color: Colors.grey[200]),
                 ProfileListTile(
                   icon: Icons.lock_outline,
-                  title: 'Change password',
+                  title: l10n.profileChangePassword,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -418,57 +436,57 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ]),
               SizedBox(height: 22.h),
-              _sectionTitle('Preferences'),
+              _sectionTitle(l10n.profilePreferences),
               SizedBox(height: 12.h),
               _sectionCard([
                 ProfileListTile(
                   icon: Icons.notifications_outlined,
-                  title: 'Notification',
-                  onTap: () => _showComingSoon('Notification'),
+                  title: l10n.profileNotification,
+                  onTap: () => _showComingSoon(l10n.profileNotification),
                 ),
                 Divider(height: 1, color: Colors.grey[200]),
                 ProfileListTile(
                   icon: Icons.language_outlined,
-                  title: 'Language',
-                  onTap: () => _showComingSoon('Language'),
+                  title: l10n.profileLanguage,
+                  onTap: _showLanguagePicker,
                 ),
                 Divider(height: 1, color: Colors.grey[200]),
                 ProfileListTile(
                   icon: Icons.card_membership_outlined,
-                  title: 'Plans',
-                  onTap: () => _showComingSoon('Plans'),
+                  title: l10n.profilePlans,
+                  onTap: () => _showComingSoon(l10n.profilePlans),
                 ),
                 Divider(height: 1, color: Colors.grey[200]),
                 ProfileListTile(
                   icon: Icons.palette_outlined,
-                  title: 'Appearance',
-                  onTap: () => _showComingSoon('Appearance'),
+                  title: l10n.profileAppearance,
+                  onTap: () => _showComingSoon(l10n.profileAppearance),
                 ),
               ]),
               SizedBox(height: 22.h),
-              _sectionTitle('Support'),
+              _sectionTitle(l10n.profileSupport),
               SizedBox(height: 12.h),
               _sectionCard([
                 ProfileListTile(
                   icon: Icons.help_outline_rounded,
-                  title: 'Help and Support',
-                  onTap: () => _showComingSoon('Help and Support'),
+                  title: l10n.profileHelpSupport,
+                  onTap: () => _showComingSoon(l10n.profileHelpSupport),
                 ),
               ]),
               SizedBox(height: 22.h),
-              _sectionTitle('Danger zone'),
+              _sectionTitle(l10n.profileDangerZone),
               SizedBox(height: 12.h),
               _sectionCard([
                 ProfileListTile(
                   icon: Icons.logout_rounded,
-                  title: 'Logout',
+                  title: l10n.profileLogout,
                   tint: ThemeColor.primaryColor,
                   onTap: logout,
                 ),
                 Divider(height: 1, color: Colors.grey[200]),
                 ProfileListTile(
                   icon: Icons.delete_outline_rounded,
-                  title: 'Delete Account',
+                  title: l10n.profileDeleteAccount,
                   tint: Colors.red,
                   onTap: deleteAccount,
                 ),
@@ -533,14 +551,14 @@ class _ProfilePageState extends State<ProfilePage> {
             HapticFeedback.mediumImpact();
             showAppNotification(
               context: context,
-              title: 'Error',
+              title: context.l10n.commonError,
               message: state.message,
               isError: true,
             );
           } else if (state is ProfileActionSuccess) {
             showAppNotification(
               context: context,
-              title: 'Success',
+              title: context.l10n.commonSuccess,
               message: state.model.message,
             );
 
@@ -592,7 +610,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: FloatingActionButton(
           onPressed: () {
             HapticFeedback.selectionClick();
-            _showComingSoon('Search');
+            _showComingSoon(context.l10n.homeSearch);
           },
           backgroundColor: ThemeColor.primaryColor,
           elevation: 0,

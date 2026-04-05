@@ -4,6 +4,7 @@ import 'package:rahhala_app/features/onboarding/presentation/pages/onboarding_sc
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/welcome_page.dart';
@@ -116,7 +117,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
               // Subtitle with better styling
               Text(
-                'Your Travel Companion',
+                context.l10n.splashSubtitle,
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w500,

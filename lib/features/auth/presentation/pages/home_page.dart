@@ -5,6 +5,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/image_search/presentation/widgets/image_search_bar.dart';
 import 'package:rahhala_app/features/profile/presentation/pages/profile_page.dart';
@@ -58,18 +59,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onTabTapped(int index) {
+    final l10n = context.l10n;
     setState(() => _currentIndex = index);
 
     if (index == 1) {
-      _notifyComingSoon('Wishlist page - Coming soon!');
+      _notifyComingSoon(l10n.homeWishlistSoon);
     } else if (index == 2) {
       HapticFeedback.mediumImpact();
-      _notifyComingSoon('Search - Coming soon!');
+      _notifyComingSoon(l10n.homeSearchSoon);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final storage = sl<TokenStorage>();
     final displayName = storage.displayName;
     final email = storage.email ?? '';
@@ -82,8 +85,8 @@ class _HomePageState extends State<HomePage> {
         email: email,
         profileImageUrl: profileImageUrl,
       ),
-      const _SoonPage(title: 'Wishlist'),
-      const _SoonPage(title: 'Search'),
+      _SoonPage(title: l10n.homeWishlist),
+      _SoonPage(title: l10n.homeSearch),
       const TripTypeSelectionScreen(),
       const ProfilePage(embedded: true),
     ];
@@ -246,6 +249,7 @@ class _HomeMainSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Padding(
       padding: EdgeInsets.all(20.w),
       child: Column(
@@ -260,8 +264,8 @@ class _HomeMainSection extends StatelessWidget {
                   children: [
                     Text(
                       isGuest
-                          ? 'Welcome, Guest! 👋'
-                          : 'Hi, ${displayName ?? (email.isNotEmpty ? email.split('@').first : 'there')}! 👋',
+                          ? '${l10n.homeWelcomeGuest} 👋'
+                          : '${l10n.homeWelcomeUser(displayName ?? (email.isNotEmpty ? email.split('@').first : 'there'))} 👋',
                       style: TextStyle(
                         fontSize: 23.sp,
                         fontWeight: FontWeight.bold,
@@ -273,7 +277,7 @@ class _HomeMainSection extends StatelessWidget {
                     ),
                     SizedBox(height: 10.h),
                     Text(
-                      'Explore amazing destinations',
+                      l10n.homeExploreDestinations,
                       style: TextStyle(
                         fontSize: 17.sp,
                         color: ThemeColor.neutralGrayColor,
@@ -299,7 +303,8 @@ class _HomeMainSection extends StatelessWidget {
                   ),
                   child: CircleAvatar(
                     radius: 30.r,
-                    backgroundColor: ThemeColor.primaryColor.withValues(alpha: 0.15),
+                    backgroundColor:
+                        ThemeColor.primaryColor.withValues(alpha: 0.15),
                     backgroundImage:
                         (profileImageUrl != null && profileImageUrl!.isNotEmpty)
                             ? NetworkImage(profileImageUrl!)
@@ -346,7 +351,7 @@ class _HomeMainSection extends StatelessWidget {
                   ),
                   SizedBox(height: 28.h),
                   Text(
-                    'Home Page Content',
+                    l10n.homePageContent,
                     style: TextStyle(
                       fontSize: 22.sp,
                       fontWeight: FontWeight.w600,
@@ -355,7 +360,7 @@ class _HomeMainSection extends StatelessWidget {
                   ),
                   SizedBox(height: 16.h),
                   Text(
-                    'Coming Soon...',
+                    l10n.commonComingSoon,
                     style: TextStyle(
                       fontSize: 17.sp,
                       color: ThemeColor.neutralGrayColor,
@@ -377,9 +382,10 @@ class _SoonPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Center(
       child: Text(
-        '$title — Coming soon',
+        l10n.homeComingSoonShort(title),
         style: TextStyle(
           fontSize: 17.sp,
           color: ThemeColor.neutralGrayColor,

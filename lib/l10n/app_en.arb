@@ -1,0 +1,80 @@
+{
+  "@@locale": "en",
+  "appTitle": "Rahhala App",
+  "commonCancel": "Cancel",
+  "commonBack": "Go Back",
+  "commonError": "Error",
+  "commonSuccess": "Success",
+  "commonComingSoon": "Coming Soon...",
+  "commonGotIt": "Got it",
+  "commonUnknownError": "Unknown error",
+  "routerPageNotFound": "Page Not Found",
+  "routerGoHome": "Go Home",
+  "routerFeatureTitle": "{featureName}",
+  "@routerFeatureTitle": {
+    "placeholders": {
+      "featureName": {}
+    }
+  },
+  "routerFeatureUnderDevelopment": "{featureName} - Coming soon!",
+  "@routerFeatureUnderDevelopment": {
+    "placeholders": {
+      "featureName": {}
+    }
+  },
+  "routerTripPlanner": "Trip Planner",
+  "routerDestinations": "Destinations",
+  "routerDestinationDetails": "Destination Details ({id})",
+  "@routerDestinationDetails": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "profileTitle": "Profile",
+  "profileNoEmail": "No email",
+  "profileAccount": "Account",
+  "profilePreferences": "Preferences",
+  "profileSupport": "Support",
+  "profileDangerZone": "Danger zone",
+  "profileEdit": "Edit profile",
+  "profilePlanHistory": "Plan History",
+  "profileChangePassword": "Change password",
+  "profileNotification": "Notification",
+  "profileLanguage": "Language",
+  "profilePlans": "Plans",
+  "profileAppearance": "Appearance",
+  "profileHelpSupport": "Help and Support",
+  "profileLogout": "Logout",
+  "profileDeleteAccount": "Delete Account",
+  "profileDeleteAccountConfirm": "Delete your account permanently?",
+  "profileLogoutConfirm": "Log out from your account?",
+  "profileDeleteAction": "Delete",
+  "profileLogoutAction": "Logout",
+  "profileLanguageBottomSheetTitle": "Choose app language",
+  "profileLanguageBottomSheetSubtitle": "Changes are applied instantly",
+  "languageEnglish": "English",
+  "languageArabic": "Arabic",
+  "homeWelcomeGuest": "Welcome, Guest!",
+  "homeWelcomeUser": "Hi, {name}!",
+  "@homeWelcomeUser": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "homeExploreDestinations": "Explore amazing destinations",
+  "homeWishlist": "Wishlist",
+  "homeSearch": "Search",
+  "homeWishlistSoon": "Wishlist page - Coming soon!",
+  "homeSearchSoon": "Search - Coming soon!",
+  "navHome": "Home",
+  "navWishlist": "Wish list",
+  "navProfile": "Profile",
+  "homePageContent": "Home Page Content",
+  "homeComingSoonShort": "{title} - Coming soon",
+  "@homeComingSoonShort": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "splashSubtitle": "Your Travel Companion"
+}
