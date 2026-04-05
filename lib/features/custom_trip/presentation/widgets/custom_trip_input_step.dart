@@ -58,7 +58,7 @@ class CustomTripInputStep extends StatelessWidget {
             decoration: BoxDecoration(
               color: i == 0
                   ? const Color(0xFFA88866)
-                  : const Color(0xFFA88866).withOpacity(0.25),
+                  : const Color(0xFFA88866).withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(2.r),
             ),
           ),
@@ -79,7 +79,7 @@ class CustomTripInputStep extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
           decoration: BoxDecoration(
-            color: const Color(0xFF6A4D3B).withOpacity(0.08),
+            color: const Color(0xFF6A4D3B).withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(18.r),
             border: Border.all(
               color: const Color(0xFFA88866),
@@ -96,7 +96,7 @@ class CustomTripInputStep extends StatelessWidget {
                   style: TextStyle(
                     color: selected != null
                         ? const Color(0xFF6A4D3B)
-                        : const Color(0xFF6A4D3B).withOpacity(0.6),
+                        : const Color(0xFF6A4D3B).withValues(alpha: 0.6),
                     fontSize: 17.sp,
                     fontWeight: FontWeight.w500,
                   ),
@@ -205,7 +205,7 @@ class CustomTripInputStep extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF6A4D3B).withOpacity(0.08),
+        color: const Color(0xFF6A4D3B).withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(18.r),
         border: Border.all(
           color: const Color(0xFFA88866),
@@ -279,7 +279,7 @@ class CustomTripInputStep extends StatelessWidget {
         onPressed: isEnabled ? onNext : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFA88866),
-          disabledBackgroundColor: const Color(0xFFA88866).withOpacity(0.4),
+          disabledBackgroundColor: const Color(0xFFA88866).withValues(alpha: 0.4),
           padding: EdgeInsets.symmetric(vertical: 16.h),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.r),

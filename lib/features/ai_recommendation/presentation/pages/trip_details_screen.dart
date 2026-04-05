@@ -342,7 +342,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Container(
-                      color: headerBackgroundColor.withOpacity(0.3),
+                      color: headerBackgroundColor.withValues(alpha: 0.3),
                       child: Center(
                         child: CircularProgressIndicator(
                           value: loadingProgress.expectedTotalBytes != null
@@ -368,8 +368,8 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   colors: [
                     Colors.transparent,
                     Colors.transparent,
-                    screenBackgroundColor.withOpacity(0.15),
-                    screenBackgroundColor.withOpacity(0.5),
+                    screenBackgroundColor.withValues(alpha: 0.15),
+                    screenBackgroundColor.withValues(alpha: 0.5),
                     screenBackgroundColor,
                   ],
                   stops: const [0.0, 0.45, 0.7, 0.85, 1.0],
@@ -387,10 +387,10 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   colors: [
                     Colors.transparent,
                     Colors.transparent,
-                    screenBackgroundColor.withOpacity(0.3),
+                    screenBackgroundColor.withValues(alpha: 0.3),
 
                     /// screenBackgroundColor,
-                    const Color(0xFFF3E5D8).withOpacity(0.8)
+                    const Color(0xFFF3E5D8).withValues(alpha: 0.8)
                   ],
                   stops: const [0.0, 0.5, 0.8, 1.0],
                 ),
@@ -506,12 +506,12 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
           height: 1.4,
           shadows: [
             Shadow(
-              color: Colors.black.withOpacity(1.0),
+              color: Colors.black.withValues(alpha: 1.0),
               offset: const Offset(0, 2),
               blurRadius: 255,
             ),
             Shadow(
-              color: Colors.black.withOpacity(1.0),
+              color: Colors.black.withValues(alpha: 1.0),
               offset: const Offset(0, 4),
               blurRadius: 100,
             ),
@@ -526,7 +526,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3E5D8).withOpacity(0.5),
+        color: const Color(0xFFF3E5D8).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(30.r),
         border: Border.all(
           color: const Color(0xFF8B6F5A),
@@ -571,7 +571,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
         border: Border.all(color: lightBorderColor, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 8,
               offset: const Offset(0, 2))
         ],
@@ -778,7 +778,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: lightBorderColor.withOpacity(0.4), width: 1),
+        border: Border.all(color: lightBorderColor.withValues(alpha: 0.4), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -830,7 +830,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
             Container(
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Icon(
@@ -856,7 +856,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   Text(
                     content.isEmpty ? "No information available" : content,
                     style: TextStyle(
-                      color: primaryTextColor.withOpacity(0.8),
+                      color: primaryTextColor.withValues(alpha: 0.8),
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w500,
                     ),
@@ -902,7 +902,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
         border: Border.all(color: Colors.black12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -918,7 +918,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                 Container(
                   padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
-                    color: lightBorderColor.withOpacity(0.07),
+                    color: lightBorderColor.withValues(alpha: 0.07),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Icon(Icons.emergency_outlined,
@@ -947,10 +947,10 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   padding:
                       EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                   decoration: BoxDecoration(
-                    color: lightBorderColor.withOpacity(0.06),
+                    color: lightBorderColor.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(
-                        color: lightBorderColor.withOpacity(0.2), width: 1),
+                        color: lightBorderColor.withValues(alpha: 0.2), width: 1),
                   ),
                   child: IntrinsicWidth(
                     child: Row(

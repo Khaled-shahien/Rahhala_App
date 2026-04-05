@@ -217,8 +217,8 @@ class _TripHistoryDetailView extends StatelessWidget {
                   colors: [
                     Colors.transparent,
                     Colors.transparent,
-                    _screenBgColor.withOpacity(0.15),
-                    _screenBgColor.withOpacity(0.5),
+                    _screenBgColor.withValues(alpha: 0.15),
+                    _screenBgColor.withValues(alpha: 0.5),
                     _screenBgColor,
                   ],
                   stops: const [0.0, 0.45, 0.7, 0.85, 1.0],
@@ -235,8 +235,8 @@ class _TripHistoryDetailView extends StatelessWidget {
                   colors: [
                     Colors.transparent,
                     Colors.transparent,
-                    _screenBgColor.withOpacity(0.3),
-                    const Color(0xFFF3E5D8).withOpacity(0.8),
+                    _screenBgColor.withValues(alpha: 0.3),
+                    const Color(0xFFF3E5D8).withValues(alpha: 0.8),
                   ],
                   stops: const [0.0, 0.5, 0.8, 1.0],
                 ),
@@ -310,12 +310,12 @@ class _TripHistoryDetailView extends StatelessWidget {
                       height: 1.4,
                       shadows: [
                         Shadow(
-                          color: Colors.black.withOpacity(1.0),
+                          color: Colors.black.withValues(alpha: 1.0),
                           offset: const Offset(0, 2),
                           blurRadius: 255,
                         ),
                         Shadow(
-                          color: Colors.black.withOpacity(1.0),
+                          color: Colors.black.withValues(alpha: 1.0),
                           offset: const Offset(0, 4),
                           blurRadius: 100,
                         ),
@@ -340,7 +340,7 @@ class _TripHistoryDetailView extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3E5D8).withOpacity(0.7),
+        color: const Color(0xFFF3E5D8).withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(30.r),
         border: Border.all(color: const Color(0xFF8B6F5A), width: 1.4),
       ),
@@ -373,7 +373,7 @@ class _TripHistoryDetailView extends StatelessWidget {
         border: Border.all(color: _lightBorderColor, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 8,
               offset: const Offset(0, 2))
         ],
@@ -498,7 +498,7 @@ class _TripHistoryDetailView extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Icon(icon, color: AppColors.primary, size: 24.sp),
@@ -517,7 +517,7 @@ class _TripHistoryDetailView extends StatelessWidget {
                   Text(
                     content,
                     style: TextStyle(
-                        color: _primaryTextColor.withOpacity(0.8),
+                        color: _primaryTextColor.withValues(alpha: 0.8),
                         fontSize: 13.sp),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -556,7 +556,7 @@ class _TripHistoryDetailView extends StatelessWidget {
         border: Border.all(color: Colors.black12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -572,7 +572,7 @@ class _TripHistoryDetailView extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Icon(Icons.emergency_outlined,
@@ -601,10 +601,10 @@ class _TripHistoryDetailView extends StatelessWidget {
                   padding:
                       EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                   decoration: BoxDecoration(
-                    color: lightBorderColor.withOpacity(0.06),
+                    color: lightBorderColor.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(
-                        color: lightBorderColor.withOpacity(0.2), width: 1),
+                        color: lightBorderColor.withValues(alpha: 0.2), width: 1),
                   ),
                   child: IntrinsicWidth(
                     child: Row(

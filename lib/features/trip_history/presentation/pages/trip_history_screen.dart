@@ -65,12 +65,12 @@ class _TripHistoryView extends StatelessWidget {
         right: 20.w,
       ),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [
             AppColors.lightBrown,
-            const Color(0xFF96785A),
+            Color(0xFF96785A),
           ],
         ),
         borderRadius: BorderRadius.only(
@@ -94,7 +94,7 @@ class _TripHistoryView extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(10.r),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child:
@@ -313,7 +313,7 @@ class _TripHistoryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
