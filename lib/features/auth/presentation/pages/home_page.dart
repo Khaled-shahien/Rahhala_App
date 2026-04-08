@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-
+import 'package:rahhala_app/features/home/presentation/pages/home_screen.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
@@ -325,50 +325,7 @@ class _HomeMainSection extends StatelessWidget {
           const ImageSearchBar(),
           SizedBox(height: 36.h),
           Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 130.w,
-                    height: 130.w,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          ThemeColor.primaryColor.withValues(alpha: 0.2),
-                          ThemeColor.primaryColor.withValues(alpha: 0.08),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.explore_outlined,
-                      size: 65.sp,
-                      color: ThemeColor.primaryColor.withValues(alpha: 0.8),
-                    ),
-                  ),
-                  SizedBox(height: 28.h),
-                  Text(
-                    l10n.homePageContent,
-                    style: TextStyle(
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.w600,
-                      color: ThemeColor.charcoalColor,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    l10n.commonComingSoon,
-                    style: TextStyle(
-                      fontSize: 17.sp,
-                      color: ThemeColor.neutralGrayColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            child: const HomeScreen(),
           ),
         ],
       ),
