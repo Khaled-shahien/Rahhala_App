@@ -7,6 +7,7 @@ import 'package:rahhala_app/features/home/data/repositories/home_repository_impl
 import 'package:rahhala_app/features/home/domain/repositories/home_repository.dart';
 import 'package:rahhala_app/features/home/presentation/details_cubit/place_details_cubit.dart';
 import 'package:rahhala_app/features/home/presentation/details_cubit/review_cubit.dart';
+import 'package:rahhala_app/features/home/presentation/cubit/favourites_cubit.dart';
 import 'package:rahhala_app/features/image_search/data/repositories/image_search_repository_impl.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_cubit.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_repository.dart';
@@ -203,5 +204,9 @@ Future<void> setupServiceLocator() async {
 
   sl.registerFactory<ReviewCubit>(
     () => ReviewCubit(sl<HomeRepository>()),
+  );
+
+  sl.registerFactory<FavouritesCubit>(
+    () => FavouritesCubit(sl<HomeRepository>()),
   );
 }

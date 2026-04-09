@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:rahhala_app/features/home/presentation/pages/home_screen.dart';
+import 'package:rahhala_app/features/home/presentation/pages/favourites_screen.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
@@ -62,9 +63,7 @@ class _HomePageState extends State<HomePage> {
     final l10n = context.l10n;
     setState(() => _currentIndex = index);
 
-    if (index == 1) {
-      _notifyComingSoon(l10n.homeWishlistSoon);
-    } else if (index == 2) {
+    if (index == 2) {
       HapticFeedback.mediumImpact();
       _notifyComingSoon(l10n.homeSearchSoon);
     }
@@ -85,7 +84,7 @@ class _HomePageState extends State<HomePage> {
         email: email,
         profileImageUrl: profileImageUrl,
       ),
-      _SoonPage(title: l10n.homeWishlist),
+      const FavouritesScreen(),
       _SoonPage(title: l10n.homeSearch),
       const TripTypeSelectionScreen(),
       const ProfilePage(embedded: true),
@@ -324,8 +323,8 @@ class _HomeMainSection extends StatelessWidget {
           SizedBox(height: 16.h),
           const ImageSearchBar(),
           SizedBox(height: 36.h),
-          Expanded(
-            child: const HomeScreen(),
+          const Expanded(
+            child: HomeScreen(),
           ),
         ],
       ),

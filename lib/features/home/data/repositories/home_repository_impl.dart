@@ -17,6 +17,25 @@ class HomeRepositoryImpl implements HomeRepository {
   }
 
   @override
+  Future<List<FavouriteModel>> getFavourites() async {
+    try {
+      return await remoteDataSource.getFavourites();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> addFavourite(String placeId) async {
+    return await remoteDataSource.addFavourite(placeId);
+  }
+
+  @override
+  Future<void> removeFavourite(String placeId) async {
+    return await remoteDataSource.removeFavourite(placeId);
+  }
+
+  @override
   Future<PlaceDetailsModel> getPlaceDetails(String id) async {
     try {
       return await remoteDataSource.getPlaceDetails(id);
