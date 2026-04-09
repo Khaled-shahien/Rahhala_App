@@ -129,7 +129,7 @@ class PlaceDetailsScreen extends StatelessWidget {
                           SizedBox(height: 10.h),
                           ...place.reviews
                               .map((review) => ReviewCard(review: review))
-                              .toList(),
+                              ,
                           SizedBox(height: 20.h),
                           SubmitReview(placeId: place.id),
                           SizedBox(height: 30.h),

@@ -13,7 +13,6 @@ import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/expa
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_day_section.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_details_header.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_details_theme.dart';
-import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_info_sections.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_save_button.dart';
 
 class TripDetailsScreen extends StatefulWidget {
