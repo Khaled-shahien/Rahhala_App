@@ -2,6 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
+import 'package:rahhala_app/features/home/data/datasource/home_remote_data_source.dart';
+import 'package:rahhala_app/features/home/data/repositories/home_repository_impl.dart';
+import 'package:rahhala_app/features/home/domain/repositories/home_repository.dart';
+import 'package:rahhala_app/features/home/presentation/details_cubit/place_details_cubit.dart';
+import 'package:rahhala_app/features/home/presentation/details_cubit/review_cubit.dart';
 import 'package:rahhala_app/features/image_search/data/repositories/image_search_repository_impl.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_cubit.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_repository.dart';
@@ -181,5 +186,23 @@ Future<void> setupServiceLocator() async {
       getContextUseCase: sl<GetContextUseCase>(),
       discardContextUseCase: sl<DiscardContextUseCase>(),
     ),
+  );
+  sl.registerLazySingleton<HomeRemoteDataSource>(
+    () => HomeRemoteDataSourceImpl(
+      api: sl(),
+      tokenStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<HomeRepository>(
+    () => HomeRepositoryImpl(remoteDataSource: sl<HomeRemoteDataSource>()),
+  );
+
+//details
+  sl.registerFactory<PlaceDetailsCubit>(
+    () => PlaceDetailsCubit(sl<HomeRepository>()),
+  );
+
+  sl.registerFactory<ReviewCubit>(
+    () => ReviewCubit(sl<HomeRepository>()),
   );
 }

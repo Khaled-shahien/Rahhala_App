@@ -25,6 +25,9 @@ class EndPoints {
   static const String chatBot = '/api/chat';
   static const String createChatContext = '/api/chat/context';
   static const String discardChatContext = '/api/chat/context/discard';
+
+  static const String getHome = '/api/Home/GetHome';
+  static String placeDetails(String id) => '/api/Home/Places/$id';
 }
 
 class ApiKey {

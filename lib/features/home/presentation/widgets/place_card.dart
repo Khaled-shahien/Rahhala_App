@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/features/home/data/models/home_model.dart';
 import '../../data/models/place_model.dart';
 
 class PlaceCard extends StatelessWidget {
-  final Place place;
+  final PlaceModel place;
   final bool isFav;
   final VoidCallback onTap;
   final VoidCallback onFavTap;
@@ -26,7 +27,7 @@ class PlaceCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18.r),
           image: DecorationImage(
-            image: AssetImage(place.image) as ImageProvider,
+            image: NetworkImage(place.imageUrl),
             // image: NetworkImage(place.image),
             fit: BoxFit.cover,
           ),
@@ -44,7 +45,7 @@ class PlaceCard extends StatelessWidget {
                           color: Colors.white,
                           fontSize: 26.sp,
                           fontWeight: FontWeight.bold)),
-                  Text(place.location,
+                  Text(place.country,
                       style: TextStyle(color: Colors.white, fontSize: 18.sp)),
                 ],
               ),

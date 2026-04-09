@@ -4,7 +4,7 @@ class Place {
   final String location;
   final String image;
   final String description;
-  final double rating;
+  final double rating; // ← ضيف ده
 
   Place({
     required this.id,
@@ -12,7 +12,7 @@ class Place {
     required this.location,
     required this.image,
     required this.description,
-    required this.rating,
+    required this.rating, // ← ضيف ده
   });
 }
 

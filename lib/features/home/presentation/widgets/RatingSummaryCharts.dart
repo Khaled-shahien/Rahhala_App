@@ -62,7 +62,7 @@ class RatingSummaryCard extends StatelessWidget {
                     Icon(Icons.star,
                         size: 14.sp, color: const Color(0xFFB08968)),
                     SizedBox(width: 15.w),
-                    //Charts
+                    // البار (Chart)
                     Expanded(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10.r),
@@ -76,7 +76,7 @@ class RatingSummaryCard extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: 15.w),
-                    // النسبة المئوية
+
                     SizedBox(
                       width: 35.w,
                       child: Text("${(ratio * 100).toInt()}%",

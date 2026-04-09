@@ -1,54 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../data/models/home_model.dart';
 import 'rating_stars.dart';
 
 class ReviewCard extends StatelessWidget {
-  const ReviewCard({super.key});
+  final ReviewModel review;
+
+  const ReviewCard({super.key, required this.review});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            spreadRadius: 2,
-            offset: const Offset(0, 4),
+            blurRadius: 12.r,
+            offset: Offset(0, 4.h),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: EdgeInsets.all(14.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            /// 👤 Name + Date (من غير avatar)
+          children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Sara Ahmed",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  review.userName,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.sp,
+                  ),
                 ),
                 Text(
-                  "2 days ago",
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                  review.createdAt.substring(0, 10),
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12.sp,
+                  ),
                 ),
               ],
             ),
-
-            SizedBox(height: 8),
-
-            RatingStars(rating: 5),
-
-            SizedBox(height: 8),
-
+            SizedBox(height: 8.h),
+            RatingStars(rating: review.rating),
+            SizedBox(height: 8.h),
             Text(
-              "Amazing place! Everything was perfect and the view was incredible 🔥",
-              style: TextStyle(fontSize: 13),
+              review.comment,
+              style: TextStyle(
+                fontSize: 16.sp,
+                height: 1.2.h,
+              ),
             ),
           ],
         ),

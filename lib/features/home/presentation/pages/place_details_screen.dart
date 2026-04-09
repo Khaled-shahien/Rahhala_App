@@ -1,146 +1,147 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/core/constants/app_colors.dart';
+import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/features/home/presentation/details_cubit/place_details_cubit.dart';
+import 'package:rahhala_app/features/home/presentation/details_cubit/place_details_state.dart';
+import 'package:rahhala_app/features/home/presentation/details_cubit/review_cubit.dart';
 import 'package:rahhala_app/features/home/presentation/widgets/RatingSummaryCharts.dart';
-import '../../data/models/place_model.dart';
 import '../widgets/horizontal_section.dart';
-import '../widgets/rating_stars.dart';
 import '../widgets/review_card.dart';
 import '../widgets/submit_review.dart';
 
 class PlaceDetailsScreen extends StatelessWidget {
-  final Place place;
+  final String placeId;
 
-  const PlaceDetailsScreen({super.key, required this.place});
+  const PlaceDetailsScreen({super.key, required this.placeId});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) =>
+              sl<PlaceDetailsCubit>()..getPlaceDetails(placeId),
+        ),
+        BlocProvider(
+          create: (context) => sl<ReviewCubit>(),
+        ),
+      ],
+      child: Scaffold(
+        backgroundColor: Colors.grey[100],
+        body: BlocBuilder<PlaceDetailsCubit, PlaceDetailsState>(
+          builder: (context, state) {
+            if (state is PlaceDetailsLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is PlaceDetailsError) {
+              return Center(child: Text(state.message));
+            } else if (state is PlaceDetailsSuccess) {
+              final place = state.placeDetails;
+
+              return CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    expandedHeight: 250.h,
+                    pinned: true,
+                    backgroundColor: AppColors.mediumBrown,
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.black26,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
+                    flexibleSpace: FlexibleSpaceBar(
+                      title: Text(
+                        place.name,
+                        style: TextStyle(
+                          fontSize: 30.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      background: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.network(
+                            place.imageUrl,
+                            fit: BoxFit.cover,
+                          ),
+                          const DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [Colors.transparent, Colors.black54],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  SizedBox(width: 100.w),
-                  Expanded(
-                    child: Text(
-                      place.name,
-                      style: TextStyle(
-                        fontSize: 26.sp,
-                        fontWeight: FontWeight.bold,
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(12.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 10.h),
+                          Text(
+                            "Description",
+                            style: TextStyle(
+                                fontSize: 20.sp, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            place.description,
+                            style: TextStyle(fontSize: 16.sp, height: 1.5),
+                          ),
+                          SizedBox(height: 20.h),
+                          HorizontalSection(
+                            title: "Restaurants",
+                            items: place.restaurants,
+                          ),
+                          SizedBox(height: 20.h),
+                          HorizontalSection(
+                            title: "Hotels",
+                            items: place.hotels,
+                          ),
+                          SizedBox(height: 20.h),
+                          Text(
+                            "Rating & Reviews",
+                            style: TextStyle(
+                                fontSize: 22.sp, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 12.h),
+                          RatingSummaryCard(
+                            averageRating: place.ratingSummary.average,
+                            totalReviews: place.ratingSummary.totalReviews,
+                            stats: place.ratingSummary.distribution,
+                          ),
+                          SizedBox(height: 20.h),
+                          Text(
+                            "Customer Feedbacks",
+                            style: TextStyle(
+                                fontSize: 22.sp, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 10.h),
+                          ...place.reviews
+                              .map((review) => ReviewCard(review: review))
+                              .toList(),
+                          SizedBox(height: 20.h),
+                          SubmitReview(placeId: place.id),
+                          SizedBox(height: 30.h),
+                        ],
                       ),
                     ),
                   ),
                 ],
-              ),
-            ),
-            Container(
-              height: 220.h,
-              width: double.infinity,
-              margin: EdgeInsets.symmetric(horizontal: 12.w),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.r),
-                image: DecorationImage(
-                  image: place.image.startsWith('http')
-                      ? NetworkImage(place.image) as ImageProvider
-                      : AssetImage(place.image),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            SizedBox(height: 10.h),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(12.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //description
-                    Text(
-                      place.description,
-                      style: TextStyle(fontSize: 16.sp),
-                    ),
-
-                    SizedBox(height: 20.h),
-
-                    // Restaurants
-                    const HorizontalSection(title: "Restaurants"),
-
-                    SizedBox(height: 20.h),
-
-                    // hotels
-                    const HorizontalSection(title: "Hotels"),
-
-                    SizedBox(height: 20.h),
-
-                    //tThings to do
-                    const HorizontalSection(title: "Things to do"),
-
-                    SizedBox(height: 20.h),
-
-                    //rating section
-                    Text(
-                      "Rating & Reviews",
-                      style: TextStyle(
-                        fontSize: 26.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    SizedBox(height: 4.h),
-
-                    Text(
-                      "Share your experience with us",
-                      style:
-                          TextStyle(color: Colors.grey[600], fontSize: 12.sp),
-                    ),
-
-                    SizedBox(height: 12.h),
-
-                    RatingSummaryCard(
-                      averageRating: 4.5,
-                      totalReviews: 324,
-                      stats: const {
-                        5: 0.68,
-                        4: 0.20,
-                        3: 0.08,
-                        2: 0.03,
-                        1: 0.01,
-                      },
-                    ),
-
-                    SizedBox(height: 20.h),
-
-                    // feedbacks
-                    Text(
-                      "Customer Feedbacks",
-                      style: TextStyle(
-                        fontSize: 26.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    SizedBox(height: 10.h),
-
-                    const ReviewCard(),
-                    const ReviewCard(),
-                    const ReviewCard(),
-
-                    SizedBox(height: 20.h),
-
-                    //submit review
-                    const SubmitReview(),
-                  ],
-                ),
-              ),
-            ),
-          ],
+              );
+            }
+            return const SizedBox();
+          },
         ),
       ),
     );
