@@ -324,8 +324,8 @@ class _HomeMainSection extends StatelessWidget {
           SizedBox(height: 16.h),
           const ImageSearchBar(),
           SizedBox(height: 36.h),
-          Expanded(
-            child: const HomeScreen(),
+          const Expanded(
+            child: HomeScreen(),
           ),
         ],
       ),
