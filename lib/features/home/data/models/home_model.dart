@@ -108,19 +108,21 @@ class SubItemModel {
 }
 
 class ReviewModel {
-  final String userName, comment, createdAt;
+  final String id, userName, comment, createdAt;
   final double rating;
 
   ReviewModel(
-      {required this.userName,
+      {required this.id,
+      required this.userName,
       required this.comment,
       required this.createdAt,
       required this.rating});
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) => ReviewModel(
-        userName: json["userName"],
-        comment: json["comment"],
-        createdAt: json["createdAt"],
+        id: (json["id"] ?? '').toString(),
+        userName: (json["userName"] ?? '').toString(),
+        comment: (json["comment"] ?? '').toString(),
+        createdAt: (json["createdAt"] ?? '').toString(),
         rating: (json["rating"] ?? 0).toDouble(),
       );
 }

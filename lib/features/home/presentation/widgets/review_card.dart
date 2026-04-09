@@ -5,8 +5,19 @@ import 'rating_stars.dart';
 
 class ReviewCard extends StatelessWidget {
   final ReviewModel review;
+  final bool canManage;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+  final bool isDeleting;
 
-  const ReviewCard({super.key, required this.review});
+  const ReviewCard({
+    super.key,
+    required this.review,
+    this.canManage = false,
+    this.onEdit,
+    this.onDelete,
+    this.isDeleting = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +28,7 @@ class ReviewCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 12.r,
             offset: Offset(0, 4.h),
           ),
@@ -30,16 +41,21 @@ class ReviewCard extends StatelessWidget {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  review.userName,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.sp,
+                Expanded(
+                  child: Text(
+                    review.userName,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.sp,
+                    ),
                   ),
                 ),
                 Text(
-                  review.createdAt.substring(0, 10),
+                  review.createdAt.length >= 10
+                      ? review.createdAt.substring(0, 10)
+                      : review.createdAt,
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 12.sp,
@@ -57,6 +73,47 @@ class ReviewCard extends StatelessWidget {
                 height: 1.2.h,
               ),
             ),
+            if (canManage) ...[
+              SizedBox(height: 4.h),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      constraints: const BoxConstraints(),
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Edit review',
+                      onPressed: onEdit,
+                      icon: Icon(
+                        Icons.edit_outlined,
+                        size: 20.sp,
+                        color: Colors.blueGrey,
+                      ),
+                    ),
+                    IconButton(
+                      constraints: const BoxConstraints(),
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Delete review',
+                      onPressed: isDeleting ? null : onDelete,
+                      icon: isDeleting
+                          ? SizedBox(
+                              width: 16.w,
+                              height: 16.w,
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Icon(
+                              Icons.delete_outline,
+                              size: 20.sp,
+                              color: Colors.redAccent,
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       ),

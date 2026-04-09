@@ -190,7 +190,6 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<HomeRemoteDataSource>(
     () => HomeRemoteDataSourceImpl(
       api: sl(),
-      tokenStorage: sl(),
     ),
   );
   sl.registerLazySingleton<HomeRepository>(

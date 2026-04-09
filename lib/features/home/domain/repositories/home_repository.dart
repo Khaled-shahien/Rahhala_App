@@ -5,4 +5,6 @@ abstract class HomeRepository {
 
   Future<PlaceDetailsModel> getPlaceDetails(String id);
   Future<void> addReview(String placeId, ReviewRequest reviewRequest);
+  Future<void> updateReview(String reviewId, ReviewRequest reviewRequest);
+  Future<void> deleteReview(String reviewId);
 }
