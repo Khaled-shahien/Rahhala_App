@@ -16,14 +16,22 @@ class ChatInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final inputFillColor =
+        isDark ? const Color(0xFF2C2C2C) : const Color(0xFFF9F9F9);
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final hintColor = isDark ? Colors.white38 : Colors.grey.shade400;
+    final borderColor = const Color(0xFFD1B89A);
+
     return Container(
-      padding: EdgeInsets.fromLTRB(
-          16.w, 8.h, 16.w, 24.h), // مساحة أسفل SafeArea لراحة الإبهام
+      padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 24.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: backgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.03),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -38,35 +46,33 @@ class ChatInputField extends StatelessWidget {
                 controller: controller,
                 maxLines: 5,
                 minLines: 1,
-                style: TextStyle(fontSize: 15.sp, color: Colors.black87),
+                style: TextStyle(fontSize: 15.sp, color: textColor),
                 decoration: InputDecoration(
                   hintText: 'Type your message...',
-                  hintStyle:
-                      TextStyle(fontSize: 14.sp, color: Colors.grey.shade400),
+                  hintStyle: TextStyle(fontSize: 14.sp, color: hintColor),
                   filled: true,
-                  fillColor:
-                      const Color(0xFFF9F9F9), // خلفية خفيفة جداً لتمييز الحقل
+                  fillColor: inputFillColor,
 
-                  // الحواف هنا هي السر في الشكل النظيف
+                  // الحواف
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(25.r),
-                    borderSide:
-                        const BorderSide(color: Color(0xFFD1B89A), width: 1.2),
+                    borderSide: BorderSide(color: borderColor, width: 1.2),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(25.r),
-                    borderSide: const BorderSide(
-                        color: Color(0xFFD1B89A), width: 1.8), // تبرز عند الضغط
+                    borderSide: BorderSide(color: borderColor, width: 1.8),
                   ),
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
 
-                  // أيقونة المرفقات بداخل الحافة تماماً
                   suffixIcon: Padding(
                     padding: EdgeInsets.only(right: 4.w),
                     child: IconButton(
-                      icon: Icon(Icons.attach_file_outlined,
-                          color: Colors.grey.shade500, size: 20.sp),
+                      icon: Icon(
+                        Icons.attach_file_outlined,
+                        color: isDark ? Colors.white54 : Colors.grey.shade500,
+                        size: 20.sp,
+                      ),
                       onPressed: () {},
                     ),
                   ),
@@ -74,19 +80,19 @@ class ChatInputField extends StatelessWidget {
               ),
             ),
             SizedBox(width: 12.w),
-            _buildSendButton(),
+            _buildSendButton(borderColor),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSendButton() {
+  Widget _buildSendButton(Color color) {
     return Container(
       height: 48.h,
       width: 48.h,
-      decoration: const BoxDecoration(
-        color: Color(0xFFD1B89A),
+      decoration: BoxDecoration(
+        color: color,
         shape: BoxShape.circle,
       ),
       child: IconButton(

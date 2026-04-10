@@ -21,6 +21,11 @@ class TripDetailsHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final overlayColor = isDark ? Colors.black : const Color(0xFFF3E5D8);
+
     return SizedBox(
       width: double.infinity,
       height: 380.h,
@@ -38,36 +43,14 @@ class TripDetailsHeader extends StatelessWidget {
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: 380.h,
-                  semanticLabel: 'Destination image',
                   errorBuilder: (context, error, stackTrace) {
-                    AppLogger.instance.w(
-                      'TripDetailsHeader country image failed to load',
-                      error: error,
-                    );
                     return Container(
                       decoration: BoxDecoration(
-                        color: headerBackgroundColor,
+                        color:
+                            isDark ? Colors.grey[900] : headerBackgroundColor,
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(35.r),
                           bottomRight: Radius.circular(35.r),
-                        ),
-                      ),
-                    );
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) {
-                      return child;
-                    }
-                    return Container(
-                      color: headerBackgroundColor.withValues(alpha: 0.3),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                          valueColor:
-                              const AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       ),
                     );
@@ -84,9 +67,13 @@ class TripDetailsHeader extends StatelessWidget {
                   colors: [
                     Colors.transparent,
                     Colors.transparent,
-                    screenBackgroundColor.withValues(alpha: 0.15),
-                    screenBackgroundColor.withValues(alpha: 0.5),
-                    screenBackgroundColor,
+                    isDark
+                        ? Colors.black.withValues(alpha: 0.2)
+                        : theme.scaffoldBackgroundColor.withValues(alpha: 0.15),
+                    isDark
+                        ? Colors.black.withValues(alpha: 0.5)
+                        : theme.scaffoldBackgroundColor.withValues(alpha: 0.5),
+                    theme.scaffoldBackgroundColor,
                   ],
                   stops: const [0.0, 0.45, 0.7, 0.85, 1.0],
                 ),
@@ -102,8 +89,12 @@ class TripDetailsHeader extends StatelessWidget {
                   colors: [
                     Colors.transparent,
                     Colors.transparent,
-                    screenBackgroundColor.withValues(alpha: 0.3),
-                    const Color(0xFFF3E5D8).withValues(alpha: 0.8),
+                    isDark
+                        ? Colors.black.withValues(alpha: 0.15)
+                        : theme.scaffoldBackgroundColor.withValues(alpha: 0.3),
+                    isDark
+                        ? Colors.black.withValues(alpha: 0.3)
+                        : overlayColor.withValues(alpha: 0.8),
                   ],
                   stops: const [0.0, 0.5, 0.8, 1.0],
                 ),
@@ -117,6 +108,8 @@ class TripDetailsHeader extends StatelessWidget {
               'assets/images/cover.png',
               width: 400.w,
               fit: BoxFit.contain,
+              color: isDark ? Colors.white.withValues(alpha: 0.8) : null,
+              colorBlendMode: isDark ? BlendMode.modulate : null,
               errorBuilder: (context, error, stackTrace) => const SizedBox(),
             ),
           ),
@@ -127,26 +120,22 @@ class TripDetailsHeader extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Semantics(
-                  button: true,
-                  label: 'Back',
-                  child: GestureDetector(
-                    onTap: onBack,
-                    child: Container(
-                      padding: EdgeInsets.all(8.r),
-                      decoration: const BoxDecoration(
-                        color: Colors.black38,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white,
-                        size: 20.sp,
-                      ),
+                GestureDetector(
+                  onTap: onBack,
+                  child: Container(
+                    padding: EdgeInsets.all(8.r),
+                    decoration: const BoxDecoration(
+                      color: Colors.black38,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white,
+                      size: 20.sp,
                     ),
                   ),
                 ),
-                _buildRegenerateControl(),
+                _buildRegenerateControl(isDark),
               ],
             ),
           ),
@@ -166,11 +155,13 @@ class TripDetailsHeader extends StatelessWidget {
                 _ModernPill(
                   icon: Icons.location_on_outlined,
                   text: plan.destination,
+                  isDark: isDark,
                 ),
                 SizedBox(height: 12.h),
                 _ModernPill(
                   text: 'Total cost: ${plan.totalEstimatedCost}',
                   isCost: true,
+                  isDark: isDark,
                 ),
               ],
             ),
@@ -180,42 +171,29 @@ class TripDetailsHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildRegenerateControl() {
-    if (isRegenerating) {
-      return Container(
+  Widget _buildRegenerateControl(bool isDark) {
+    return GestureDetector(
+      onTap: onRegenerate,
+      child: Container(
         padding: EdgeInsets.all(8.r),
         decoration: const BoxDecoration(
           color: AppColors.primary,
           shape: BoxShape.circle,
         ),
-        child: SizedBox(
-          width: 20.sp,
-          height: 20.sp,
-          child: const CircularProgressIndicator(
-            strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-          ),
-        ),
-      );
-    }
-
-    return Semantics(
-      button: true,
-      label: 'Regenerate trip plan',
-      child: GestureDetector(
-        onTap: onRegenerate,
-        child: Container(
-          padding: EdgeInsets.all(8.r),
-          decoration: const BoxDecoration(
-            color: AppColors.primary,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.refresh_rounded,
-            color: Colors.white,
-            size: 20.sp,
-          ),
-        ),
+        child: isRegenerating
+            ? SizedBox(
+                width: 20.sp,
+                height: 20.sp,
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Icon(
+                Icons.refresh_rounded,
+                color: Colors.white,
+                size: 20.sp,
+              ),
       ),
     );
   }
@@ -235,14 +213,9 @@ class _Title extends StatelessWidget {
           height: 1.4,
           shadows: [
             Shadow(
-              color: Colors.black.withValues(alpha: 1),
+              color: Colors.black.withValues(alpha: 0.8),
               offset: const Offset(0, 2),
-              blurRadius: 255,
-            ),
-            Shadow(
-              color: Colors.black.withValues(alpha: 1),
-              offset: const Offset(0, 4),
-              blurRadius: 100,
+              blurRadius: 10,
             ),
           ],
         ),
@@ -256,21 +229,25 @@ class _ModernPill extends StatelessWidget {
     this.icon,
     required this.text,
     this.isCost = false,
+    required this.isDark,
   });
 
   final IconData? icon;
   final String text;
   final bool isCost;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3E5D8).withValues(alpha: 0.5),
+        color: isDark
+            ? Colors.black.withValues(alpha: 0.5)
+            : const Color(0xFFF3E5D8).withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(30.r),
         border: Border.all(
-          color: const Color(0xFF8B6F5A),
+          color: isDark ? Colors.white12 : const Color(0xFF8B6F5A),
           width: 1.4,
         ),
       ),
@@ -278,13 +255,15 @@ class _ModernPill extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 18.sp, color: const Color(0xFF5C4634)),
+            Icon(icon,
+                size: 18.sp,
+                color: isDark ? Colors.white : const Color(0xFF5C4634)),
             SizedBox(width: 8.w),
           ],
           Text(
             text,
             style: TextStyle(
-              color: const Color(0xFF5C4634),
+              color: isDark ? Colors.white : const Color(0xFF5C4634),
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
             ),

@@ -17,17 +17,26 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final botBubbleColor = isDark ? const Color(0xFF2C2C2C) : Colors.white;
+    final botTextColor =
+        isDark ? Colors.white.withOpacity(0.9) : ThemeColor.charcoalColor;
+    final userBubbleColor = ThemeColor.primaryColor;
+    final iconBgColor = ThemeColor.primaryColor.withOpacity(isDark ? 0.2 : 0.1);
+
     return Padding(
       padding: EdgeInsets.only(bottom: 16.h),
       child: Row(
         mainAxisAlignment:
             isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
             Container(
               padding: EdgeInsets.all(8.r),
               decoration: BoxDecoration(
-                color: ThemeColor.primaryColor.withValues(alpha: 0.1),
+                color: iconBgColor,
                 borderRadius: BorderRadius.circular(20.r),
               ),
               child: Icon(
@@ -50,7 +59,7 @@ class ChatBubble extends StatelessWidget {
                     vertical: 12.h,
                   ),
                   decoration: BoxDecoration(
-                    color: isUser ? ThemeColor.primaryColor : Colors.white,
+                    color: isUser ? userBubbleColor : botBubbleColor,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(16),
                       topRight: const Radius.circular(16),
@@ -59,7 +68,7 @@ class ChatBubble extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
+                        color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -69,7 +78,7 @@ class ChatBubble extends StatelessWidget {
                     message,
                     style: TextStyle(
                       fontSize: 15.sp,
-                      color: isUser ? Colors.white : ThemeColor.charcoalColor,
+                      color: isUser ? Colors.white : botTextColor,
                       height: 1.4,
                     ),
                   ),
@@ -80,7 +89,8 @@ class ChatBubble extends StatelessWidget {
                     DateFormat('h:mm a').format(timestamp!),
                     style: TextStyle(
                       fontSize: 11.sp,
-                      color: ThemeColor.neutralGrayColor,
+                      color:
+                          isDark ? Colors.white38 : ThemeColor.neutralGrayColor,
                     ),
                   ),
                 ],
@@ -92,7 +102,7 @@ class ChatBubble extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(8.r),
               decoration: BoxDecoration(
-                color: ThemeColor.primaryColor.withValues(alpha: 0.1),
+                color: iconBgColor,
                 borderRadius: BorderRadius.circular(20.r),
               ),
               child: Icon(

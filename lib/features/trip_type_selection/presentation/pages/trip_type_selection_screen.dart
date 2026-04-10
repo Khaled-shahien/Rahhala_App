@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
+
 import 'package:rahhala_app/features/custom_trip/presentation/pages/custom_trip_flow_screen.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/pages/ai_recommendation_flow_screen.dart';
 
@@ -11,19 +12,21 @@ class TripTypeSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ThemeColor.bgColor,
-      // appBar: AppBar(
-      //   backgroundColor: ThemeColor.bgColor,
-      //   elevation: 0,
-      //   leading: IconButton(
-      //     icon: const Icon(Icons.arrow_back_ios_new_outlined,
-      //         color: Colors.black),
-      //     onPressed: () => Navigator.pop(context),
-      //   ),
-      // ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -41,10 +44,10 @@ class TripTypeSelectionScreen extends StatelessWidget {
                 'Choose how you want to plan your trip',
                 style: TextStyle(
                   fontSize: 16.sp,
-                  color: ThemeColor.neutralGrayColor,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
-              SizedBox(height: 48.h),
+              SizedBox(height: 40.h),
 
               // Custom Trip Option
               _buildTripTypeCard(
@@ -96,24 +99,24 @@ class TripTypeSelectionScreen extends StatelessWidget {
     required String description,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.all(24.w),
+        padding: EdgeInsets.all(20.w),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20.r),
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(24.r),
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+          ),
           boxShadow: [
             BoxShadow(
-              color: ThemeColor.primaryColor.withValues(alpha: 0.08),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -121,26 +124,19 @@ class TripTypeSelectionScreen extends StatelessWidget {
           children: [
             // Icon Container
             Container(
-              width: 64.w,
-              height: 64.w,
+              width: 60.w,
+              height: 60.w,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    ThemeColor.primaryColor.withValues(alpha: 0.2),
-                    ThemeColor.primaryColor.withValues(alpha: 0.1),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: ThemeColor.primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16.r),
               ),
               child: Icon(
                 icon,
-                size: 32.sp,
+                size: 30.sp,
                 color: ThemeColor.primaryColor,
               ),
             ),
-            SizedBox(width: 20.w),
+            SizedBox(width: 16.w),
 
             // Text Content
             Expanded(
@@ -152,27 +148,27 @@ class TripTypeSelectionScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
-                      color: ThemeColor.charcoalColor,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
-                  SizedBox(height: 6.h),
+                  SizedBox(height: 4.h),
                   Text(
                     description,
                     style: TextStyle(
-                      fontSize: 14.sp,
-                      color: ThemeColor.neutralGrayColor,
-                      height: 1.3,
+                      fontSize: 13.sp,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      height: 1.4,
                     ),
                   ),
                 ],
               ),
             ),
 
-            // Arrow Icon
+            SizedBox(width: 8.w),
             Icon(
-              Icons.arrow_forward_ios,
-              size: 18.sp,
-              color: ThemeColor.neutralGrayColor,
+              Icons.arrow_forward_ios_rounded,
+              size: 16.sp,
+              color: ThemeColor.primaryColor.withOpacity(0.5),
             ),
           ],
         ),

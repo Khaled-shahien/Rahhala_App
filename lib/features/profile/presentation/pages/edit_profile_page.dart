@@ -66,7 +66,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _selectDateOfBirth(BuildContext context) async {
-    // Set default date to 18 years ago if no date is selected
     final DateTime defaultDate = _dobController.text.trim().isNotEmpty
         ? DateTime.parse(_dobController.text.trim())
         : DateTime.now().subtract(const Duration(days: 6570));
@@ -79,11 +78,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: ThemeColor.charcoalColor,
-              onPrimary: Colors.white,
-              onSurface: ThemeColor.charcoalColor,
-            ),
+            colorScheme: Theme.of(context).brightness == Brightness.dark
+                ? ColorScheme.dark(
+                    primary: ThemeColor.primaryColor,
+                    onPrimary: Colors.white,
+                    surface: Theme.of(context).cardColor,
+                    onSurface: Theme.of(context).colorScheme.onSurface,
+                  )
+                : const ColorScheme.light(
+                    primary: ThemeColor.charcoalColor,
+                    onPrimary: Colors.white,
+                    onSurface: ThemeColor.charcoalColor,
+                  ),
           ),
           child: child!,
         );
@@ -91,7 +97,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
     if (picked != null) {
       setState(() {
-        // Format date as YYYY-MM-DD
         _dobController.text =
             "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
       });
@@ -133,13 +138,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
             (details.countryName?.trim().isNotEmpty ?? false)) {
           _countryController.text = details.countryName!.trim();
         }
-        // Fix: Load birth date
         if (_dobController.text.trim().isEmpty && (details.birthDate != null)) {
-          // Format date as YYYY-MM-DD
           _dobController.text =
               "${details.birthDate!.year}-${details.birthDate!.month.toString().padLeft(2, '0')}-${details.birthDate!.day.toString().padLeft(2, '0')}";
         }
-        // Fix: Load gender and update in variables
         if (_genderController.text.trim().isEmpty &&
             (details.gender?.trim().isNotEmpty ?? false)) {
           setState(() {
@@ -147,16 +149,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _genderController.text = details.gender!.trim();
           });
         }
-        // Set default values if no data exists
         if (_dobController.text.trim().isEmpty) {
-          // Set default birth date to 18 years ago
           final defaultDate =
               DateTime.now().subtract(const Duration(days: 6570));
           _dobController.text =
               "${defaultDate.year}-${defaultDate.month.toString().padLeft(2, '0')}-${defaultDate.day.toString().padLeft(2, '0')}";
         }
         if (_genderController.text.trim().isEmpty) {
-          // Set default gender to "Prefer not to say"
           setState(() {
             _selectedGender = "Prefer not to say";
             _genderController.text = "Prefer not to say";
@@ -174,38 +173,50 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<void> _pickAndUploadPhoto() async {
     if (_isUploadingPhoto) return;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
+      backgroundColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
       builder: (_) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(height: 12.h),
-              Container(
-                width: 45.w,
-                height: 6.h,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(3.r),
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+          ),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: 12.h),
+                Container(
+                  width: 45.w,
+                  height: 6.h,
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[700] : Colors.grey[300],
+                    borderRadius: BorderRadius.circular(3.r),
+                  ),
                 ),
-              ),
-              SizedBox(height: 16.h),
-              ListTile(
-                leading: const Icon(Icons.photo_library_outlined),
-                title: const Text('Choose from gallery'),
-                onTap: () => Navigator.pop(context, ImageSource.gallery),
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_camera_outlined),
-                title: const Text('Take a photo'),
-                onTap: () => Navigator.pop(context, ImageSource.camera),
-              ),
-              SizedBox(height: 12.h),
-            ],
+                SizedBox(height: 16.h),
+                ListTile(
+                  leading: Icon(Icons.photo_library_outlined,
+                      color: isDark ? Colors.white : null),
+                  title: Text('Choose from gallery',
+                      style: TextStyle(color: isDark ? Colors.white : null)),
+                  onTap: () => Navigator.pop(context, ImageSource.gallery),
+                ),
+                ListTile(
+                  leading: Icon(Icons.photo_camera_outlined,
+                      color: isDark ? Colors.white : null),
+                  title: Text('Take a photo',
+                      style: TextStyle(color: isDark ? Colors.white : null)),
+                  onTap: () => Navigator.pop(context, ImageSource.camera),
+                ),
+                SizedBox(height: 12.h),
+              ],
+            ),
           ),
         );
       },
@@ -227,19 +238,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
           setState(() => _isUploadingPhoto = false);
           HapticFeedback.mediumImpact();
           showAppNotification(
-            context: context,
-            title: 'Error',
-            message: f.message,
-            isError: true,
-          );
+              context: context,
+              title: 'Error',
+              message: f.message,
+              isError: true);
         },
         (ok) async {
           showAppNotification(
-            context: context,
-            title: 'Updated',
-            message: ok.message,
-          );
-
+              context: context, title: 'Updated', message: ok.message);
           final detailsRes = await repo.getDetails();
           detailsRes.fold((_) {}, (details) async {
             if (details.profileImageUrl != null &&
@@ -253,7 +259,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
               }
             }
           });
-
           if (mounted) setState(() => _isUploadingPhoto = false);
         },
       );
@@ -262,22 +267,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
       setState(() => _isUploadingPhoto = false);
       HapticFeedback.mediumImpact();
       showAppNotification(
-        context: context,
-        title: 'Error',
-        message: 'Failed to upload photo',
-        isError: true,
-      );
+          context: context,
+          title: 'Error',
+          message: 'Failed to upload photo',
+          isError: true);
     }
   }
 
   void _showGenderPicker(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
           ),
           child: Column(
@@ -288,7 +293,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 width: 45.w,
                 height: 6.h,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: isDark ? Colors.grey[700] : Colors.grey[300],
                   borderRadius: BorderRadius.circular(3.r),
                 ),
               ),
@@ -301,7 +306,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       style: TextStyle(
                         fontSize: 22.sp,
                         fontWeight: FontWeight.bold,
-                        color: ThemeColor.charcoalColor,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     SizedBox(height: 24.h),
@@ -310,6 +315,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       {'icon': Icons.female, 'label': 'Female'},
                       {'icon': Icons.transgender, 'label': 'Other'},
                     ].map((item) => _buildGenderOption(
+                          context: context,
                           icon: item['icon'] as IconData,
                           label: item['label'] as String,
                           isSelected: _selectedGender == item['label'],
@@ -333,11 +339,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Widget _buildGenderOption({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryCol = ThemeColor.primaryColor;
+
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       child: InkWell(
@@ -347,11 +357,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
           padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 18.h),
           decoration: BoxDecoration(
             color: isSelected
-                ? ThemeColor.charcoalColor.withValues(alpha: 0.1)
-                : Colors.grey[50],
+                ? primaryCol.withOpacity(0.1)
+                : isDark
+                    ? const Color(0xFF2C2C2C)
+                    : Colors.grey[50],
             borderRadius: BorderRadius.circular(14.r),
             border: Border.all(
-              color: isSelected ? ThemeColor.charcoalColor : Colors.grey[200]!,
+              color: isSelected
+                  ? primaryCol
+                  : isDark
+                      ? Colors.grey[700]!
+                      : Colors.grey[200]!,
               width: isSelected ? 2.5 : 1.5,
             ),
           ),
@@ -360,13 +376,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
               Container(
                 padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
-                  color:
-                      isSelected ? ThemeColor.charcoalColor : Colors.grey[300],
+                  color: isSelected
+                      ? primaryCol
+                      : isDark
+                          ? Colors.grey[700]
+                          : Colors.grey[300],
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(
                   icon,
-                  color: isSelected ? Colors.white : Colors.grey[600],
+                  color: isSelected
+                      ? Colors.white
+                      : isDark
+                          ? Colors.grey[400]
+                          : Colors.grey[600],
                   size: 24.sp,
                 ),
               ),
@@ -376,17 +399,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 style: TextStyle(
                   fontSize: 17.sp,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color:
-                      isSelected ? ThemeColor.charcoalColor : Colors.grey[700],
+                  color: isSelected
+                      ? primaryCol
+                      : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const Spacer(),
               if (isSelected)
-                Icon(
-                  Icons.check_circle,
-                  color: ThemeColor.charcoalColor,
-                  size: 24.sp,
-                ),
+                Icon(Icons.check_circle, color: primaryCol, size: 24.sp),
             ],
           ),
         ),
@@ -396,10 +416,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final scaffoldBg = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final primaryCol = ThemeColor.primaryColor;
+
     return BlocProvider(
       create: (_) => sl<EditProfileCubit>(),
       child: Scaffold(
-        backgroundColor: Colors.grey[50],
+        backgroundColor: scaffoldBg,
         body: SafeArea(
           child: BlocConsumer<EditProfileCubit, EditProfileState>(
             listener: (context, state) {
@@ -422,15 +447,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
               final isLoading = state is EditProfileLoading;
               return Column(
                 children: [
-                  // Custom App Bar with improved styling
+                  // ─── App Bar ──────────────────────────────────────────────
                   Container(
                     padding:
                         EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: cardBg,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.04),
+                          color: Colors.black.withOpacity(isDark ? 0.3 : 0.04),
                           blurRadius: 12,
                           offset: const Offset(0, 2),
                         ),
@@ -442,11 +467,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           onPressed: () => Navigator.pop(context),
                           icon: Icon(
                             Icons.arrow_back_ios_new_rounded,
-                            color: ThemeColor.charcoalColor,
+                            color: Theme.of(context).colorScheme.onSurface,
                             size: 22.sp,
                           ),
                           style: IconButton.styleFrom(
-                            backgroundColor: Colors.grey[100],
+                            backgroundColor: isDark
+                                ? const Color(0xFF2C2C2C)
+                                : Colors.grey[100],
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.r),
                             ),
@@ -461,14 +488,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               style: TextStyle(
                                 fontSize: 22.sp,
                                 fontWeight: FontWeight.bold,
-                                color: ThemeColor.charcoalColor,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             Text(
                               'Update your personal information',
                               style: TextStyle(
                                 fontSize: 13.sp,
-                                color: Colors.grey[600],
+                                color: isDark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600],
                                 height: 1.4,
                               ),
                             ),
@@ -478,7 +507,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                   ),
 
-                  // Form Content with improved styling
+                  // ─── Form ─────────────────────────────────────────────────
                   Expanded(
                     child: SingleChildScrollView(
                       padding: EdgeInsets.all(24.w),
@@ -488,7 +517,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // Profile Avatar Section with improved styling
+                            // Avatar
                             Center(
                               child: Stack(
                                 clipBehavior: Clip.none,
@@ -504,8 +533,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         shape: BoxShape.circle,
                                         boxShadow: [
                                           BoxShadow(
-                                            color: ThemeColor.charcoalColor
-                                                .withValues(alpha: 0.15),
+                                            color: primaryCol.withOpacity(0.2),
                                             blurRadius: 16,
                                             spreadRadius: 4,
                                           ),
@@ -513,9 +541,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       ),
                                       child: CircleAvatar(
                                         radius: 60.r,
-                                        backgroundColor: ThemeColor
-                                            .charcoalColor
-                                            .withValues(alpha: 0.12),
+                                        backgroundColor:
+                                            primaryCol.withOpacity(0.12),
                                         backgroundImage: (_profileImageUrl !=
                                                     null &&
                                                 _profileImageUrl!.isNotEmpty)
@@ -527,8 +554,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                             ? Icon(
                                                 Icons.person,
                                                 size: 55.sp,
-                                                color: ThemeColor.charcoalColor
-                                                    .withValues(alpha: 0.7),
+                                                color:
+                                                    primaryCol.withOpacity(0.7),
                                               )
                                             : null,
                                       ),
@@ -544,26 +571,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       child: Container(
                                         padding: EdgeInsets.all(10.w),
                                         decoration: BoxDecoration(
-                                          color: ThemeColor.charcoalColor,
+                                          color: primaryCol,
                                           shape: BoxShape.circle,
                                           border: Border.all(
-                                            color: Colors.white,
+                                            color: cardBg,
                                             width: 3.5,
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black
-                                                  .withValues(alpha: 0.2),
+                                              color:
+                                                  Colors.black.withOpacity(0.2),
                                               blurRadius: 8,
                                               offset: const Offset(0, 2),
                                             ),
                                           ],
                                         ),
-                                        child: Icon(
-                                          Icons.camera_alt,
-                                          size: 18.sp,
-                                          color: Colors.white,
-                                        ),
+                                        child: Icon(Icons.camera_alt,
+                                            size: 18.sp, color: Colors.white),
                                       ),
                                     ),
                                   ),
@@ -591,8 +615,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             ),
                             SizedBox(height: 36.h),
 
-                            // Personal Information Section with improved styling
-                            _buildSectionTitle('Personal Information'),
+                            _buildSectionTitle(context, 'Personal Information'),
                             SizedBox(height: 18.h),
 
                             CustomFormTextField(
@@ -630,8 +653,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         labelText: 'Birth Date',
                                         hintText: 'Select date',
                                         prefixIcon: Icons.cake_outlined,
-                                        validator: (v) =>
-                                            null, // Make birth date not required
+                                        validator: (v) => null,
                                       ),
                                     ),
                                   ),
@@ -646,8 +668,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         labelText: 'Gender',
                                         hintText: 'Select',
                                         prefixIcon: Icons.transgender_outlined,
-                                        validator: (v) =>
-                                            null, // Make gender not required
+                                        validator: (v) => null,
                                       ),
                                     ),
                                   ),
@@ -657,8 +678,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                             SizedBox(height: 32.h),
 
-                            // Contact Information Section with improved styling
-                            _buildSectionTitle('Contact Information'),
+                            _buildSectionTitle(context, 'Contact Information'),
                             SizedBox(height: 18.h),
 
                             CustomFormTextField(
@@ -684,6 +704,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   context: context,
                                   showPhoneCode: false,
                                   countryListTheme: CountryListThemeData(
+                                    backgroundColor: cardBg,
                                     borderRadius: BorderRadius.only(
                                       topLeft: Radius.circular(22.r),
                                       topRight: Radius.circular(22.r),
@@ -719,30 +740,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                             SizedBox(height: 36.h),
 
-                            // Save Button with improved styling
                             CustomButton(
                               onTap: isLoading
                                   ? null
                                   : () {
                                       if (_formKey.currentState!.validate()) {
-                                        // Format date properly before sending
                                         String? formattedDob;
                                         if (_dobController.text
                                             .trim()
                                             .isNotEmpty) {
                                           try {
-                                            // Ensure date is in ISO format (YYYY-MM-DD)
                                             final date = DateTime.parse(
                                                 _dobController.text.trim());
                                             formattedDob =
                                                 "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
                                           } catch (e) {
-                                            // If parsing fails, send as is
                                             formattedDob =
                                                 _dobController.text.trim();
                                           }
                                         }
-
                                         context.read<EditProfileCubit>().save(
                                               fullName: _name.text.trim(),
                                               phoneNumber: _phone.text.trim(),
@@ -773,14 +789,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
         Container(
           width: 5.w,
           height: 24.h,
           decoration: BoxDecoration(
-            color: ThemeColor.charcoalColor,
+            color: ThemeColor.primaryColor,
             borderRadius: BorderRadius.circular(3.r),
           ),
         ),
@@ -790,7 +807,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
-            color: ThemeColor.charcoalColor,
+            color: isDark ? Colors.white : ThemeColor.charcoalColor,
           ),
         ),
       ],

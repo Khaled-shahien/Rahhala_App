@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_cubit.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_state.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/pages/trip_splash_screen.dart';
@@ -13,6 +12,7 @@ class TripInterestsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<AiTripCubit>();
+    final colorScheme = Theme.of(context).colorScheme;
 
     return BlocBuilder<AiTripCubit, AiTripState>(
       builder: (context, state) {
@@ -33,7 +33,7 @@ class TripInterestsScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.black,
+                  color: colorScheme.onSurface,
                   height: 1.3,
                 ),
               ),
@@ -53,6 +53,7 @@ class TripInterestsScreen extends StatelessWidget {
                   final isSelected = state.selectedInterests.contains(interest);
 
                   return _buildInterestToggle(
+                    context,
                     interest,
                     isSelected,
                     () => cubit.toggleInterest(interest),
@@ -64,7 +65,6 @@ class TripInterestsScreen extends StatelessWidget {
                 onPressed: () {
                   cubit.generateTripPlan();
 
-                  // Navigate to splash screen with the cubit
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -85,22 +85,28 @@ class TripInterestsScreen extends StatelessWidget {
   }
 
   Widget _buildInterestToggle(
+    BuildContext context,
     String label,
     bool isSelected,
     VoidCallback onPressed,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       height: 56.h,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: isSelected ? AppColors.primary : AppColors.primaryLight,
+        color: isSelected ? colorScheme.primary : colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: AppColors.borderDark, width: 2.w),
+        border: Border.all(
+          color: isSelected ? colorScheme.primary : colorScheme.outlineVariant,
+          width: 2.w,
+        ),
         boxShadow: [
           BoxShadow(
             color: isSelected
-                ? AppColors.primary.withValues(alpha: 0.3)
-                : Colors.black.withValues(alpha: 0.05),
+                ? colorScheme.primary.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -116,7 +122,7 @@ class TripInterestsScreen extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? AppColors.white : AppColors.black,
+            color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
             fontSize: 18.sp,
             fontWeight: FontWeight.w500,
           ),

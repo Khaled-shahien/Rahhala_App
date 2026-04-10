@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/core/constants/app_colors.dart'; // تأكدي من المسار ده للألوان الثابتة
 
 class ProgressIndicatorBar extends StatelessWidget {
   final int currentStep;
@@ -8,44 +9,61 @@ class ProgressIndicatorBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // تحديد هل إحنا في الدارك مود ولا لا
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // الألوان بناءً على المود
+    final activeColor = const Color(0xFFA88866); // اللون البني بتاعنا
+    final inactiveCircleBg = isDark ? const Color(0xFF2C2C2C) : Colors.white;
+    final inactiveLineColor = isDark ? Colors.white10 : Colors.grey.shade300;
+    final inactiveTextColor = isDark ? Colors.white54 : const Color(0xFFA88866);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(4, (index) {
+        bool isCompletedOrCurrent = index <= currentStep;
+        bool isLineCompleted = index < currentStep;
+
         return Row(
           children: [
+            // الدائرة (الرقم)
             Container(
               width: 30.w,
               height: 30.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: index <= currentStep
-                    ? const Color(0xFFA88866)
-                    : Colors.white,
+                color: isCompletedOrCurrent ? activeColor : inactiveCircleBg,
                 border: Border.all(
-                  color: const Color(0xFFA88866),
+                  color: activeColor,
                   width: 2.w,
                 ),
+                boxShadow: isDark && isCompletedOrCurrent
+                    ? [
+                        BoxShadow(
+                            color: activeColor.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2))
+                      ]
+                    : null,
               ),
               child: Center(
                 child: Text(
                   '${index + 1}',
                   style: TextStyle(
-                    color: index <= currentStep
-                        ? Colors.white
-                        : const Color(0xFFA88866),
+                    color:
+                        isCompletedOrCurrent ? Colors.white : inactiveTextColor,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
+
             if (index < 3) ...[
               Container(
                 width: 40.w,
                 height: 2.h,
-                color: index < currentStep
-                    ? const Color(0xFFA88866)
-                    : Colors.grey.shade300,
+                color: isLineCompleted ? activeColor : inactiveLineColor,
               ),
             ],
           ],

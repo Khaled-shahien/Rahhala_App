@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:rahhala_app/features/image_search/data/models/image_search_model.dart';
+import 'package:rahhala_app/core/theme/app_theme.dart';
 
 class PlaceCard extends StatelessWidget {
   final PlaceResult place;
@@ -11,14 +12,18 @@ class PlaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color:
+                isDark ? Colors.black26 : Colors.black.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -38,16 +43,18 @@ class PlaceCard extends StatelessWidget {
                   width: double.infinity,
                   fit: BoxFit.cover,
                   placeholder: (_, __) => Shimmer.fromColors(
-                    baseColor: Colors.grey.shade300,
-                    highlightColor: Colors.grey.shade100,
+                    baseColor:
+                        isDark ? Colors.grey[800]! : Colors.grey.shade300,
+                    highlightColor:
+                        isDark ? Colors.grey[700]! : Colors.grey.shade100,
                     child: Container(
                       height: 180.h,
-                      color: Colors.white,
+                      color: colorScheme.surface,
                     ),
                   ),
                   errorWidget: (_, __, ___) => Container(
                     height: 180.h,
-                    color: Colors.grey.shade200,
+                    color: isDark ? Colors.grey[900] : Colors.grey.shade200,
                     child: Icon(
                       Icons.image_not_supported_outlined,
                       size: 40.sp,
@@ -65,7 +72,9 @@ class PlaceCard extends StatelessWidget {
                       vertical: 6.h,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark
+                          ? colorScheme.secondaryContainer
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(20.r),
                       boxShadow: [
                         BoxShadow(
@@ -85,7 +94,7 @@ class PlaceCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -106,7 +115,7 @@ class PlaceCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 17.sp,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF3E3431),
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 SizedBox(height: 6.h),
@@ -131,7 +140,7 @@ class PlaceCard extends StatelessWidget {
                       '(${place.rating.toStringAsFixed(1)})',
                       style: TextStyle(
                         fontSize: 13.sp,
-                        color: Colors.grey,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -142,7 +151,7 @@ class PlaceCard extends StatelessWidget {
                     Icon(
                       Icons.location_on_outlined,
                       size: 16.sp,
-                      color: const Color(0xFFA88866),
+                      color: ThemeColor.primaryColor,
                     ),
                     SizedBox(width: 4.w),
                     Expanded(
@@ -150,7 +159,7 @@ class PlaceCard extends StatelessWidget {
                         place.address,
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: Colors.grey.shade600,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

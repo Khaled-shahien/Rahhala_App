@@ -5,6 +5,7 @@ import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/localization/app_locale_controller.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
+import 'package:rahhala_app/core/theme/theme_controller.dart';
 import 'package:rahhala_app/features/splash/presentation/pages/splash_screen.dart';
 import 'package:rahhala_app/l10n/generated/app_localizations.dart';
 
@@ -16,7 +17,7 @@ void main() async {
   // Initialize dependency injection
   await setupServiceLocator();
   await sl<AppLocaleController>().initialize();
-
+  await sl<AppThemeController>().initialize();
   // Run the application
   runApp(const RahhalaApp());
 }
@@ -34,9 +35,9 @@ class RahhalaApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (_, __) {
         final localeController = sl<AppLocaleController>();
-
+        final themeController = sl<AppThemeController>();
         return ListenableBuilder(
-          listenable: localeController,
+          listenable: Listenable.merge([localeController, themeController]),
           builder: (context, child) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
@@ -64,7 +65,7 @@ class RahhalaApp extends StatelessWidget {
               },
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
-              themeMode: ThemeMode.system,
+              themeMode: themeController.themeMode,
               home: const SplashScreen(),
             );
           },

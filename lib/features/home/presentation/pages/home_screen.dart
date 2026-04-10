@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/features/home/domain/repositories/home_repository.dart';
 import 'package:rahhala_app/features/home/presentation/cubit/home_cubit.dart';
@@ -12,27 +11,41 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return BlocProvider(
       create: (context) => HomeCubit(sl<HomeRepository>())..getHomeData(),
       child: Scaffold(
+        backgroundColor: Colors.transparent,
         body: Builder(
           builder: (context) {
             return RefreshIndicator(
-              color: AppColors.lightBrown,
-              backgroundColor: Colors.white,
+              color: colorScheme.primary,
+              backgroundColor: colorScheme.surface,
               onRefresh: () async {
                 await context.read<HomeCubit>().getHomeData();
               },
               child: BlocBuilder<HomeCubit, HomeState>(
                 builder: (context, state) {
                   if (state is HomeLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return Center(
+                      child:
+                          CircularProgressIndicator(color: colorScheme.primary),
+                    );
                   } else if (state is HomeError) {
                     return ListView(
                       children: [
                         SizedBox(
                             height: MediaQuery.of(context).size.height * 0.4),
-                        Center(child: Text('Error: ${state.message}')),
+                        Center(
+                          child: Text(
+                            'Error: ${state.message}',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
                       ],
                     );
                   } else if (state is HomeSuccess) {
@@ -62,7 +75,14 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       SizedBox(
                           height: MediaQuery.of(context).size.height * 0.4),
-                      const Center(child: Text("No Data Found")),
+                      Center(
+                        child: Text(
+                          "No Data Found",
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
                     ],
                   );
                 },

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/features/custom_trip/presentation/cubit/custom_trip_cubit.dart';
 import 'package:rahhala_app/features/custom_trip/presentation/pages/custom_trip_splash_screen.dart';
@@ -16,49 +15,49 @@ class CustomTripFlowScreen extends StatefulWidget {
 class _CustomTripFlowScreenState extends State<CustomTripFlowScreen> {
   @override
   Widget build(BuildContext context) {
+    // بنجيب الـ ColorScheme بتاعنا
+    final colorScheme = Theme.of(context).colorScheme;
+
     return BlocProvider(
       create: (_) => sl<CustomTripCubit>(),
       child: Builder(
         builder: (innerContext) {
           void goToSplash() {
             final cubit = innerContext.read<CustomTripCubit>();
-
-            // Check if region is selected
-            if (cubit.selectedRegion == null || cubit.selectedRegion!.isEmpty) {
+            if (cubit.selectedRegion == null || cubit.selectedRegion!.isEmpty)
               return;
-            }
-
-            // Call the API to generate trip plan
             cubit.generateTripPlan();
-
-            // Navigate to splash screen which will listen for the result
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => CustomTripSplashScreen(cubit: cubit),
-              ),
+                  builder: (_) => CustomTripSplashScreen(cubit: cubit)),
             );
           }
 
           return PopScope(
             canPop: true,
             onPopInvoked: (didPop) {
-              if (didPop) {
-                // Reset cubit when navigating back to this screen
-                innerContext.read<CustomTripCubit>().reset();
-              }
+              if (didPop) innerContext.read<CustomTripCubit>().reset();
             },
-            child: Scaffold(
-              backgroundColor: AppColors.white,
-              appBar: AppBar(
-                backgroundColor: AppColors.white,
-                elevation: 0,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new_outlined,
-                      color: Colors.black),
-                  onPressed: () => Navigator.pop(context),
-                ),
+            child: Theme(
+              data: Theme.of(context).copyWith(
+                textTheme: Theme.of(context).textTheme.apply(
+                      bodyColor: Colors.white,
+                      displayColor: Colors.white,
+                    ),
               ),
-              body: CustomTripInputStep(onNext: goToSplash),
+              child: Scaffold(
+                backgroundColor: colorScheme.surface,
+                appBar: AppBar(
+                  backgroundColor: colorScheme.surface,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new_outlined,
+                        color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+                body: CustomTripInputStep(onNext: goToSplash),
+              ),
             ),
           );
         },

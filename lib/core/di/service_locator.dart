@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
+import 'package:rahhala_app/core/theme/theme_controller.dart';
 import 'package:rahhala_app/features/home/data/datasource/home_remote_data_source.dart';
 import 'package:rahhala_app/features/home/data/repositories/home_repository_impl.dart';
 import 'package:rahhala_app/features/home/domain/repositories/home_repository.dart';
@@ -205,4 +206,7 @@ Future<void> setupServiceLocator() async {
   sl.registerFactory<ReviewCubit>(
     () => ReviewCubit(sl<HomeRepository>()),
   );
+
+  // App theme controller
+  sl.registerSingleton<AppThemeController>(AppThemeController());
 }

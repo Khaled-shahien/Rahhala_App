@@ -49,13 +49,18 @@ class _SimpleExpansionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final details = content.isEmpty ? TripDetailsStrings.noInfo : content;
+
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? theme.cardColor : Colors.white,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(
+          color: isDark ? Colors.white12 : Colors.black12,
+        ),
       ),
       child: CustomExpansionTile(
         tilePadding: EdgeInsets.all(16.w),
@@ -64,10 +69,13 @@ class _SimpleExpansionTile extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                // درجة الشفافية للـ Primary بتزيد شوية في الدارك مود عشان تظهر
+                color: AppColors.primary.withValues(alpha: isDark ? 0.2 : 0.1),
                 borderRadius: BorderRadius.circular(12.r),
               ),
-              child: Icon(icon, color: AppColors.primary, size: 24.sp),
+              child: Icon(icon,
+                  color: isDark ? theme.primaryColorLight : AppColors.primary,
+                  size: 24.sp),
             ),
             SizedBox(width: 16.w),
             Expanded(
@@ -77,7 +85,7 @@ class _SimpleExpansionTile extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      color: primaryTextColor,
+                      color: isDark ? Colors.white : primaryTextColor,
                       fontSize: 14.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -86,7 +94,9 @@ class _SimpleExpansionTile extends StatelessWidget {
                   Text(
                     details,
                     style: TextStyle(
-                      color: primaryTextColor.withValues(alpha: 0.8),
+                      color: isDark
+                          ? Colors.white70
+                          : primaryTextColor.withValues(alpha: 0.8),
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w500,
                     ),
@@ -97,7 +107,7 @@ class _SimpleExpansionTile extends StatelessWidget {
               ),
             ),
             Icon(Icons.keyboard_arrow_down,
-                color: primaryTextColor, size: 20.sp),
+                color: isDark ? Colors.white60 : primaryTextColor, size: 20.sp),
           ],
         ),
         iconColor: Colors.transparent,
@@ -108,7 +118,9 @@ class _SimpleExpansionTile extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Text(
               details,
-              style: TextStyle(fontSize: 13.sp, color: primaryTextColor),
+              style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? Colors.white70 : primaryTextColor),
             ),
           ),
         ],
@@ -124,6 +136,9 @@ class _EmergencyContactSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     if (emergencyContact.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -131,9 +146,11 @@ class _EmergencyContactSection extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? theme.cardColor : Colors.white,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(
+          color: isDark ? Colors.white12 : Colors.black12,
+        ),
       ),
       child: Padding(
         padding: EdgeInsets.all(16.w),
@@ -142,12 +159,12 @@ class _EmergencyContactSection extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.primary.withValues(alpha: isDark ? 0.2 : 0.1),
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Icon(
                 Icons.emergency_outlined,
-                color: AppColors.primary,
+                color: isDark ? theme.primaryColorLight : AppColors.primary,
                 size: 24.sp,
               ),
             ),
@@ -159,7 +176,7 @@ class _EmergencyContactSection extends StatelessWidget {
                   Text(
                     TripDetailsStrings.emergencyContact,
                     style: TextStyle(
-                      color: primaryTextColor,
+                      color: isDark ? Colors.white : primaryTextColor,
                       fontSize: 14.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -168,7 +185,9 @@ class _EmergencyContactSection extends StatelessWidget {
                   Text(
                     emergencyContact,
                     style: TextStyle(
-                      color: primaryTextColor.withValues(alpha: 0.8),
+                      color: isDark
+                          ? Colors.white70
+                          : primaryTextColor.withValues(alpha: 0.8),
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w500,
                     ),

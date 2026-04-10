@@ -18,6 +18,8 @@ class PlaceDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -29,7 +31,7 @@ class PlaceDetailsScreen extends StatelessWidget {
         ),
       ],
       child: Scaffold(
-        backgroundColor: Colors.grey[100],
+        backgroundColor: colorScheme.surface,
         body: BlocBuilder<PlaceDetailsCubit, PlaceDetailsState>(
           builder: (context, state) {
             if (state is PlaceDetailsLoading) {
@@ -45,18 +47,22 @@ class PlaceDetailsScreen extends StatelessWidget {
                     expandedHeight: 250.h,
                     pinned: true,
                     backgroundColor: AppColors.mediumBrown,
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.black26,
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () => Navigator.pop(context),
+                    leading: Padding(
+                      padding: EdgeInsets.all(8.w),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.black26,
+                        child: IconButton(
+                          icon:
+                              const Icon(Icons.arrow_back, color: Colors.white),
+                          onPressed: () => Navigator.pop(context),
+                        ),
                       ),
                     ),
                     flexibleSpace: FlexibleSpaceBar(
                       title: Text(
                         place.name,
                         style: TextStyle(
-                          fontSize: 30.sp,
+                          fontSize: 20.sp,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -64,10 +70,7 @@ class PlaceDetailsScreen extends StatelessWidget {
                       background: Stack(
                         fit: StackFit.expand,
                         children: [
-                          Image.network(
-                            place.imageUrl,
-                            fit: BoxFit.cover,
-                          ),
+                          Image.network(place.imageUrl, fit: BoxFit.cover),
                           const DecoratedBox(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -83,22 +86,26 @@ class PlaceDetailsScreen extends StatelessWidget {
                   ),
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsets.all(12.w),
+                      padding: EdgeInsets.all(16.w),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 10.h),
                           Text(
                             "Description",
                             style: TextStyle(
-                                fontSize: 20.sp, fontWeight: FontWeight.bold),
+                                fontSize: 20.sp,
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface),
                           ),
                           SizedBox(height: 8.h),
                           Text(
                             place.description,
-                            style: TextStyle(fontSize: 16.sp, height: 1.5),
+                            style: TextStyle(
+                                fontSize: 16.sp,
+                                height: 1.5,
+                                color: colorScheme.onSurfaceVariant),
                           ),
-                          SizedBox(height: 20.h),
+                          SizedBox(height: 24.h),
                           HorizontalSection(
                             title: "Restaurants",
                             items: place.restaurants,
@@ -108,11 +115,13 @@ class PlaceDetailsScreen extends StatelessWidget {
                             title: "Hotels",
                             items: place.hotels,
                           ),
-                          SizedBox(height: 20.h),
+                          SizedBox(height: 24.h),
                           Text(
                             "Rating & Reviews",
                             style: TextStyle(
-                                fontSize: 22.sp, fontWeight: FontWeight.bold),
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface),
                           ),
                           SizedBox(height: 12.h),
                           RatingSummaryCard(
@@ -120,11 +129,13 @@ class PlaceDetailsScreen extends StatelessWidget {
                             totalReviews: place.ratingSummary.totalReviews,
                             stats: place.ratingSummary.distribution,
                           ),
-                          SizedBox(height: 20.h),
+                          SizedBox(height: 24.h),
                           Text(
                             "Customer Feedbacks",
                             style: TextStyle(
-                                fontSize: 22.sp, fontWeight: FontWeight.bold),
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface),
                           ),
                           SizedBox(height: 10.h),
                           ...place.reviews

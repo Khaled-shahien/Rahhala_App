@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rahhala_app/core/constants/app_colors.dart';
+
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_cubit.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/pages/trip_budget_range_screen.dart';
@@ -56,17 +56,21 @@ class _AIRecommendationFlowScreenState
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return BlocProvider(
       create: (context) => AiTripCubit(geminiRepository: sl()),
       child: Scaffold(
-        backgroundColor: AppColors.white,
+        backgroundColor: colorScheme.surface,
         appBar: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_outlined,
-                color: Colors.black),
+            icon: Icon(
+              Icons.arrow_back_ios_new_outlined,
+              color: colorScheme.onSurface,
+            ),
             onPressed: _onBackPressed,
           ),
-          backgroundColor: AppColors.white,
+          backgroundColor: colorScheme.surface,
           elevation: 0,
         ),
         body: PageView(

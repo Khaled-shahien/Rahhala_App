@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:rahhala_app/features/ai_recommendation/presentation/pages/trip_details_screen.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_details_theme.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
@@ -11,12 +10,6 @@ import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/expa
 import 'package:rahhala_app/features/trip_history/data/models/trip_history_model.dart';
 import 'package:rahhala_app/features/trip_history/domain/cubits/trip_history_cubit.dart';
 import 'package:rahhala_app/features/trip_history/domain/cubits/trip_history_state.dart';
-
-const Color _primaryTextColor = AppColors.darkBrown;
-const Color _lightBorderColor = AppColors.lightBrown;
-const Color _costBadgeBgColor = AppColors.costBadgeBackground;
-const Color _screenBgColor = AppColors.screenBackground;
-const Color _timelineColor = AppColors.lightBrown;
 
 class TripHistoryDetailScreen extends StatelessWidget {
   final String tripId;
@@ -35,14 +28,45 @@ class TripHistoryDetailScreen extends StatelessWidget {
 class _TripHistoryDetailView extends StatelessWidget {
   const _TripHistoryDetailView();
 
+  // ─── Theme Helpers ────────────────────────────────────────────────────────
+  Color _primaryText(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? Colors.white
+          : AppColors.darkBrown;
+
+  Color _lightBorder(BuildContext context) => AppColors.lightBrown;
+
+  Color _costBadgeBg(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF2C2C2C)
+          : AppColors.costBadgeBackground;
+
+  Color _screenBg(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF121212)
+          : AppColors.screenBackground;
+
+  Color _cardBg(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF1E1E1E)
+          : Colors.white;
+
+  Color _chipBg(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF2A2A2A)
+          : AppColors.lightBrown.withOpacity(0.06);
+
+  Color _chipBorder(BuildContext context) =>
+      AppColors.lightBrown.withOpacity(0.2);
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TripHistoryCubit, TripHistoryState>(
       builder: (context, state) {
         if (state is TripHistoryDetailLoading) {
-          return _buildLoading();
+          return _buildLoading(context);
         } else if (state is TripRegenerateLoading) {
-          return _buildRegenerateLoading();
+          return _buildRegenerateLoading(context);
         } else if (state is TripHistoryDetailLoaded) {
           return _buildContent(context, state.response.trip);
         } else if (state is TripRegenerateSuccess) {
@@ -57,9 +81,9 @@ class _TripHistoryDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildRegenerateLoading() {
+  Widget _buildRegenerateLoading(BuildContext context) {
     return Scaffold(
-      backgroundColor: _screenBgColor,
+      backgroundColor: _screenBg(context),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -74,7 +98,7 @@ class _TripHistoryDetailView extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w600,
-                color: _primaryTextColor,
+                color: _primaryText(context),
               ),
             ),
           ],
@@ -83,15 +107,16 @@ class _TripHistoryDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildLoading() {
+  Widget _buildLoading(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: _screenBgColor,
+      backgroundColor: _screenBg(context),
       body: Shimmer.fromColors(
-        baseColor: Colors.grey.shade300,
-        highlightColor: Colors.grey.shade100,
+        baseColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+        highlightColor: isDark ? Colors.grey.shade700 : Colors.grey.shade100,
         child: Column(
           children: [
-            Container(height: 380.h, color: Colors.white),
+            Container(height: 380.h, color: _cardBg(context)),
             SizedBox(height: 16.h),
             ...List.generate(
               3,
@@ -99,7 +124,7 @@ class _TripHistoryDetailView extends StatelessWidget {
                 margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 height: 80.h,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: _cardBg(context),
                   borderRadius: BorderRadius.circular(16.r),
                 ),
               ),
@@ -112,7 +137,7 @@ class _TripHistoryDetailView extends StatelessWidget {
 
   Widget _buildError(BuildContext context, String message) {
     return Scaffold(
-      backgroundColor: _screenBgColor,
+      backgroundColor: _screenBg(context),
       appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: Center(
         child: Column(
@@ -121,7 +146,8 @@ class _TripHistoryDetailView extends StatelessWidget {
             Icon(Icons.error_outline, size: 60.sp, color: Colors.grey.shade400),
             SizedBox(height: 16.h),
             Text(message,
-                style: TextStyle(fontSize: 15.sp, color: Colors.grey.shade600)),
+                style:
+                    TextStyle(fontSize: 15.sp, color: _primaryText(context))),
             SizedBox(height: 24.h),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
@@ -141,7 +167,7 @@ class _TripHistoryDetailView extends StatelessWidget {
 
   Widget _buildContent(BuildContext context, TripHistoryDetail trip) {
     return Scaffold(
-      backgroundColor: _screenBgColor,
+      backgroundColor: _screenBg(context),
       extendBodyBehindAppBar: true,
       body: SafeArea(
         top: false,
@@ -157,23 +183,27 @@ class _TripHistoryDetailView extends StatelessWidget {
                   child: Column(
                     children: [
                       SizedBox(height: 16.h),
-                      ...trip.days.map((day) => _buildDayTile(day)),
+                      ...trip.days.map((day) => _buildDayTile(context, day)),
                       SizedBox(height: 12.h),
                       if (trip.budgetTips.isNotEmpty)
                         _buildSimpleTile(
+                          context: context,
                           icon: Icons.lightbulb_outline,
                           title: 'Budget tips',
                           content: trip.budgetTips,
                         ),
                       if (trip.travelTips.isNotEmpty)
                         _buildSimpleTile(
+                          context: context,
                           icon: Icons.favorite_border,
                           title: 'Travel tips',
                           content: trip.travelTips,
                         ),
                       if (trip.emergencyContact.isNotEmpty)
                         _buildEmergencySection(
-                            emergencyContact: trip.emergencyContact),
+                          context: context,
+                          emergencyContact: trip.emergencyContact,
+                        ),
                       SizedBox(height: 32.h),
                     ],
                   ),
@@ -187,6 +217,7 @@ class _TripHistoryDetailView extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context, TripHistoryDetail trip) {
+    final screenBg = _screenBg(context);
     return SizedBox(
       width: double.infinity,
       height: 380.h,
@@ -217,9 +248,9 @@ class _TripHistoryDetailView extends StatelessWidget {
                   colors: [
                     Colors.transparent,
                     Colors.transparent,
-                    _screenBgColor.withValues(alpha: 0.15),
-                    _screenBgColor.withValues(alpha: 0.5),
-                    _screenBgColor,
+                    screenBg.withOpacity(0.15),
+                    screenBg.withOpacity(0.5),
+                    screenBg,
                   ],
                   stops: const [0.0, 0.45, 0.7, 0.85, 1.0],
                 ),
@@ -235,8 +266,8 @@ class _TripHistoryDetailView extends StatelessWidget {
                   colors: [
                     Colors.transparent,
                     Colors.transparent,
-                    _screenBgColor.withValues(alpha: 0.3),
-                    const Color(0xFFF3E5D8).withValues(alpha: 0.8),
+                    Colors.black.withOpacity(0.2),
+                    Colors.black.withOpacity(0.2),
                   ],
                   stops: const [0.0, 0.5, 0.8, 1.0],
                 ),
@@ -310,12 +341,12 @@ class _TripHistoryDetailView extends StatelessWidget {
                       height: 1.4,
                       shadows: [
                         Shadow(
-                          color: Colors.black.withValues(alpha: 1.0),
+                          color: Colors.black.withOpacity(1.0),
                           offset: const Offset(0, 2),
                           blurRadius: 255,
                         ),
                         Shadow(
-                          color: Colors.black.withValues(alpha: 1.0),
+                          color: Colors.black.withOpacity(1.0),
                           offset: const Offset(0, 4),
                           blurRadius: 100,
                         ),
@@ -324,9 +355,11 @@ class _TripHistoryDetailView extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 30.h),
-                _buildPill(Icons.location_on_outlined, trip.destination),
+                _buildPill(
+                    context, Icons.location_on_outlined, trip.destination),
                 SizedBox(height: 12.h),
-                _buildPill(null, 'Total cost: ${trip.totalEstimatedCost}',
+                _buildPill(
+                    context, null, 'Total cost: ${trip.totalEstimatedCost}',
                     isCost: true),
               ],
             ),
@@ -336,25 +369,37 @@ class _TripHistoryDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildPill(IconData? icon, String text, {bool isCost = false}) {
+  Widget _buildPill(BuildContext context, IconData? icon, String text,
+      {bool isCost = false}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3E5D8).withValues(alpha: 0.7),
+        color: isDark
+            ? Colors.black.withOpacity(0.45)
+            : const Color(0xFFF3E5D8).withOpacity(0.7),
         borderRadius: BorderRadius.circular(30.r),
-        border: Border.all(color: const Color(0xFF8B6F5A), width: 1.4),
+        border: Border.all(
+          color: isDark ? Colors.white24 : const Color(0xFF8B6F5A),
+          width: 1.4,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 16.sp, color: const Color(0xFF5C4634)),
+            Icon(
+              icon,
+              size: 16.sp,
+              color: isDark ? Colors.white70 : const Color(0xFF5C4634),
+            ),
             SizedBox(width: 6.w),
           ],
           Text(
             text,
             style: TextStyle(
-              color: const Color(0xFF5C4634),
+              color: isDark ? Colors.white : const Color(0xFF5C4634),
               fontSize: 14.sp,
               fontWeight: FontWeight.w600,
             ),
@@ -364,16 +409,20 @@ class _TripHistoryDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildDayTile(TripHistoryDay day) {
+  Widget _buildDayTile(BuildContext context, TripHistoryDay day) {
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardBg(context),
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: _lightBorderColor, width: 1.5),
+        border: Border.all(
+            color: Colors.black.withOpacity(
+                Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.08),
+            width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: Colors.black.withOpacity(
+                  Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.08),
               blurRadius: 8,
               offset: const Offset(0, 2))
         ],
@@ -387,7 +436,7 @@ class _TripHistoryDetailView extends StatelessWidget {
             Text(
               'Day ${day.day}',
               style: TextStyle(
-                color: _lightBorderColor,
+                color: _lightBorder(context),
                 fontSize: 13.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -395,7 +444,7 @@ class _TripHistoryDetailView extends StatelessWidget {
             Text(
               day.title,
               style: TextStyle(
-                color: _primaryTextColor,
+                color: _primaryText(context),
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w600,
               ),
@@ -404,24 +453,25 @@ class _TripHistoryDetailView extends StatelessWidget {
         ),
         trailing: CostBadge(
           cost: day.estimatedDayCost,
-          backgroundColor: _costBadgeBgColor,
-          textColor: _primaryTextColor,
-          borderColor: _lightBorderColor,
-          iconColor: _lightBorderColor,
+          backgroundColor: _costBadgeBg(context),
+          textColor: _primaryText(context),
+          borderColor: _lightBorder(context),
+          iconColor: _lightBorder(context),
         ),
-        iconColor: _primaryTextColor,
-        collapsedIconColor: _primaryTextColor,
-        children: [_buildActivities(day.activities)],
+        iconColor: _primaryText(context),
+        collapsedIconColor: _primaryText(context),
+        children: [_buildActivities(context, day.activities)],
       ),
     );
   }
 
-  Widget _buildActivities(List<TripHistoryActivity> activities) {
+  Widget _buildActivities(
+      BuildContext context, List<TripHistoryActivity> activities) {
     return Container(
       margin: EdgeInsets.all(12.w),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: _costBadgeBgColor,
+        color: _costBadgeBg(context),
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: Column(
@@ -432,23 +482,24 @@ class _TripHistoryDetailView extends StatelessWidget {
           return TimelineWrapperHistory(
             isFirst: i == 0,
             isLast: i == activities.length - 1,
+            timelineColor: _lightBorder(context),
             child: CustomExpansionTile(
               tilePadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
               leading: NumberCircle(
                 number: i + 1,
-                backgroundColor: _timelineColor,
+                backgroundColor: _lightBorder(context),
                 textColor: Colors.white,
               ),
               title: Text(
                 act.place,
                 style: TextStyle(
-                  color: _primaryTextColor,
+                  color: _primaryText(context),
                   fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              iconColor: _primaryTextColor,
-              collapsedIconColor: _primaryTextColor,
+              iconColor: _primaryText(context),
+              collapsedIconColor: _primaryText(context),
               children: [
                 if (act.image != null && act.image!.isNotEmpty)
                   ClipRRect(
@@ -468,7 +519,8 @@ class _TripHistoryDetailView extends StatelessWidget {
                       EdgeInsets.only(left: 45.w, right: 12.w, bottom: 12.h),
                   child: Text(
                     act.description,
-                    style: TextStyle(color: _primaryTextColor, fontSize: 13.sp),
+                    style: TextStyle(
+                        color: _primaryText(context), fontSize: 13.sp),
                   ),
                 ),
               ],
@@ -480,6 +532,7 @@ class _TripHistoryDetailView extends StatelessWidget {
   }
 
   Widget _buildSimpleTile({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String content,
@@ -487,9 +540,12 @@ class _TripHistoryDetailView extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardBg(context),
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white12
+                : Colors.black12),
       ),
       child: CustomExpansionTile(
         tilePadding: EdgeInsets.all(16.w),
@@ -498,7 +554,7 @@ class _TripHistoryDetailView extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Icon(icon, color: AppColors.primary, size: 24.sp),
@@ -510,14 +566,14 @@ class _TripHistoryDetailView extends StatelessWidget {
                 children: [
                   Text(title,
                       style: TextStyle(
-                          color: _primaryTextColor,
+                          color: _primaryText(context),
                           fontSize: 14.sp,
                           fontWeight: FontWeight.bold)),
                   SizedBox(height: 4.h),
                   Text(
                     content,
                     style: TextStyle(
-                        color: _primaryTextColor.withValues(alpha: 0.8),
+                        color: _primaryText(context).withOpacity(0.7),
                         fontSize: 13.sp),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -526,7 +582,7 @@ class _TripHistoryDetailView extends StatelessWidget {
               ),
             ),
             Icon(Icons.keyboard_arrow_down,
-                color: _primaryTextColor, size: 20.sp),
+                color: _primaryText(context), size: 20.sp),
           ],
         ),
         iconColor: Colors.transparent,
@@ -536,14 +592,18 @@ class _TripHistoryDetailView extends StatelessWidget {
             padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.w),
             alignment: Alignment.centerLeft,
             child: Text(content,
-                style: TextStyle(fontSize: 13.sp, color: _primaryTextColor)),
+                style:
+                    TextStyle(fontSize: 13.sp, color: _primaryText(context))),
           )
         ],
       ),
     );
   }
 
-  Widget _buildEmergencySection({required String emergencyContact}) {
+  Widget _buildEmergencySection({
+    required BuildContext context,
+    required String emergencyContact,
+  }) {
     if (emergencyContact.isEmpty) return const SizedBox.shrink();
 
     final contacts = emergencyContact.split(',');
@@ -551,12 +611,16 @@ class _TripHistoryDetailView extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardBg(context),
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white12
+                : Colors.black12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withOpacity(
+                Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -572,7 +636,7 @@ class _TripHistoryDetailView extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: Colors.red.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Icon(Icons.emergency_outlined,
@@ -582,7 +646,7 @@ class _TripHistoryDetailView extends StatelessWidget {
                 Text(
                   'Emergency Contacts',
                   style: TextStyle(
-                    color: _primaryTextColor,
+                    color: _primaryText(context),
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
                   ),
@@ -601,10 +665,9 @@ class _TripHistoryDetailView extends StatelessWidget {
                   padding:
                       EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                   decoration: BoxDecoration(
-                    color: lightBorderColor.withValues(alpha: 0.06),
+                    color: _chipBg(context),
                     borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(
-                        color: lightBorderColor.withValues(alpha: 0.2), width: 1),
+                    border: Border.all(color: _chipBorder(context), width: 1),
                   ),
                   child: IntrinsicWidth(
                     child: Row(
@@ -616,7 +679,7 @@ class _TripHistoryDetailView extends StatelessWidget {
                           child: Text(
                             '$label${number.isNotEmpty ? ': $number' : ''}',
                             style: TextStyle(
-                              color: _primaryTextColor,
+                              color: _primaryText(context),
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w600,
                             ),
@@ -641,12 +704,13 @@ class _TripHistoryDetailView extends StatelessWidget {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
+          backgroundColor: Theme.of(context).cardColor,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
           title: Text(
             'Regenerate Trip Plan',
             style: TextStyle(
-              color: _primaryTextColor,
+              color: _primaryText(context),
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
             ),
@@ -654,20 +718,15 @@ class _TripHistoryDetailView extends StatelessWidget {
           content: Text(
             'Would you like to regenerate the entire trip plan with new suggestions for all days and activities?',
             style: TextStyle(
-              color: _primaryTextColor,
+              color: _primaryText(context),
               fontSize: 14.sp,
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14.sp,
-                ),
-              ),
+              child: Text('Cancel',
+                  style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -677,17 +736,13 @@ class _TripHistoryDetailView extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
+                    borderRadius: BorderRadius.circular(8.r)),
               ),
-              child: Text(
-                'Regenerate',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: Text('Regenerate',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600)),
             ),
           ],
         );
@@ -696,25 +751,14 @@ class _TripHistoryDetailView extends StatelessWidget {
   }
 
   void _regenerateTrip(BuildContext context, TripHistoryDetail trip) {
-    final cubit = context.read<TripHistoryCubit>();
-
-    // Prepare parameters from the current trip data
-    final destination = trip.country;
-    final numberOfDays = trip.numberOfDays;
-    final budget = trip.budgetRange;
-    final interests = trip.interests;
-    final season = trip.season;
-    final tripId = trip.tripId;
-
-    // Call the regenerate method
-    cubit.regenerateTripPlan(
-      tripId,
-      destination,
-      numberOfDays,
-      budget,
-      interests,
-      season,
-    );
+    context.read<TripHistoryCubit>().regenerateTripPlan(
+          trip.tripId,
+          trip.country,
+          trip.numberOfDays,
+          trip.budgetRange,
+          trip.interests,
+          trip.season,
+        );
   }
 }
 
@@ -722,10 +766,12 @@ class TimelineWrapperHistory extends StatelessWidget {
   final Widget child;
   final bool isFirst;
   final bool isLast;
+  final Color timelineColor;
 
   const TimelineWrapperHistory({
     super.key,
     required this.child,
+    required this.timelineColor,
     this.isFirst = false,
     this.isLast = false,
   });
@@ -743,12 +789,12 @@ class TimelineWrapperHistory extends StatelessWidget {
                 Container(
                   height: 25.h,
                   width: 2,
-                  color: isFirst ? Colors.transparent : _timelineColor,
+                  color: isFirst ? Colors.transparent : timelineColor,
                 ),
                 Expanded(
                   child: Container(
                     width: 2,
-                    color: isLast ? Colors.transparent : _timelineColor,
+                    color: isLast ? Colors.transparent : timelineColor,
                   ),
                 ),
               ],

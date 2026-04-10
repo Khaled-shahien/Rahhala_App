@@ -28,15 +28,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late int _currentIndex;
+  final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
   }
-
-  //int _currentIndex = 0;
-  final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
 
   void _notifyComingSoon(String text) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -50,7 +48,7 @@ class _HomePageState extends State<HomePage> {
           borderRadius: BorderRadius.circular(14),
         ),
         margin: EdgeInsets.only(
-          bottom: 60.h,
+          bottom: 90.h,
           right: 20.w,
           left: 20.w,
         ),
@@ -60,6 +58,7 @@ class _HomePageState extends State<HomePage> {
 
   void _onTabTapped(int index) {
     final l10n = context.l10n;
+
     setState(() => _currentIndex = index);
 
     if (index == 1) {
@@ -73,6 +72,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     final storage = sl<TokenStorage>();
     final displayName = storage.displayName;
     final email = storage.email ?? '';
@@ -92,29 +94,15 @@ class _HomePageState extends State<HomePage> {
     ];
 
     return Scaffold(
-      backgroundColor: ThemeColor.bgColor,
+      backgroundColor: colorScheme.surface,
       extendBody: true,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              ThemeColor.primaryColor.withValues(alpha: 0.1),
-              ThemeColor.primaryColor.withValues(alpha: 0.15),
-              ThemeColor.primaryColor.withValues(alpha: 0.18),
-            ],
-          ),
           boxShadow: [
             BoxShadow(
-              color: ThemeColor.primaryColor.withValues(alpha: 0.2),
-              blurRadius: 22,
+              color: ThemeColor.primaryColor.withOpacity(isDark ? 0.3 : 0.15),
+              blurRadius: 20,
               offset: const Offset(0, -4),
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 14,
-              offset: const Offset(0, -3),
             ),
           ],
         ),
@@ -123,106 +111,60 @@ class _HomePageState extends State<HomePage> {
           index: _currentIndex,
           height: 70.0,
           items: <Widget>[
-            Icon(
-              Icons.home_outlined,
-              size: 34,
-              color: _currentIndex == 0
-                  ? Colors.white
-                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
-            ),
-            Icon(
-              Icons.favorite_border,
-              size: 34,
-              color: _currentIndex == 1
-                  ? Colors.white
-                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
-            ),
-            Icon(
-              Icons.search,
-              size: 34,
-              color: _currentIndex == 2
-                  ? Colors.white
-                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
-            ),
-            Icon(
-              Icons.auto_awesome,
-              size: 34,
-              color: _currentIndex == 3
-                  ? Colors.white
-                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
-            ),
-            Icon(
-              Icons.person_outline,
-              size: 34,
-              color: _currentIndex == 4
-                  ? Colors.white
-                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
-            ),
+            _buildNavIcon(Icons.home_outlined, 0),
+            _buildNavIcon(Icons.favorite_border, 1),
+            _buildNavIcon(Icons.search, 2),
+            _buildNavIcon(Icons.auto_awesome, 3),
+            _buildNavIcon(Icons.person_outline, 4),
           ],
           color: ThemeColor.primaryColor,
-          buttonBackgroundColor: ThemeColor.charcoalColor,
+          buttonBackgroundColor:
+              isDark ? colorScheme.secondary : ThemeColor.charcoalColor,
           backgroundColor: Colors.transparent,
           animationCurve: Curves.easeInOutCubic,
           animationDuration: const Duration(milliseconds: 400),
           onTap: _onTabTapped,
-          letIndexChange: (index) => true,
         ),
       ),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.dark.copyWith(
-          statusBarColor: Colors.transparent,
-        ),
+        value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
         child: SafeArea(
+          bottom: false,
           child: Stack(
             children: [
               IndexedStack(
                 index: _currentIndex,
                 children: pages,
               ),
-              // Floating Chat Button
               Positioned(
-                right: 16.w,
-                bottom: 80.h,
+                right: 20.w,
+                bottom: 100.h,
                 child: FloatingActionButton(
                   onPressed: () {
                     HapticFeedback.mediumImpact();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const ChatBotScreen(),
-                      ),
+                          builder: (context) => const ChatBotScreen()),
                     );
                   },
                   backgroundColor: ThemeColor.primaryColor,
                   elevation: 8,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
+                      borderRadius: BorderRadius.circular(20.r)),
                   child: Container(
                     padding: EdgeInsets.all(12.r),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
                           ThemeColor.primaryColor,
-                          ThemeColor.primaryColor.withValues(alpha: 0.8),
+                          ThemeColor.primaryColor.withOpacity(0.8)
                         ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(20.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: ThemeColor.primaryColor.withValues(alpha: 0.4),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
                     ),
-                    child: const Icon(
-                      Icons.smart_toy_outlined,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+                    child: const Icon(Icons.smart_toy_outlined,
+                        color: Colors.white, size: 28),
                   ),
                 ),
               ),
@@ -230,6 +172,15 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildNavIcon(IconData icon, int index) {
+    return Icon(
+      icon,
+      size: 30.sp,
+      color:
+          _currentIndex == index ? Colors.white : Colors.white.withOpacity(0.7),
     );
   }
 }
@@ -250,6 +201,8 @@ class _HomeMainSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: EdgeInsets.all(20.w),
       child: Column(
@@ -279,8 +232,8 @@ class _HomeMainSection extends StatelessWidget {
                     Text(
                       l10n.homeExploreDestinations,
                       style: TextStyle(
-                        fontSize: 17.sp,
-                        color: ThemeColor.neutralGrayColor,
+                        fontSize: 16.sp,
+                        color: colorScheme.onSurfaceVariant,
                         height: 1.4,
                       ),
                     ),
@@ -295,7 +248,7 @@ class _HomeMainSection extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: ThemeColor.primaryColor.withValues(alpha: 0.25),
+                        color: ThemeColor.primaryColor.withOpacity(0.25),
                         blurRadius: 10,
                         spreadRadius: 3,
                       ),
@@ -303,18 +256,14 @@ class _HomeMainSection extends StatelessWidget {
                   ),
                   child: CircleAvatar(
                     radius: 30.r,
-                    backgroundColor:
-                        ThemeColor.primaryColor.withValues(alpha: 0.15),
+                    backgroundColor: ThemeColor.primaryColor.withOpacity(0.15),
                     backgroundImage:
                         (profileImageUrl != null && profileImageUrl!.isNotEmpty)
                             ? NetworkImage(profileImageUrl!)
                             : null,
                     child: (profileImageUrl == null || profileImageUrl!.isEmpty)
-                        ? Icon(
-                            Icons.person,
-                            size: 30.sp,
-                            color: ThemeColor.primaryColor,
-                          )
+                        ? Icon(Icons.person,
+                            size: 30.sp, color: ThemeColor.primaryColor)
                         : null,
                   ),
                 ),
@@ -323,10 +272,8 @@ class _HomeMainSection extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           const ImageSearchBar(),
-          SizedBox(height: 36.h),
-          Expanded(
-            child: const HomeScreen(),
-          ),
+          SizedBox(height: 24.h),
+          Expanded(child: const HomeScreen()),
         ],
       ),
     );
@@ -345,7 +292,7 @@ class _SoonPage extends StatelessWidget {
         l10n.homeComingSoonShort(title),
         style: TextStyle(
           fontSize: 17.sp,
-          color: ThemeColor.neutralGrayColor,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
       ),
     );

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_cubit.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_state.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/button.dart';
@@ -14,6 +13,9 @@ class TripBudgetRangeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<AiTripCubit>();
+
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return BlocBuilder<AiTripCubit, AiTripState>(
       builder: (context, state) {
@@ -33,10 +35,11 @@ class TripBudgetRangeScreen extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.black),
+                    color: colorScheme.onSurface),
               ),
               SizedBox(height: 44.h),
               ...cubit.budgetRanges.map((range) => _buildBudgetToggle(
+                    context,
                     range,
                     state.selectedRange == range,
                     () => cubit.selectRange(range),
@@ -53,8 +56,10 @@ class TripBudgetRangeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBudgetToggle(
-      String label, bool isSelected, VoidCallback onPressed) {
+  Widget _buildBudgetToggle(BuildContext context, String label, bool isSelected,
+      VoidCallback onPressed) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: EdgeInsets.only(bottom: 24.h),
       child: InkWell(
@@ -63,16 +68,18 @@ class TripBudgetRangeScreen extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary : AppColors.primaryLight,
+            color: isSelected ? colorScheme.primary : colorScheme.surface,
             borderRadius: BorderRadius.circular(14.r),
             border: Border.all(
-                color: isSelected ? AppColors.primary : AppColors.borderDark,
+                color: isSelected
+                    ? colorScheme.primary
+                    : colorScheme.outlineVariant,
                 width: 2.5.w),
             boxShadow: [
               BoxShadow(
                 color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.3)
-                    : Colors.black.withValues(alpha: 0.05),
+                    ? colorScheme.primary.withOpacity(0.3)
+                    : Colors.black.withOpacity(0.05),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -85,12 +92,15 @@ class TripBudgetRangeScreen extends StatelessWidget {
                 label,
                 style: TextStyle(
                     fontSize: 18.sp,
-                    color: isSelected ? AppColors.white : AppColors.black,
+                    color: isSelected
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurface,
                     fontWeight: FontWeight.w500),
               ),
               Icon(
                 Icons.money,
-                color: isSelected ? AppColors.white : AppColors.black,
+                color:
+                    isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
                 size: 24.sp,
               )
             ],

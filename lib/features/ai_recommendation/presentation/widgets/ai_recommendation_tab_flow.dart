@@ -49,21 +49,29 @@ class _AIRecommendationTabFlowState extends State<AIRecommendationTabFlow> {
   }
 
   Widget _buildNavigationHeader() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       height: 60.0,
-      color: AppColors.backgroundGray,
+      color: theme.scaffoldBackgroundColor,
       alignment: Alignment.centerLeft,
       child: _currentStep == 0
           ? const SizedBox.shrink()
           : IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_outlined,
-                  color: Colors.black),
+              icon: Icon(
+                Icons.arrow_back_ios_new_outlined,
+                color: isDark ? Colors.white : Colors.black,
+              ),
               onPressed: _previousPage,
             ),
     );
   }
 
   Widget _buildDashedProgress(int currentStep) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     const int totalSteps = 3;
     final List<Widget> dashes = [];
 
@@ -75,7 +83,11 @@ class _AIRecommendationTabFlowState extends State<AIRecommendationTabFlow> {
             duration: const Duration(milliseconds: 300),
             height: 6.h,
             decoration: BoxDecoration(
-              color: isActive ? AppColors.primary : Colors.grey.shade300,
+              color: isActive
+                  ? AppColors.primary
+                  : (isDark
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.grey.shade300),
               borderRadius: BorderRadius.circular(6.r),
             ),
           ),
@@ -90,32 +102,37 @@ class _AIRecommendationTabFlowState extends State<AIRecommendationTabFlow> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return BlocProvider(
       create: (context) => sl<AiTripCubit>(),
-      child: Column(
-        children: [
-          _buildNavigationHeader(),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 44.w, vertical: 20.h),
-            child: _buildDashedProgress(_currentStep),
-          ),
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              onPageChanged: (page) {
-                setState(() {
-                  _currentStep = page;
-                });
-              },
-              children: [
-                TripInfoScreen(onNext: _nextPage),
-                TripBudgetRangeScreen(onNext: _nextPage),
-                const TripInterestsScreen(),
-              ],
+      child: Container(
+        color: theme.scaffoldBackgroundColor,
+        child: Column(
+          children: [
+            _buildNavigationHeader(),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 44.w, vertical: 20.h),
+              child: _buildDashedProgress(_currentStep),
             ),
-          ),
-        ],
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                onPageChanged: (page) {
+                  setState(() {
+                    _currentStep = page;
+                  });
+                },
+                children: [
+                  TripInfoScreen(onNext: _nextPage),
+                  TripBudgetRangeScreen(onNext: _nextPage),
+                  const TripInterestsScreen(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

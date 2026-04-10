@@ -19,45 +19,92 @@ class PlaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.all(12.w),
-        height: 180.h,
+        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+        height: 200.h,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18.r),
+          borderRadius: BorderRadius.circular(20.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
           image: DecorationImage(
             image: NetworkImage(place.imageUrl),
-            // image: NetworkImage(place.image),
             fit: BoxFit.cover,
           ),
         ),
         child: Stack(
           children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.r),
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.7),
+                    Colors.transparent,
+                  ],
+                  stops: const [0.0, 0.5],
+                ),
+              ),
+            ),
             Positioned(
-              bottom: 16,
-              left: 16,
+              bottom: 16.h,
+              left: 16.w,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(place.name,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 26.sp,
-                          fontWeight: FontWeight.bold)),
-                  Text(place.country,
-                      style: TextStyle(color: Colors.white, fontSize: 18.sp)),
+                  Text(
+                    place.name,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.location_on,
+                          color: Colors.white70, size: 14.sp),
+                      SizedBox(width: 4.w),
+                      Text(
+                        place.country,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
             Positioned(
-              top: 10,
-              right: 10,
+              top: 12.h,
+              right: 12.w,
               child: GestureDetector(
                 onTap: onFavTap,
-                child: Icon(
-                  isFav ? Icons.favorite : Icons.favorite_border,
-                  color: Colors.red,
+                child: Container(
+                  padding: EdgeInsets.all(8.r),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isFav ? Icons.favorite : Icons.favorite_border,
+                    color: isFav ? Colors.red : Colors.white,
+                    size: 22.sp,
+                  ),
                 ),
               ),
             )

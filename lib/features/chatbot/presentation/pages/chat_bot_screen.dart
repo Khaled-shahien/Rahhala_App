@@ -6,8 +6,9 @@ import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/features/chatbot/presentation/cubit/chat_bot_cubit.dart';
 import 'package:rahhala_app/features/chatbot/presentation/cubit/chat_bot_state.dart';
 import 'package:rahhala_app/features/chatbot/presentation/widgets/chat_bubble.dart';
-import 'package:rahhala_app/features/chatbot/presentation/widgets/chat_input_field.dart';
+
 import 'package:rahhala_app/features/chatbot/presentation/widgets/typing_indicator.dart';
+import 'package:rahhala_app/features/chatbot/presentation/widgets/chat_input_field.dart';
 
 class ChatBotScreen extends StatelessWidget {
   const ChatBotScreen({super.key});
@@ -35,7 +36,6 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<ChatBotCubit>().initializeContext();
@@ -60,17 +60,24 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
     }
   }
 
+  // ─── Theme Helpers ────────────────────────────────────────────────────────
+  bool _isDark(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark;
+
   @override
   Widget build(BuildContext context) {
+    final isDark = _isDark(context);
+    final scaffoldBg = isDark ? const Color(0xFF121212) : Colors.grey[50];
+    final cardBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: scaffoldBg,
       appBar: _buildAppBar(context),
       body: BlocConsumer<ChatBotCubit, ChatBotState>(
         listener: (context, state) {
           if (state is ChatBotMessageSent || state is ChatBotMessageReceived) {
             _scrollToBottom();
           }
-
           if (state is ChatBotError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -89,18 +96,15 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
             children: [
               Expanded(
                 child: messages.isEmpty
-                    ? _buildEmptyState(cubit)
+                    ? _buildEmptyState(context, cubit)
                     : ListView.builder(
                         controller: _scrollController,
                         physics: const BouncingScrollPhysics(),
                         padding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 20.h,
-                        ),
+                            horizontal: 16.w, vertical: 20.h),
                         itemCount: messages.length,
                         itemBuilder: (context, index) {
                           final message = messages[index];
-
                           return Padding(
                             padding: EdgeInsets.only(bottom: 12.h),
                             child: ChatBubble(
@@ -124,10 +128,10 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: cardBg,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
+                        color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, -5),
                       ),
@@ -155,21 +159,25 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
   }
 
   AppBar _buildAppBar(BuildContext context) {
+    final isDark = _isDark(context);
+    final appBarBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDark ? Colors.white : ThemeColor.charcoalColor;
+
     return AppBar(
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
-      elevation: 0.5,
+      backgroundColor: appBarBg,
+      surfaceTintColor: appBarBg,
+      elevation: isDark ? 0 : 0.5,
       leadingWidth: 40.w,
       leading: IconButton(
-        icon:
-            const Icon(Icons.arrow_back_ios_new_outlined, color: Colors.black),
+        icon: Icon(Icons.arrow_back_ios_new_outlined,
+            color: isDark ? Colors.white : Colors.black),
         onPressed: () => Navigator.pop(context),
       ),
       title: Row(
         children: [
           CircleAvatar(
             radius: 18.r,
-            backgroundColor: ThemeColor.primaryColor.withValues(alpha: 0.1),
+            backgroundColor: ThemeColor.primaryColor.withOpacity(0.1),
             child: Icon(
               Icons.smart_toy_outlined,
               color: ThemeColor.primaryColor,
@@ -185,7 +193,7 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: ThemeColor.charcoalColor,
+                  color: textColor,
                 ),
               ),
               BlocBuilder<ChatBotCubit, ChatBotState>(
@@ -207,14 +215,16 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
       ),
       actions: [
         IconButton(
-          icon: Icon(Icons.delete_sweep_outlined, color: Colors.grey[600]),
+          icon: Icon(Icons.delete_sweep_outlined,
+              color: isDark ? Colors.grey[400] : Colors.grey[600]),
           onPressed: _showClearConfirmation,
         ),
       ],
     );
   }
 
-  Widget _buildEmptyState(ChatBotCubit cubit) {
+  Widget _buildEmptyState(BuildContext context, ChatBotCubit cubit) {
+    final isDark = _isDark(context);
     final suggestions = [
       "Plan a trip to Dubai",
       "What are the best hotels in Mecca?",
@@ -229,7 +239,8 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
             Container(
               padding: EdgeInsets.all(25.r),
               decoration: BoxDecoration(
-                color: ThemeColor.primaryColor.withValues(alpha: 0.05),
+                color:
+                    ThemeColor.primaryColor.withOpacity(isDark ? 0.15 : 0.05),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -244,6 +255,7 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
               style: TextStyle(
                 fontSize: 22.sp,
                 fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black,
               ),
             ),
             SizedBox(height: 12.h),
@@ -252,7 +264,7 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14.sp,
-                color: Colors.grey[600],
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
               ),
             ),
             SizedBox(height: 30.h),
@@ -261,16 +273,21 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
               runSpacing: 10,
               alignment: WrapAlignment.center,
               children: suggestions
-                  .map(
-                    (text) => ActionChip(
-                      label: Text(text),
-                      backgroundColor: Colors.white,
-                      shape: StadiumBorder(
-                        side: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      onPressed: () => cubit.sendMessage(text),
-                    ),
-                  )
+                  .map((text) => ActionChip(
+                        label: Text(text,
+                            style: TextStyle(
+                                color:
+                                    isDark ? Colors.white70 : Colors.black87)),
+                        backgroundColor:
+                            isDark ? const Color(0xFF2C2C2C) : Colors.white,
+                        shape: StadiumBorder(
+                          side: BorderSide(
+                              color: isDark
+                                  ? Colors.white12
+                                  : Colors.grey.shade300),
+                        ),
+                        onPressed: () => cubit.sendMessage(text),
+                      ))
                   .toList(),
             ),
           ],
@@ -280,39 +297,37 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
   }
 
   void _showClearConfirmation() {
+    final isDark = _isDark(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.r),
-        ),
-        title: const Text('Clear Conversation'),
-        content: const Text(
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
+        title: Text('Clear Conversation',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+        content: Text(
           'Are you sure you want to delete all messages? This action cannot be undone.',
+          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
+            child: Text('Cancel',
+                style: TextStyle(
+                    color: isDark ? Colors.grey[400] : Colors.grey[600])),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.redAccent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-              ),
+                  borderRadius: BorderRadius.circular(8.r)),
             ),
             onPressed: () {
               context.read<ChatBotCubit>().clearConversation();
               Navigator.pop(context);
             },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

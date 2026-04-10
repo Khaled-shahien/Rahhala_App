@@ -15,16 +15,22 @@ class TripDaySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final cleanCost = day.estimatedDayCost.replaceAll('EGP', '').trim();
+
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? theme.cardColor : Colors.white,
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: lightBorderColor, width: 1.5),
+        border: Border.all(
+          color: isDark ? Colors.white10 : lightBorderColor,
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -39,7 +45,7 @@ class TripDaySection extends StatelessWidget {
             Text(
               'Day ${day.day}',
               style: TextStyle(
-                color: lightBorderColor,
+                color: isDark ? theme.primaryColorLight : lightBorderColor,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -47,7 +53,7 @@ class TripDaySection extends StatelessWidget {
             Text(
               day.title,
               style: TextStyle(
-                color: primaryTextColor,
+                color: isDark ? Colors.white : primaryTextColor,
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w600,
               ),
@@ -56,13 +62,16 @@ class TripDaySection extends StatelessWidget {
         ),
         trailing: CostBadge(
           cost: cleanCost,
-          backgroundColor: costBadgeBgColor,
-          textColor: primaryTextColor,
-          borderColor: lightBorderColor,
-          iconColor: lightBorderColor,
+          backgroundColor: isDark
+              ? theme.primaryColor.withValues(alpha: 0.2)
+              : costBadgeBgColor,
+          textColor: isDark ? Colors.white : primaryTextColor,
+          borderColor:
+              isDark ? Colors.white.withValues(alpha: 0.2) : lightBorderColor,
+          iconColor: isDark ? theme.primaryColorLight : lightBorderColor,
         ),
-        iconColor: primaryTextColor,
-        collapsedIconColor: primaryTextColor,
+        iconColor: isDark ? Colors.white : primaryTextColor,
+        collapsedIconColor: isDark ? Colors.white70 : primaryTextColor,
         children: [_DayDetailsContent(activities: day.activities)],
       ),
     );
@@ -76,11 +85,13 @@ class _DayDetailsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: EdgeInsets.all(12.w),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: locationCardBackgroundColor,
+        color: isDark ? Colors.black26 : locationCardBackgroundColor,
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: Column(
@@ -107,68 +118,43 @@ class _DayDetailsContent extends StatelessWidget {
                       child: Text(
                         act.place,
                         style: TextStyle(
-                          color: primaryTextColor,
+                          color: isDark ? Colors.white : primaryTextColor,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.bold,
                         ),
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
                       ),
                     ),
                   ],
                 ),
-                iconColor: primaryTextColor,
-                collapsedIconColor: primaryTextColor,
+                iconColor: isDark ? Colors.white70 : primaryTextColor,
+                collapsedIconColor: isDark ? Colors.white70 : primaryTextColor,
                 children: [
                   if (act.image != null && act.image!.isNotEmpty)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12.r),
-                      child: Image.network(
-                        act.image!,
-                        width: double.infinity,
-                        height: 180.h,
-                        fit: BoxFit.cover,
-                        semanticLabel: 'Activity image',
-                        errorBuilder: (context, error, stackTrace) {
-                          AppLogger.instance.w(
-                            'TripDaySection activity image failed to load',
-                            error: error,
-                          );
-                          return const SizedBox.shrink();
-                        },
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) {
-                            return child;
-                          }
-                          return Container(
-                            width: double.infinity,
-                            height: 180.h,
-                            color: Colors.grey[200],
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                                valueColor: const AlwaysStoppedAnimation<Color>(
-                                  primaryTextColor,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 12.h),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12.r),
+                        child: Image.network(
+                          act.image!,
+                          width: double.infinity,
+                          height: 180.h,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            AppLogger.instance.w('Image load failed');
+                            return const SizedBox.shrink();
+                          },
+                        ),
                       ),
                     ),
-                  if (act.image != null && act.image!.isNotEmpty)
-                    SizedBox(height: 12.h),
                   Padding(
                     padding:
                         EdgeInsets.only(left: 45.w, right: 12.w, bottom: 12.h),
                     child: Text(
                       act.description,
-                      style:
-                          TextStyle(color: primaryTextColor, fontSize: 13.sp),
+                      style: TextStyle(
+                        color: isDark ? Colors.white70 : primaryTextColor,
+                        fontSize: 13.sp,
+                      ),
                     ),
                   ),
                 ],
@@ -189,14 +175,10 @@ class _TransportationSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final allTransports = <Transportation>[];
-    for (final activity in activities) {
-      allTransports.addAll(activity.transportation);
-    }
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final allTransports = activities.expand((a) => a.transportation).toList();
 
-    if (allTransports.isEmpty) {
-      return const SizedBox.shrink();
-    }
+    if (allTransports.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,13 +190,13 @@ class _TransportationSection extends StatelessWidget {
               Icon(
                 Icons.directions_car_outlined,
                 size: 18.sp,
-                color: brownTextColor,
+                color: isDark ? Colors.white70 : brownTextColor,
               ),
               SizedBox(width: 8.w),
               Text(
                 TripDetailsStrings.transportRoutes,
                 style: TextStyle(
-                  color: brownTextColor,
+                  color: isDark ? Colors.white : brownTextColor,
                   fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
                 ),
@@ -227,7 +209,8 @@ class _TransportationSection extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: allTransports.map(_RouteRow.new).toList(),
+            children:
+                allTransports.map((t) => _RouteRow(transport: t)).toList(),
           ),
         ),
       ],
@@ -236,8 +219,7 @@ class _TransportationSection extends StatelessWidget {
 }
 
 class _RouteRow extends StatelessWidget {
-  const _RouteRow(this.transport);
-
+  const _RouteRow({required this.transport});
   final Transportation transport;
 
   @override
@@ -259,31 +241,34 @@ class _RouteRow extends StatelessWidget {
 
 class _RoutePill extends StatelessWidget {
   const _RoutePill({required this.text, this.isMethod = false});
-
   final String text;
   final bool isMethod;
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-            color: lightBorderColor.withValues(alpha: 0.4), width: 1),
+          color:
+              isDark ? Colors.white24 : lightBorderColor.withValues(alpha: 0.4),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (isMethod) ...[
-            Icon(Icons.directions_car, size: 12.sp, color: brownTextColor),
+            Icon(Icons.directions_car,
+                size: 12.sp, color: isDark ? Colors.white70 : brownTextColor),
             SizedBox(width: 4.w),
           ],
           Text(
             text,
             style: TextStyle(
-              color: brownTextColor,
+              color: isDark ? Colors.white : brownTextColor,
               fontSize: 11.sp,
               fontWeight: FontWeight.w600,
             ),

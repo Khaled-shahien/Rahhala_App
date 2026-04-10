@@ -9,23 +9,22 @@ class BackgroundDecorator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Stack(
       children: [
-        // Gradient background
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
                 ThemeColor.primaryColor.withValues(alpha: 0.1),
-                Colors.white,
+                isDark ? const Color(0xFF121212) : Colors.white,
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
           ),
         ),
-
-        // Top right decorative circle
         Positioned(
           top: -120.h,
           right: -80.w,
@@ -33,13 +32,13 @@ class BackgroundDecorator extends StatelessWidget {
             width: 280.w,
             height: 280.w,
             decoration: BoxDecoration(
-              color: ThemeColor.primaryColor.withValues(alpha: 0.14),
+              color: ThemeColor.primaryColor.withValues(
+                alpha: isDark ? 0.05 : 0.14,
+              ),
               borderRadius: BorderRadius.circular(140.r),
             ),
           ),
         ),
-
-        // Bottom left decorative circle
         Positioned(
           bottom: -120.h,
           left: -100.w,
@@ -47,13 +46,13 @@ class BackgroundDecorator extends StatelessWidget {
             width: 320.w,
             height: 320.w,
             decoration: BoxDecoration(
-              color: ThemeColor.primaryColor.withValues(alpha: 0.1),
+              color: ThemeColor.primaryColor.withValues(
+                alpha: isDark ? 0.04 : 0.1,
+              ),
               borderRadius: BorderRadius.circular(160.r),
             ),
           ),
         ),
-
-        // Child content
         child,
       ],
     );

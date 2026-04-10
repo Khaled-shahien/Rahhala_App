@@ -6,9 +6,10 @@ class TransportationRoute extends StatelessWidget {
   final String to;
   final String method;
   final String cost;
-  final Color textColor;
-  final Color borderColor;
-  final Color backgroundColor;
+
+  final Color? textColor;
+  final Color? borderColor;
+  final Color? backgroundColor;
 
   const TransportationRoute({
     super.key,
@@ -16,13 +17,25 @@ class TransportationRoute extends StatelessWidget {
     required this.to,
     required this.method,
     required this.cost,
-    required this.textColor,
-    required this.borderColor,
-    required this.backgroundColor,
+    this.textColor,
+    this.borderColor,
+    this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final effectiveTextColor = textColor ??
+        (isDark ? theme.primaryColorLight : const Color(0xFF5C4634));
+    final effectiveBorderColor = borderColor ??
+        (isDark
+            ? theme.primaryColor.withValues(alpha: 0.5)
+            : const Color(0xFF8B6F5A));
+    final effectiveBgColor = backgroundColor ??
+        (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white);
+
     IconData icon;
     switch (method.toLowerCase()) {
       case 'taxi':
@@ -51,26 +64,26 @@ class TransportationRoute extends StatelessWidget {
             TransportationPill(
               text: from,
               icon: null,
-              textColor: textColor,
-              borderColor: borderColor,
-              backgroundColor: backgroundColor,
+              textColor: effectiveTextColor,
+              borderColor: effectiveBorderColor,
+              backgroundColor: effectiveBgColor,
             ),
-            ArrowIcon(color: borderColor),
+            ArrowIcon(color: effectiveBorderColor),
             TransportationPill(
               text: method,
               cost: costText,
               icon: icon,
-              textColor: textColor,
-              borderColor: borderColor,
-              backgroundColor: backgroundColor,
+              textColor: effectiveTextColor,
+              borderColor: effectiveBorderColor,
+              backgroundColor: effectiveBgColor,
             ),
-            ArrowIcon(color: borderColor),
+            ArrowIcon(color: effectiveBorderColor),
             TransportationPill(
               text: to,
               icon: null,
-              textColor: textColor,
-              borderColor: borderColor,
-              backgroundColor: backgroundColor,
+              textColor: effectiveTextColor,
+              borderColor: effectiveBorderColor,
+              backgroundColor: effectiveBgColor,
             ),
           ],
         ),
@@ -102,17 +115,18 @@ class TransportationPill extends StatelessWidget {
     return Container(
       constraints: BoxConstraints(
         minWidth: 60.w,
-        maxWidth: 140.w,
+        maxWidth: 160.w,
       ),
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
       margin: EdgeInsets.only(right: 6.w),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: borderColor, width: 1.5),
+        border:
+            Border.all(color: borderColor.withValues(alpha: 0.5), width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -126,19 +140,14 @@ class TransportationPill extends StatelessWidget {
             SizedBox(width: 4.w),
           ],
           if (cost != null) ...[
-            Flexible(
-              child: Text(
-                cost!,
-                style: TextStyle(
-                  color: borderColor,
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+            Text(
+              "$cost - ",
+              style: TextStyle(
+                color: borderColor,
+                fontSize: 10.sp,
+                fontWeight: FontWeight.w700,
               ),
             ),
-            SizedBox(width: 4.w),
           ],
           Flexible(
             child: Text(
@@ -146,7 +155,7 @@ class TransportationPill extends StatelessWidget {
               style: TextStyle(
                 color: textColor,
                 fontSize: 12.sp,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
@@ -160,7 +169,6 @@ class TransportationPill extends StatelessWidget {
 
 class ArrowIcon extends StatelessWidget {
   final Color color;
-
   const ArrowIcon({super.key, required this.color});
 
   @override

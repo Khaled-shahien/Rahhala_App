@@ -6,6 +6,7 @@ import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 import 'package:rahhala_app/core/theme/app_theme.dart';
+import 'package:rahhala_app/core/theme/theme_controller.dart';
 import 'package:rahhala_app/core/utils/app_notifications.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
 
@@ -40,15 +41,9 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _profileCubit = sl<ProfileCubit>();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _profileCubit.fetch();
     });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   void _showComingSoon(String featureName) {
@@ -56,47 +51,38 @@ class _ProfilePageState extends State<ProfilePage> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Theme.of(context).cardColor,
         child: Padding(
           padding: EdgeInsets.all(28.w),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 90.w,
-                height: 90.w,
+                width: 80.w,
+                height: 80.w,
                 decoration: BoxDecoration(
-                  color: ThemeColor.primaryColor.withValues(alpha: 0.15),
+                  color: ThemeColor.primaryColor.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.schedule_rounded,
-                  size: 45.sp,
-                  color: ThemeColor.primaryColor,
-                ),
+                child: Icon(Icons.schedule_rounded,
+                    size: 40.sp, color: ThemeColor.primaryColor),
               ),
-              SizedBox(height: 24.h),
+              SizedBox(height: 20.h),
               Text(
                 l10n.commonComingSoon,
                 style: TextStyle(
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface),
               ),
-              SizedBox(height: 16.h),
+              SizedBox(height: 12.h),
               Text(
                 l10n.routerFeatureUnderDevelopment(featureName),
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  color: Colors.grey[600],
-                  height: 1.5,
-                ),
+                style: TextStyle(fontSize: 15.sp, color: Colors.grey[500]),
               ),
-              SizedBox(height: 28.h),
+              SizedBox(height: 24.h),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -104,18 +90,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ThemeColor.primaryColor,
                     foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 14.h),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
+                        borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: Text(
-                    l10n.commonGotIt,
-                    style: TextStyle(
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  child: Text(l10n.commonGotIt),
                 ),
               ),
             ],
@@ -130,23 +108,25 @@ class _ProfilePageState extends State<ProfilePage> {
     required String okLabel,
     required Color okColor,
   }) {
-    final l10n = context.l10n;
     return showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
+        backgroundColor: Theme.of(context).cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(title),
+        title: Text(title,
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 18.sp)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text(l10n.commonCancel)),
+              child: Text(context.l10n.commonCancel)),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: okColor,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
+                backgroundColor: okColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10))),
             onPressed: () => Navigator.pop(context, true),
             child: Text(okLabel),
           ),
@@ -155,50 +135,35 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<void> deleteAccount() async {
-    final l10n = context.l10n;
-    final confirm = await _confirm(
-      title: l10n.profileDeleteAccountConfirm,
-      okLabel: l10n.profileDeleteAction,
-      okColor: Colors.red,
-    );
-    if (confirm != true) return;
-    if (!mounted) return;
-    _profileCubit.deleteAccount();
-  }
-
   Future<void> logout() async {
-    final l10n = context.l10n;
     final confirm = await _confirm(
-      title: l10n.profileLogoutConfirm,
-      okLabel: l10n.profileLogoutAction,
+      title: context.l10n.profileLogoutConfirm,
+      okLabel: context.l10n.profileLogoutAction,
       okColor: ThemeColor.primaryColor,
     );
-    if (confirm != true) return;
-
-    await sl<TokenStorage>().clearAll();
-    if (!mounted) return;
-
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const WelcomePage()),
-      (_) => false,
-    );
+    if (confirm == true) {
+      await sl<TokenStorage>().clearAll();
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const WelcomePage()),
+        (_) => false,
+      );
+    }
   }
 
-  Future<void> _showLanguagePicker() async {
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) => const LanguagePickerBottomSheet(),
+  Future<void> deleteAccount() async {
+    final confirm = await _confirm(
+      title: context.l10n.profileDeleteAccountConfirm,
+      okLabel: context.l10n.profileDeleteAction,
+      okColor: Colors.red,
     );
+    if (confirm == true) _profileCubit.deleteAccount();
   }
 
   Widget buildContent(ProfileState state) {
     final l10n = context.l10n;
+    final themeController = sl<AppThemeController>();
     final storage = sl<TokenStorage>();
 
     String displayName = storage.displayName;
@@ -206,16 +171,10 @@ class _ProfilePageState extends State<ProfilePage> {
     String? profileImageUrl = storage.profileImageUrl;
 
     if (state is ProfileLoaded) {
-      if (state.details.fullName.trim().isNotEmpty) {
-        displayName = state.details.fullName.trim();
-      }
-      if (state.details.email.trim().isNotEmpty) {
-        displayEmail = state.details.email.trim();
-      }
-      if (state.details.profileImageUrl != null &&
-          state.details.profileImageUrl!.isNotEmpty) {
-        profileImageUrl = state.details.profileImageUrl;
-      }
+      if (state.details.fullName.isNotEmpty)
+        displayName = state.details.fullName;
+      if (state.details.email.isNotEmpty) displayEmail = state.details.email;
+      profileImageUrl = state.details.profileImageUrl;
     }
 
     return CustomScrollView(
@@ -226,69 +185,49 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (!widget.embedded)
+                if (!widget.embedded) ...[
                   Row(
                     children: [
                       IconButton(
-                        onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const HomePage(isGuest: false),
-                            ),
-                            (route) => false,
-                          );
-                        },
-                        icon: Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          size: 24.sp,
-                          color: Colors.black87,
-                        ),
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.arrow_back_ios_new_rounded),
                         style: IconButton.styleFrom(
-                          backgroundColor: Colors.grey[100],
+                          backgroundColor: Theme.of(context).cardColor,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
+                              borderRadius: BorderRadius.circular(14)),
                         ),
                       ),
                       SizedBox(width: 16.w),
-                      Text(
-                        l10n.profileTitle,
-                        style: TextStyle(
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const Spacer(),
+                      Text(l10n.profileTitle,
+                          style: TextStyle(
+                              fontSize: 20.sp, fontWeight: FontWeight.bold)),
                     ],
                   ),
-                if (!widget.embedded) SizedBox(height: 20.h),
+                  SizedBox(height: 20.h),
+                ],
 
-                // Profile header with improved styling
+                // Profile Header Card
                 Container(
-                  padding: EdgeInsets.fromLTRB(20.w, 22.h, 20.w, 24.h),
+                  padding:
+                      EdgeInsets.symmetric(vertical: 24.h, horizontal: 20.w),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        ThemeColor.primaryColor.withValues(alpha: 0.08),
-                        Colors.white,
+                        ThemeColor.primaryColor.withOpacity(0.15),
+                        Theme.of(context).colorScheme.surface,
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(28),
-                    border: Border.all(color: Colors.grey[200]!),
+                    borderRadius: BorderRadius.circular(28.r),
+                    border: Border.all(
+                        color: Theme.of(context).dividerColor.withOpacity(0.1)),
                     boxShadow: [
                       BoxShadow(
-                        color: ThemeColor.primaryColor.withValues(alpha: 0.1),
-                        blurRadius: 30,
-                        offset: const Offset(0, 12),
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.06),
-                        blurRadius: 12,
-                        offset: const Offset(0, 6),
+                        color: Colors.black.withOpacity(
+                            themeController.isDarkMode ? 0.2 : 0.05),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
                       ),
                     ],
                   ),
@@ -296,81 +235,42 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       Hero(
                         tag: 'profile_avatar_main',
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: ThemeColor.primaryColor
-                                    .withValues(alpha: 0.2),
-                                blurRadius: 20,
-                                spreadRadius: 6,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: CircleAvatar(
-                            radius: 60.r,
-                            backgroundColor: Colors.grey.shade300,
-                            backgroundImage: (profileImageUrl != null &&
-                                    profileImageUrl.isNotEmpty)
-                                ? NetworkImage(profileImageUrl) as ImageProvider
-                                : null,
-                            child: (profileImageUrl == null ||
-                                    profileImageUrl.isEmpty)
-                                ? Icon(
-                                    Icons.person,
-                                    color: Colors.white,
-                                    size: 52.sp,
-                                  )
-                                : null,
-                          ),
+                        child: CircleAvatar(
+                          radius: 55.r,
+                          backgroundColor:
+                              ThemeColor.primaryColor.withOpacity(0.1),
+                          backgroundImage: (profileImageUrl != null &&
+                                  profileImageUrl.isNotEmpty)
+                              ? NetworkImage(profileImageUrl)
+                              : null,
+                          child: (profileImageUrl == null ||
+                                  profileImageUrl.isEmpty)
+                              ? Icon(Icons.person,
+                                  size: 50.sp, color: ThemeColor.primaryColor)
+                              : null,
                         ),
                       ),
-                      SizedBox(height: 18.h),
-                      Text(
-                        displayName,
-                        style: TextStyle(
-                          fontSize: 26.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 10.h),
+                      SizedBox(height: 16.h),
+                      Text(displayName,
+                          style: TextStyle(
+                              fontSize: 22.sp, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 8.h),
                       Container(
                         padding: EdgeInsets.symmetric(
-                          horizontal: 14.w,
-                          vertical: 10.h,
-                        ),
+                            horizontal: 12.w, vertical: 6.h),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: Colors.grey[200]!),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(10.r),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.mail_outline_rounded,
-                              size: 18.sp,
-                              color: Colors.grey[600],
-                            ),
-                            SizedBox(width: 10.w),
-                            Flexible(
-                              child: Text(
-                                displayEmail,
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: Colors.grey[700],
-                                  height: 1.3,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
+                        child: Text(displayEmail,
+                            style: TextStyle(
+                                fontSize: 13.sp,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant)),
                       ),
                     ],
                   ),
@@ -379,119 +279,91 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
         ),
-        if (state is ProfileLoading && state is! ProfileLoaded)
-          const SliverToBoxAdapter(
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.all(32.0),
-                child: CircularProgressIndicator(
-                  color: ThemeColor.primaryColor,
-                ),
-              ),
-            ),
-          ),
+
+        // Settings Sections
         SliverPadding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           sliver: SliverList(
             delegate: SliverChildListDelegate([
-              SizedBox(height: 16.h),
-              _sectionTitle(l10n.profileAccount),
-              SizedBox(height: 12.h),
-              _sectionCard([
+              _sectionTitle(context, l10n.profileAccount),
+              SizedBox(height: 10.h),
+              _sectionCard(context, [
                 ProfileListTile(
                   icon: Icons.edit_outlined,
                   title: l10n.profileEdit,
                   onTap: () async {
                     await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const EditProfilePage(),
-                      ),
-                    );
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const EditProfilePage()));
                     _profileCubit.fetch();
                   },
                 ),
-                Divider(height: 1, color: Colors.grey[200]),
+                _customDivider(context),
                 ProfileListTile(
                   icon: Icons.history_rounded,
                   title: l10n.profilePlanHistory,
                   onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const TripHistoryScreen()),
-                  ),
-                ),
-                Divider(height: 1, color: Colors.grey[200]),
-                ProfileListTile(
-                  icon: Icons.lock_outline,
-                  title: l10n.profileChangePassword,
-                  onTap: () {
-                    Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const ResetPasswordLoggedInPage(),
-                      ),
-                    );
-                  },
+                          builder: (_) => const TripHistoryScreen())),
                 ),
               ]),
-              SizedBox(height: 22.h),
-              _sectionTitle(l10n.profilePreferences),
-              SizedBox(height: 12.h),
-              _sectionCard([
-                ProfileListTile(
-                  icon: Icons.notifications_outlined,
-                  title: l10n.profileNotification,
-                  onTap: () => _showComingSoon(l10n.profileNotification),
-                ),
-                Divider(height: 1, color: Colors.grey[200]),
+              SizedBox(height: 20.h),
+              _sectionTitle(context, l10n.profilePreferences),
+              SizedBox(height: 10.h),
+              _sectionCard(context, [
                 ProfileListTile(
                   icon: Icons.language_outlined,
                   title: l10n.profileLanguage,
-                  onTap: _showLanguagePicker,
+                  onTap: () => showModalBottomSheet(
+                    context: context,
+                    backgroundColor: Theme.of(context).cardColor,
+                    shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(24))),
+                    builder: (_) => const LanguagePickerBottomSheet(),
+                  ),
                 ),
-                Divider(height: 1, color: Colors.grey[200]),
-                ProfileListTile(
-                  icon: Icons.card_membership_outlined,
-                  title: l10n.profilePlans,
-                  onTap: () => _showComingSoon(l10n.profilePlans),
-                ),
-                Divider(height: 1, color: Colors.grey[200]),
-                ProfileListTile(
-                  icon: Icons.palette_outlined,
-                  title: l10n.profileAppearance,
-                  onTap: () => _showComingSoon(l10n.profileAppearance),
-                ),
-              ]),
-              SizedBox(height: 22.h),
-              _sectionTitle(l10n.profileSupport),
-              SizedBox(height: 12.h),
-              _sectionCard([
-                ProfileListTile(
-                  icon: Icons.help_outline_rounded,
-                  title: l10n.profileHelpSupport,
-                  onTap: () => _showComingSoon(l10n.profileHelpSupport),
-                ),
-              ]),
-              SizedBox(height: 22.h),
-              _sectionTitle(l10n.profileDangerZone),
-              SizedBox(height: 12.h),
-              _sectionCard([
-                ProfileListTile(
-                  icon: Icons.logout_rounded,
-                  title: l10n.profileLogout,
-                  tint: ThemeColor.primaryColor,
-                  onTap: logout,
-                ),
-                Divider(height: 1, color: Colors.grey[200]),
-                ProfileListTile(
-                  icon: Icons.delete_outline_rounded,
-                  title: l10n.profileDeleteAccount,
-                  tint: Colors.red,
-                  onTap: deleteAccount,
+                _customDivider(context),
+                ListenableBuilder(
+                  listenable: themeController,
+                  builder: (context, _) => ListTile(
+                    leading: Icon(
+                        themeController.isDarkMode
+                            ? Icons.dark_mode_rounded
+                            : Icons.light_mode_rounded,
+                        color: themeController.isDarkMode
+                            ? Colors.amber
+                            : Theme.of(context).colorScheme.onSurfaceVariant),
+                    title: Text(l10n.profileAppearance,
+                        style: TextStyle(
+                            fontSize: 15.sp, fontWeight: FontWeight.w500)),
+                    trailing: Switch(
+                      value: themeController.isDarkMode,
+                      onChanged: (v) => themeController.toggleTheme(v),
+                      activeColor: ThemeColor.primaryColor,
+                    ),
+                  ),
                 ),
               ]),
-              SizedBox(height: 36.h),
+              SizedBox(height: 20.h),
+              _sectionTitle(context, l10n.profileDangerZone),
+              SizedBox(height: 10.h),
+              _sectionCard(context, [
+                ProfileListTile(
+                    icon: Icons.logout_rounded,
+                    title: l10n.profileLogout,
+                    tint: ThemeColor.primaryColor,
+                    onTap: logout),
+                _customDivider(context),
+                ProfileListTile(
+                    icon: Icons.delete_outline_rounded,
+                    title: l10n.profileDeleteAccount,
+                    tint: Colors.red,
+                    onTap: deleteAccount),
+              ]),
+              SizedBox(height: 100.h),
             ]),
           ),
         ),
@@ -499,143 +371,66 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _sectionTitle(String title) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 6.w),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w600,
-          color: Colors.grey[600],
-          letterSpacing: 0.3,
-        ),
+  Widget _sectionTitle(BuildContext context, String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w600,
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
       ),
     );
   }
 
-  Widget _sectionCard(List<Widget> children) {
+  Widget _sectionCard(BuildContext context, List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[200]!),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(20.r),
+        border:
+            Border.all(color: Theme.of(context).dividerColor.withOpacity(0.05)),
       ),
       child: Column(children: children),
     );
   }
 
+  Widget _customDivider(BuildContext context) {
+    return Divider(
+        height: 1,
+        indent: 50.w,
+        color: Theme.of(context).dividerColor.withOpacity(0.1));
+  }
+
   @override
   Widget build(BuildContext context) {
-    final content = BlocProvider.value(
+    return BlocProvider.value(
       value: _profileCubit,
-      child: BlocConsumer<ProfileCubit, ProfileState>(
-        listener: (context, state) async {
-          if (state is! ProfileLoading && state is! ProfileActionLoading) {
-            if (Navigator.canPop(context)) {
-              final route = ModalRoute.of(context);
-              if (route != null && !route.isCurrent) {
-                Navigator.pop(context);
-              }
-            }
-          }
-
-          if (state is ProfileFailure) {
-            HapticFeedback.mediumImpact();
-            showAppNotification(
-              context: context,
-              title: context.l10n.commonError,
-              message: state.message,
-              isError: true,
-            );
-          } else if (state is ProfileActionSuccess) {
-            showAppNotification(
-              context: context,
-              title: context.l10n.commonSuccess,
-              message: state.model.message,
-            );
-
-            final msg = state.model.message.toLowerCase();
-            if (msg.contains('delete')) {
-              await sl<TokenStorage>().clearAll();
-              if (!context.mounted) return;
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-                (_) => false,
-              );
-            } else {
-              if (mounted) setState(() {});
-            }
-          } else if (state is ProfileLoaded) {
-            if (mounted) setState(() {});
-          }
-        },
-        builder: (context, state) => buildContent(state),
-      ),
-    );
-
-    if (widget.embedded) {
-      return content;
-    }
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      extendBody: true,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF3377FF).withValues(alpha: 0.18),
-              blurRadius: 30,
-              spreadRadius: 6,
-              offset: const Offset(0, 8),
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.18),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        extendBody: true,
+        bottomNavigationBar: widget.embedded
+            ? null
+            : BottomAppBar(
+                shape: const SoftArcNotchedShape(arcWidth: 120, arcHeight: 22),
+                color: Theme.of(context).cardColor,
+                child: RahhalaBottomBar(
+                  currentIndex: 2,
+                  onTap: (i) => i == 2 ? null : Navigator.pop(context),
+                ),
+              ),
+        floatingActionButton: widget.embedded
+            ? null
+            : FloatingActionButton(
+                onPressed: () => _showComingSoon(context.l10n.homeSearch),
+                backgroundColor: ThemeColor.primaryColor,
+                child: const Icon(Icons.search, color: Colors.white),
+              ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        body: SafeArea(
+          child: BlocBuilder<ProfileCubit, ProfileState>(
+            builder: (context, state) => buildContent(state),
+          ),
         ),
-        child: FloatingActionButton(
-          onPressed: () {
-            HapticFeedback.selectionClick();
-            _showComingSoon(context.l10n.homeSearch);
-          },
-          backgroundColor: ThemeColor.primaryColor,
-          elevation: 0,
-          shape: const CircleBorder(),
-          child: const Icon(Icons.search, color: Colors.white, size: 28),
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        shape: const SoftArcNotchedShape(arcWidth: 120, arcHeight: 22),
-        notchMargin: 6,
-        elevation: 0,
-        color: Colors.transparent,
-        child: RahhalaBottomBar(
-          currentIndex: 2,
-          onTap: (i) {
-            if (i == 2) {
-              return;
-            } else {
-              Navigator.pop(context);
-            }
-          },
-        ),
-      ),
-      body: SafeArea(
-        child: content,
       ),
     );
   }

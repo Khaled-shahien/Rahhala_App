@@ -15,6 +15,9 @@ class TripSaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
@@ -25,7 +28,11 @@ class TripSaveButton extends StatelessWidget {
             onPressed: isSaving ? null : onSave,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
+              disabledBackgroundColor: isDark
+                  ? AppColors.primary.withValues(alpha: 0.5)
+                  : AppColors.primary.withValues(alpha: 0.6),
               minimumSize: Size(double.infinity, 50.h),
+              elevation: isDark ? 0 : 2,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.r),
               ),
@@ -34,9 +41,10 @@ class TripSaveButton extends StatelessWidget {
                 ? SizedBox(
                     width: 18.w,
                     height: 18.w,
-                    child: const CircularProgressIndicator(
+                    child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      valueColor:
+                          const AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
                 : const Icon(

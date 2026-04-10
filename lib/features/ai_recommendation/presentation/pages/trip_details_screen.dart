@@ -218,30 +218,48 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     unawaited(showDialog<void>(
       context: context,
       builder: (dialogContext) {
+        final theme = Theme.of(dialogContext);
+        final isDark = theme.brightness == Brightness.dark;
+
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          backgroundColor: theme.dialogBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
           title: Text(
             TripDetailsStrings.regenerateTitle,
             style: TextStyle(
-              color: primaryTextColor,
+              color: theme.textTheme.titleLarge?.color ?? primaryTextColor,
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
           content: Text(
             TripDetailsStrings.regenerateBody,
-            style: TextStyle(color: primaryTextColor, fontSize: 14.sp),
+            style: TextStyle(
+              color: theme.textTheme.bodyMedium?.color ?? primaryTextColor,
+              fontSize: 14.sp,
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
               child: Text(
                 TripDetailsStrings.cancel,
-                style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+                style: TextStyle(
+                  color: isDark ? Colors.white70 : Colors.grey,
+                  fontSize: 14.sp,
+                ),
               ),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
               onPressed: () {
                 Navigator.pop(dialogContext);
                 unawaited(_regenerateTrip());
@@ -249,7 +267,6 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
               child: Text(
                 TripDetailsStrings.regenerate,
                 style: TextStyle(
-                  color: Colors.white,
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
                 ),
@@ -263,8 +280,13 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final customBgColor =
+        isDark ? const Color(0xFF121212) : theme.scaffoldBackgroundColor;
+
     return Scaffold(
-      backgroundColor: screenBackgroundColor,
+      backgroundColor: customBgColor,
       extendBodyBehindAppBar: true,
       bottomNavigationBar: TripSaveButton(
         isSaving: _isSaving,
@@ -294,11 +316,6 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                       _buildEmergencyContactSection(
                         emergencyContact: plan.emergencyContact ?? '',
                       ),
-                      // TripInfoSections(
-                      //   budgetTips: plan.budgetTips,
-                      //   travelTips: plan.travelTips,
-                      //   emergencyContact: plan.emergencyContact,
-                      // ),
                       SizedBox(height: 32.h),
                     ],
                   ),
@@ -312,12 +329,17 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   }
 
   Widget _buildHeader() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final bgColor = theme.scaffoldBackgroundColor;
+
     return SizedBox(
       width: double.infinity,
       height: 380.h,
       child: Stack(
         children: [
-          // Display country image as full-bleed background
+          // Display country image
           if (plan.countryImage != null && plan.countryImage!.isNotEmpty)
             Positioned.fill(
               child: ClipRRect(
@@ -331,10 +353,10 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   width: double.infinity,
                   height: 380.h,
                   errorBuilder: (context, error, stackTrace) {
-                    print('Error loading country image: $error');
                     return Container(
                       decoration: BoxDecoration(
-                        color: headerBackgroundColor,
+                        color:
+                            isDark ? Colors.grey[900] : headerBackgroundColor,
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(35.r),
                           bottomRight: Radius.circular(35.r),
@@ -345,7 +367,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Container(
-                      color: headerBackgroundColor.withValues(alpha: 0.3),
+                      color: isDark
+                          ? Colors.black26
+                          : headerBackgroundColor.withValues(alpha: 0.3),
                       child: Center(
                         child: CircularProgressIndicator(
                           value: loadingProgress.expectedTotalBytes != null
@@ -371,9 +395,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   colors: [
                     Colors.transparent,
                     Colors.transparent,
-                    screenBackgroundColor.withValues(alpha: 0.15),
-                    screenBackgroundColor.withValues(alpha: 0.5),
-                    screenBackgroundColor,
+                    bgColor.withValues(alpha: 0.2),
+                    bgColor.withValues(alpha: 0.6),
+                    bgColor,
                   ],
                   stops: const [0.0, 0.45, 0.7, 0.85, 1.0],
                 ),
@@ -381,34 +405,18 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
             ),
           ),
 
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.transparent,
-                    screenBackgroundColor.withValues(alpha: 0.3),
-
-                    /// screenBackgroundColor,
-                    const Color(0xFFF3E5D8).withValues(alpha: 0.8)
-                  ],
-                  stops: const [0.0, 0.5, 0.8, 1.0],
-                ),
-              ),
-            ),
-          ),
-          // Decorative assets in top-right corner
+          // Decorative assets (cover.png)
           Positioned(
             top: -20.h,
             right: -30.w,
-            child: Image.asset(
-              'assets/images/cover.png',
-              width: 400.w,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => const SizedBox(),
+            child: Opacity(
+              opacity: isDark ? 0.7 : 1.0,
+              child: Image.asset(
+                'assets/images/cover.png',
+                width: 400.w,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const SizedBox(),
+              ),
             ),
           ),
 
@@ -424,8 +432,8 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   onTap: () => Navigator.pop(context),
                   child: Container(
                     padding: EdgeInsets.all(8.r),
-                    decoration: const BoxDecoration(
-                      color: Colors.black38,
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white10 : Colors.black38,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(Icons.arrow_back_ios_new_rounded,
@@ -475,9 +483,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: 20.h,
-                ),
+                SizedBox(height: 20.h),
                 _buildTitle(),
                 SizedBox(height: 30.h),
                 _buildModernPill(
@@ -498,6 +504,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   }
 
   Widget _buildTitle() {
+    final theme = Theme.of(context);
     return SizedBox(
       width: 240.w,
       child: Text(
@@ -509,14 +516,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
           height: 1.4,
           shadows: [
             Shadow(
-              color: Colors.black.withValues(alpha: 1.0),
+              color: Colors.black.withValues(alpha: 0.8),
               offset: const Offset(0, 2),
-              blurRadius: 255,
-            ),
-            Shadow(
-              color: Colors.black.withValues(alpha: 1.0),
-              offset: const Offset(0, 4),
-              blurRadius: 100,
+              blurRadius: 10,
             ),
           ],
         ),
@@ -526,29 +528,36 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
 
   Widget _buildModernPill(
       {IconData? icon, required String text, bool isCost = false}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3E5D8).withValues(alpha: 0.5),
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.1)
+            : const Color(0xFFF3E5D8).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(30.r),
         border: Border.all(
-          color: const Color(0xFF8B6F5A),
+          color: isDark
+              ? theme.primaryColor.withValues(alpha: 0.5)
+              : const Color(0xFF8B6F5A),
           width: 1.4,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 18.sp,
-            color: const Color(0xFF5C4634),
-          ),
-          SizedBox(width: 8.w),
+          if (icon != null) ...[
+            Icon(icon,
+                size: 18.sp,
+                color: isDark ? Colors.white : const Color(0xFF5C4634)),
+            SizedBox(width: 8.w),
+          ],
           Text(
             text,
             style: TextStyle(
-              color: const Color(0xFF5C4634),
+              color: isDark ? Colors.white : const Color(0xFF5C4634),
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
             ),
@@ -720,12 +729,17 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   }
 
   Widget _buildTransportationSection(List<Activity> activities) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final List<Transportation> allTransports = [];
     for (var activity in activities) {
       allTransports.addAll(activity.transportation);
     }
 
     if (allTransports.isEmpty) return const SizedBox.shrink();
+
+    final displayColor = isDark ? theme.primaryColorLight : (brownTextColor);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -734,13 +748,16 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
           padding: EdgeInsets.only(top: 16.h, bottom: 8.h),
           child: Row(
             children: [
-              Icon(Icons.directions_car_outlined,
-                  size: 18.sp, color: brownTextColor),
+              Icon(
+                Icons.directions_car_outlined,
+                size: 18.sp,
+                color: displayColor,
+              ),
               SizedBox(width: 8.w),
               Text(
                 "Transportation Routes",
                 style: TextStyle(
-                  color: brownTextColor,
+                  color: displayColor,
                   fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
                 ),
@@ -776,24 +793,36 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   }
 
   Widget _buildRoutePill(String text, {bool isMethod = false}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: lightBorderColor.withValues(alpha: 0.4), width: 1),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.2)
+              : lightBorderColor.withValues(alpha: 0.4),
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (isMethod) ...[
-            Icon(Icons.directions_car, size: 12.sp, color: brownTextColor),
+            Icon(
+              Icons.directions_car,
+              size: 12.sp,
+              color: isDark ? theme.primaryColorLight : brownTextColor,
+            ),
             SizedBox(width: 4.w),
           ],
           Text(
             text,
             style: TextStyle(
-              color: brownTextColor,
+              color: isDark ? theme.primaryColorLight : brownTextColor,
               fontSize: 11.sp,
               fontWeight: FontWeight.w600,
             ),
@@ -804,11 +833,16 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   }
 
   Widget _buildRouteArrow() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 4.w),
       child: Icon(
         Icons.trending_flat,
-        color: arrowColor,
+        color: isDark
+            ? theme.primaryColorLight.withValues(alpha: 0.7)
+            : arrowColor,
         size: 18.sp,
       ),
     );
@@ -819,12 +853,15 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     required String title,
     required String content,
   }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
       ),
       child: CustomExpansionTile(
         tilePadding: EdgeInsets.all(16.w),
@@ -850,7 +887,8 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   Text(
                     title,
                     style: TextStyle(
-                      color: primaryTextColor,
+                      color: theme.textTheme.titleMedium?.color ??
+                          primaryTextColor,
                       fontSize: 14.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -859,7 +897,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   Text(
                     content.isEmpty ? "No information available" : content,
                     style: TextStyle(
-                      color: primaryTextColor.withValues(alpha: 0.8),
+                      color: theme.textTheme.bodySmall?.color
+                              ?.withValues(alpha: 0.8) ??
+                          primaryTextColor,
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w500,
                     ),
@@ -871,7 +911,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
             ),
             Icon(
               Icons.keyboard_arrow_down,
-              color: primaryTextColor,
+              color: theme.iconTheme.color,
               size: 20.sp,
             ),
           ],
@@ -884,7 +924,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
             alignment: Alignment.centerLeft,
             child: Text(
               content.isEmpty ? "No information available" : content,
-              style: TextStyle(fontSize: 13.sp, color: primaryTextColor),
+              style: TextStyle(
+                  fontSize: 13.sp,
+                  color: theme.textTheme.bodyMedium?.color ?? primaryTextColor),
             ),
           )
         ],
@@ -895,17 +937,19 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   Widget _buildEmergencyContactSection({required String emergencyContact}) {
     if (emergencyContact.isEmpty) return const SizedBox.shrink();
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final contacts = emergencyContact.split(',');
 
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -921,7 +965,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                 Container(
                   padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
-                    color: lightBorderColor.withValues(alpha: 0.07),
+                    color: isDark
+                        ? Colors.red.withValues(alpha: 0.1)
+                        : lightBorderColor.withValues(alpha: 0.07),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Icon(Icons.emergency_outlined,
@@ -931,7 +977,8 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                 Text(
                   'Emergency Contacts',
                   style: TextStyle(
-                    color: primaryTextColor,
+                    color:
+                        theme.textTheme.titleMedium?.color ?? primaryTextColor,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
                   ),
@@ -950,10 +997,13 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   padding:
                       EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                   decoration: BoxDecoration(
-                    color: lightBorderColor.withValues(alpha: 0.06),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : lightBorderColor.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(
-                        color: lightBorderColor.withValues(alpha: 0.2), width: 1),
+                        color: theme.dividerColor.withValues(alpha: 0.2),
+                        width: 1),
                   ),
                   child: IntrinsicWidth(
                     child: Row(
@@ -965,7 +1015,8 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                           child: Text(
                             '$label${number.isNotEmpty ? ': $number' : ''}',
                             style: TextStyle(
-                              color: primaryTextColor,
+                              color: theme.textTheme.bodyMedium?.color ??
+                                  primaryTextColor,
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w600,
                             ),
@@ -993,9 +1044,11 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
           onPressed: _isSaving ? null : _saveTrip,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
-            minimumSize: Size(double.infinity, 50.h),
+            foregroundColor: Colors.white,
+            minimumSize: Size(double.infinity, 55.h),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r)),
+                borderRadius: BorderRadius.circular(16.r)),
+            elevation: 0,
           ),
           icon: _isSaving
               ? SizedBox(
@@ -1010,7 +1063,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
             style: TextStyle(
                 color: Colors.white,
                 fontSize: 16.sp,
-                fontWeight: FontWeight.w600),
+                fontWeight: FontWeight.bold),
           ),
         ),
       ),
@@ -1032,6 +1085,12 @@ class TimelineWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final lineMainColor =
+        isDark ? theme.primaryColor.withValues(alpha: 0.3) : (timelineColor);
+
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1043,12 +1102,12 @@ class TimelineWrapper extends StatelessWidget {
                 Container(
                   height: 25.h,
                   width: 2,
-                  color: isFirst ? Colors.transparent : timelineColor,
+                  color: isFirst ? Colors.transparent : lineMainColor,
                 ),
                 Expanded(
                   child: Container(
                     width: 2,
-                    color: isLast ? Colors.transparent : timelineColor,
+                    color: isLast ? Colors.transparent : lineMainColor,
                   ),
                 ),
               ],

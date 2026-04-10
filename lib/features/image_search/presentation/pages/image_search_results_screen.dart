@@ -28,7 +28,7 @@ class ImageSearchResultsScreen extends StatelessWidget {
     return BlocBuilder<ImageSearchCubit, ImageSearchState>(
       builder: (context, state) {
         if (state is ImageSearchLoading) {
-          return _buildLoading();
+          return _buildLoading(context);
         } else if (state is ImageSearchSuccess) {
           return _buildResults(context, state);
         } else if (state is ImageSearchFailure) {
@@ -39,18 +39,21 @@ class ImageSearchResultsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLoading() {
+  Widget _buildLoading(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F4F0),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         title: Text(
           'Searching...',
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF3E3431),
+            color: colorScheme.onSurface,
           ),
         ),
       ),
@@ -58,13 +61,13 @@ class ImageSearchResultsScreen extends StatelessWidget {
         padding: EdgeInsets.all(16.w),
         itemCount: 3,
         itemBuilder: (_, __) => Shimmer.fromColors(
-          baseColor: Colors.grey.shade300,
-          highlightColor: Colors.grey.shade100,
+          baseColor: isDark ? Colors.grey[800]! : Colors.grey.shade300,
+          highlightColor: isDark ? Colors.grey[700]! : Colors.grey.shade100,
           child: Container(
             margin: EdgeInsets.only(bottom: 16.h),
             height: 260.h,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.surface,
               borderRadius: BorderRadius.circular(20.r),
             ),
           ),
@@ -75,15 +78,16 @@ class ImageSearchResultsScreen extends StatelessWidget {
 
   Widget _buildResults(BuildContext context, ImageSearchSuccess state) {
     final places = state.result.places;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F4F0),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: Color(0xFF3E3431)),
+          icon: Icon(Icons.arrow_back_ios_new_rounded,
+              color: colorScheme.onSurface),
           onPressed: () {
             context.read<ImageSearchCubit>().reset();
             Navigator.of(context).pop();
@@ -99,7 +103,7 @@ class ImageSearchResultsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF3E3431),
+                color: colorScheme.onSurface,
               ),
             ),
           ],
@@ -123,17 +127,16 @@ class ImageSearchResultsScreen extends StatelessWidget {
     );
   }
 
-  //error
-
   Widget _buildError(BuildContext context, String message) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F4F0),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: Color(0xFF3E3431)),
+          icon: Icon(Icons.arrow_back_ios_new_rounded,
+              color: colorScheme.onSurface),
           onPressed: () {
             context.read<ImageSearchCubit>().reset();
             Navigator.of(context).pop();
@@ -147,13 +150,14 @@ class ImageSearchResultsScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.sentiment_dissatisfied_outlined,
-                  size: 60.sp, color: Colors.grey.shade400),
+                  size: 60.sp,
+                  color: colorScheme.onSurfaceVariant.withOpacity(0.5)),
               SizedBox(height: 16.h),
               Text(
                 'Join us! Log in to unlock more features and search by image',
-                //'Please login first to search by image',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16.sp, color: Colors.grey.shade600),
+                style: TextStyle(
+                    fontSize: 16.sp, color: colorScheme.onSurfaceVariant),
               ),
               SizedBox(height: 24.h),
               ElevatedButton(
@@ -182,32 +186,32 @@ class ImageSearchResultsScreen extends StatelessWidget {
   }
 
   Widget _buildEmpty(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F4F0),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.search_off_outlined,
-                size: 60.sp, color: Colors.grey.shade400),
-            SizedBox(height: 16.h),
-            Text(
-              'No matching places found',
-              style: TextStyle(fontSize: 16.sp, color: Colors.grey.shade600),
+    final colorScheme = Theme.of(context).colorScheme;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.search_off_outlined,
+              size: 60.sp,
+              color: colorScheme.onSurfaceVariant.withOpacity(0.5)),
+          SizedBox(height: 16.h),
+          Text(
+            'No matching places found',
+            style:
+                TextStyle(fontSize: 16.sp, color: colorScheme.onSurfaceVariant),
+          ),
+          SizedBox(height: 24.h),
+          ElevatedButton(
+            onPressed: () => _openCamera(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ThemeColor.primaryColor,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r)),
             ),
-            SizedBox(height: 24.h),
-            ElevatedButton(
-              onPressed: () => _openCamera(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ThemeColor.primaryColor,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r)),
-              ),
-              child: Text('Try Another Image',
-                  style: TextStyle(color: Colors.white, fontSize: 16.sp)),
-            ),
-          ],
-        ),
+            child: Text('Try Another Image',
+                style: TextStyle(color: Colors.white, fontSize: 16.sp)),
+          ),
+        ],
       ),
     );
   }
