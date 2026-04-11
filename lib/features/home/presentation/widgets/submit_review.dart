@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
+import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/home/presentation/details_cubit/place_details_cubit.dart';
 import 'package:rahhala_app/features/home/presentation/details_cubit/review_cubit.dart';
 
@@ -26,20 +28,37 @@ class _SubmitReviewState extends State<SubmitReview> {
 
   @override
   Widget build(BuildContext context) {
+    final canSubmit = sl<TokenStorage>().hasToken;
+
+    if (!canSubmit) {
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: Colors.orange.shade200),
+        ),
+        child: Text(
+          'Login is required to add a rating and review.',
+          style: TextStyle(fontSize: 14.sp, color: Colors.brown.shade600),
+        ),
+      );
+    }
+
     return BlocListener<ReviewCubit, ReviewState>(
       listener: (context, state) {
-        if (state is ReviewSuccess) {
+        if (state is ReviewSuccess && state.action == ReviewAction.add) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text("your review has been submitted successfully!"),
-                backgroundColor: Colors.green),
+            SnackBar(
+                content: Text(state.message), backgroundColor: Colors.green),
           );
           setState(() {
             selectedRating = 0;
             _commentController.clear();
           });
           context.read<PlaceDetailsCubit>().getPlaceDetails(widget.placeId);
-        } else if (state is ReviewError) {
+        } else if (state is ReviewError && state.action == ReviewAction.add) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: Colors.red),
           );
@@ -106,7 +125,8 @@ class _SubmitReviewState extends State<SubmitReview> {
             height: 50.h,
             child: BlocBuilder<ReviewCubit, ReviewState>(
               builder: (context, state) {
-                if (state is ReviewLoading) {
+                if (state is ReviewActionLoading &&
+                    state.action == ReviewAction.add) {
                   return const Center(child: CircularProgressIndicator());
                 }
                 return ElevatedButton(

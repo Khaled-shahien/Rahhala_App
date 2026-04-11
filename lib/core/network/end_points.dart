@@ -28,6 +28,9 @@ class EndPoints {
 
   static const String getHome = '/api/Home/GetHome';
   static String placeDetails(String id) => '/api/Home/Places/$id';
+  static String reviewById(String id) => '/api/Home/Reviews/$id';
+  static const String favourites = '/api/Home/Favourites';
+  static String favouriteByPlaceId(String placeId) => '$favourites/$placeId';
 }
 
 class ApiKey {

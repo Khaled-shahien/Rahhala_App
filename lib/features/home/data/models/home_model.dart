@@ -38,6 +38,70 @@ class PlaceModel {
       isFavourite: json['isFavourite'] ?? false,
     );
   }
+
+  PlaceModel copyWith({
+    String? id,
+    String? name,
+    String? country,
+    String? imageUrl,
+    bool? isFavourite,
+  }) {
+    return PlaceModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      country: country ?? this.country,
+      imageUrl: imageUrl ?? this.imageUrl,
+      isFavourite: isFavourite ?? this.isFavourite,
+    );
+  }
+}
+
+class FavouritesResponse {
+  final bool success;
+  final int total;
+  final List<FavouriteModel> favourites;
+
+  FavouritesResponse({
+    required this.success,
+    required this.total,
+    required this.favourites,
+  });
+
+  factory FavouritesResponse.fromJson(Map<String, dynamic> json) {
+    return FavouritesResponse(
+      success: json['success'] ?? false,
+      total: json['total'] ?? 0,
+      favourites: (json['favourites'] as List<dynamic>? ?? [])
+          .map((item) => FavouriteModel.fromJson(item as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class FavouriteModel {
+  final String id;
+  final String name;
+  final String country;
+  final String imageUrl;
+  final String createdAt;
+
+  FavouriteModel({
+    required this.id,
+    required this.name,
+    required this.country,
+    required this.imageUrl,
+    required this.createdAt,
+  });
+
+  factory FavouriteModel.fromJson(Map<String, dynamic> json) {
+    return FavouriteModel(
+      id: (json['id'] ?? '').toString(),
+      name: (json['name'] ?? '').toString(),
+      country: (json['country'] ?? '').toString(),
+      imageUrl: (json['imageUrl'] ?? '').toString(),
+      createdAt: (json['createdAt'] ?? '').toString(),
+    );
+  }
 }
 
 class PlaceDetailsResponse {

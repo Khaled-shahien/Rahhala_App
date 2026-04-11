@@ -6,8 +6,19 @@ import 'rating_stars.dart';
 
 class ReviewCard extends StatelessWidget {
   final ReviewModel review;
+  final bool canManage;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+  final bool isDeleting;
 
-  const ReviewCard({super.key, required this.review});
+  const ReviewCard({
+    super.key,
+    required this.review,
+    this.canManage = false,
+    this.onEdit,
+    this.onDelete,
+    this.isDeleting = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +98,7 @@ class ReviewCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              displayName,
+                              displayName, // HEAD (محافظين عليه)
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15.sp,
@@ -98,7 +109,11 @@ class ReviewCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            formattedDate,
+                            formattedDate.isNotEmpty
+                                ? formattedDate
+                                : (review.createdAt.length >= 10
+                                    ? review.createdAt.substring(0, 10)
+                                    : review.createdAt),
                             style: TextStyle(
                               color:
                                   colorScheme.onSurfaceVariant.withOpacity(0.7),
@@ -107,8 +122,12 @@ class ReviewCard extends StatelessWidget {
                           ),
                         ],
                       ),
+
                       SizedBox(height: 4.h),
-                      RatingStars(rating: review.rating),
+
+                      // FEATURE من النسخة التانية (لو مش موجود عندك تجاهله)
+                      if (review.rating != null)
+                        RatingStars(rating: review.rating),
                     ],
                   ),
                 ),
@@ -124,6 +143,47 @@ class ReviewCard extends StatelessWidget {
                 color: colorScheme.onSurface.withOpacity(0.9),
               ),
             ),
+            if (canManage) ...[
+              SizedBox(height: 4.h),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      constraints: const BoxConstraints(),
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Edit review',
+                      onPressed: onEdit,
+                      icon: Icon(
+                        Icons.edit_outlined,
+                        size: 20.sp,
+                        color: Colors.blueGrey,
+                      ),
+                    ),
+                    IconButton(
+                      constraints: const BoxConstraints(),
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Delete review',
+                      onPressed: isDeleting ? null : onDelete,
+                      icon: isDeleting
+                          ? SizedBox(
+                              width: 16.w,
+                              height: 16.w,
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Icon(
+                              Icons.delete_outline,
+                              size: 20.sp,
+                              color: Colors.redAccent,
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       ),

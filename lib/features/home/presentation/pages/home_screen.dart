@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/home/domain/repositories/home_repository.dart';
 import 'package:rahhala_app/features/home/presentation/cubit/home_cubit.dart';
 import 'package:rahhala_app/features/home/presentation/pages/place_details_screen.dart';
@@ -8,6 +9,13 @@ import 'package:rahhala_app/features/home/presentation/widgets/place_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  void _showLoginRequiredMessage(BuildContext context) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please log in to manage favourites.')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +74,16 @@ class HomeScreen extends StatelessWidget {
                               ),
                             );
                           },
-                          onFavTap: () {},
+                          onFavTap: () {
+                            if (!sl<TokenStorage>().hasToken) {
+                              _showLoginRequiredMessage(context);
+                              return;
+                            }
+
+                            context
+                                .read<HomeCubit>()
+                                .toggleFavourite(place.id, place.isFavourite);
+                          },
                         );
                       },
                     );
