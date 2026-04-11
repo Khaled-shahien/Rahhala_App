@@ -346,7 +346,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     required VoidCallback onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryCol = ThemeColor.primaryColor;
+    const primaryCol = ThemeColor.primaryColor;
 
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
@@ -357,7 +357,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 18.h),
           decoration: BoxDecoration(
             color: isSelected
-                ? primaryCol.withOpacity(0.1)
+                ? primaryCol.withValues(alpha: 0.1)
                 : isDark
                     ? const Color(0xFF2C2C2C)
                     : Colors.grey[50],
@@ -419,7 +419,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
     final scaffoldBg = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
-    final primaryCol = ThemeColor.primaryColor;
+    const primaryCol = ThemeColor.primaryColor;
 
     return BlocProvider(
       create: (_) => sl<EditProfileCubit>(),
@@ -452,10 +452,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     padding:
                         EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
                     decoration: BoxDecoration(
-                      color: cardBg,
+                      color: primaryCol,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(isDark ? 0.3 : 0.04),
+                          color: Colors.black
+                              .withValues(alpha: isDark ? 0.3 : 0.04),
                           blurRadius: 12,
                           offset: const Offset(0, 2),
                         ),
@@ -467,13 +468,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           onPressed: () => Navigator.pop(context),
                           icon: Icon(
                             Icons.arrow_back_ios_new_rounded,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Colors.white,
                             size: 22.sp,
                           ),
                           style: IconButton.styleFrom(
-                            backgroundColor: isDark
-                                ? const Color(0xFF2C2C2C)
-                                : Colors.grey[100],
+                            backgroundColor:
+                                Colors.white.withValues(alpha: 0.2),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.r),
                             ),
@@ -488,16 +488,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               style: TextStyle(
                                 fontSize: 22.sp,
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: Colors.white,
                               ),
                             ),
                             Text(
                               'Update your personal information',
                               style: TextStyle(
                                 fontSize: 13.sp,
-                                color: isDark
-                                    ? Colors.grey[400]
-                                    : Colors.grey[600],
+                                color: Colors.white.withValues(alpha: 0.85),
                                 height: 1.4,
                               ),
                             ),
@@ -533,7 +531,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         shape: BoxShape.circle,
                                         boxShadow: [
                                           BoxShadow(
-                                            color: primaryCol.withOpacity(0.2),
+                                            color: primaryCol.withValues(
+                                                alpha: 0.2),
                                             blurRadius: 16,
                                             spreadRadius: 4,
                                           ),
@@ -542,7 +541,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       child: CircleAvatar(
                                         radius: 60.r,
                                         backgroundColor:
-                                            primaryCol.withOpacity(0.12),
+                                            primaryCol.withValues(alpha: 0.12),
                                         backgroundImage: (_profileImageUrl !=
                                                     null &&
                                                 _profileImageUrl!.isNotEmpty)
@@ -554,8 +553,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                             ? Icon(
                                                 Icons.person,
                                                 size: 55.sp,
-                                                color:
-                                                    primaryCol.withOpacity(0.7),
+                                                color: primaryCol.withValues(
+                                                    alpha: 0.7),
                                               )
                                             : null,
                                       ),
@@ -579,8 +578,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color:
-                                                  Colors.black.withOpacity(0.2),
+                                              color: Colors.black
+                                                  .withValues(alpha: 0.2),
                                               blurRadius: 8,
                                               offset: const Offset(0, 2),
                                             ),

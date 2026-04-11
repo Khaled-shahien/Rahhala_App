@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/home/data/models/home_model.dart';
 import 'package:rahhala_app/features/home/presentation/cubit/favourites_cubit.dart';
@@ -36,19 +37,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
   @override
   Widget build(BuildContext context) {
     final hasToken = sl<TokenStorage>().hasToken;
-
-    if (!hasToken) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: Text(
-            'Please log in to view and manage your favourites.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16.sp, color: Colors.grey.shade700),
-          ),
-        ),
-      );
-    }
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return BlocProvider.value(
       value: _favouritesCubit,
@@ -62,12 +51,24 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
           }
         },
         builder: (context, state) {
-          if (state is FavouritesLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+          Widget content;
 
-          if (state is FavouritesError) {
-            return Center(
+          if (!hasToken) {
+            content = Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Text(
+                  'Please log in to view and manage your favourites.',
+                  textAlign: TextAlign.center,
+                  style:
+                      TextStyle(fontSize: 16.sp, color: Colors.grey.shade700),
+                ),
+              ),
+            );
+          } else if (state is FavouritesLoading) {
+            content = const Center(child: CircularProgressIndicator());
+          } else if (state is FavouritesError) {
+            content = Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -81,89 +82,112 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                 ],
               ),
             );
+          } else {
+            final favourites = state is FavouritesSuccess
+                ? state.favourites
+                : <FavouriteModel>[];
+
+            content = RefreshIndicator(
+              onRefresh: () => context.read<FavouritesCubit>().getFavourites(),
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                children: [
+                  if (favourites.isEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(top: 30.h),
+                      child: Center(
+                        child: Text(
+                          'No favourites yet.',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    ...favourites.map(
+                      (item) => _FavouritePlaceCard(
+                        item: item,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  PlaceDetailsScreen(placeId: item.id),
+                            ),
+                          );
+                        },
+                        onRemove: () {
+                          context
+                              .read<FavouritesCubit>()
+                              .removeFavourite(item.id);
+                        },
+                      ),
+                    ),
+                ],
+              ),
+            );
           }
 
-          final favourites = state is FavouritesSuccess
-              ? state.favourites
-              : <FavouriteModel>[];
-
-          return RefreshIndicator(
-            onRefresh: () => context.read<FavouritesCubit>().getFavourites(),
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-              children: [
-                Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14.r),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFFA38261),
-                        Color(0xFF8E6E4E),
+          return Column(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                decoration: BoxDecoration(
+                  color: ThemeColor.primaryColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color:
+                          Colors.black.withValues(alpha: isDark ? 0.3 : 0.04),
+                      blurRadius: 12,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40.w,
+                      height: 40.w,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Icon(
+                        Icons.favorite_rounded,
+                        color: Colors.white,
+                        size: 22.sp,
+                      ),
+                    ),
+                    SizedBox(width: 16.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Your Favorites',
+                          style: TextStyle(
+                            fontSize: 22.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          'All your saved journeys in one place',
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: Colors.white.withValues(alpha: 0.85),
+                            height: 1.4,
+                          ),
+                        ),
                       ],
                     ),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Your Favorites',
-                        style: TextStyle(
-                          fontSize: 34.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 2.h),
-                      Text(
-                        'All your saved journeys in one place',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: Colors.white.withValues(alpha: 0.92),
-                        ),
-                      ),
-                    ],
-                  ),
+                  ],
                 ),
-                SizedBox(height: 12.h),
-                if (favourites.isEmpty)
-                  Padding(
-                    padding: EdgeInsets.only(top: 30.h),
-                    child: Center(
-                      child: Text(
-                        'No favourites yet.',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          color: Colors.grey.shade700,
-                        ),
-                      ),
-                    ),
-                  )
-                else
-                  ...favourites.map(
-                    (item) => _FavouritePlaceCard(
-                      item: item,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                PlaceDetailsScreen(placeId: item.id),
-                          ),
-                        );
-                      },
-                      onRemove: () {
-                        context
-                            .read<FavouritesCubit>()
-                            .removeFavourite(item.id);
-                      },
-                    ),
-                  ),
-              ],
-            ),
+              ),
+              Expanded(child: content),
+            ],
           );
         },
       ),

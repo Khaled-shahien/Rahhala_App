@@ -14,9 +14,43 @@ class TripTypeSelectionScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: ThemeColor.primaryColor,
+        foregroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
+        toolbarHeight: 88.h,
+        leadingWidth: 56.w,
+        leading: Padding(
+          padding: EdgeInsets.only(left: 12.w),
+          child: Icon(
+            Icons.alt_route_rounded,
+            color: Colors.white,
+            size: 22.sp,
+          ),
+        ),
+        titleSpacing: 12.w,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Select Trip Type',
+              style: TextStyle(
+                fontSize: 22.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            Text(
+              'Choose how you want to plan your trip',
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: Colors.white.withValues(alpha: 0.85),
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
       ),
       body: SafeArea(
         child: Padding(
@@ -24,24 +58,7 @@ class TripTypeSelectionScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Section
-              Text(
-                'Select Trip Type',
-                style: TextStyle(
-                  fontSize: 28.sp,
-                  fontWeight: FontWeight.bold,
-                  color: ThemeColor.primaryColor,
-                ),
-              ),
-              SizedBox(height: 12.h),
-              Text(
-                'Choose how you want to plan your trip',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-              SizedBox(height: 40.h),
+              SizedBox(height: 16.h),
 
               // Custom Trip Option
               _buildTripTypeCard(

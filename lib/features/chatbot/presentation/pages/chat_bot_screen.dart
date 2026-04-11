@@ -131,7 +131,8 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
                     color: cardBg,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                        color:
+                            Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, -5),
                       ),
@@ -159,65 +160,61 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
   }
 
   AppBar _buildAppBar(BuildContext context) {
-    final isDark = _isDark(context);
-    final appBarBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    final textColor = isDark ? Colors.white : ThemeColor.charcoalColor;
-
     return AppBar(
-      backgroundColor: appBarBg,
-      surfaceTintColor: appBarBg,
-      elevation: isDark ? 0 : 0.5,
-      leadingWidth: 40.w,
+      backgroundColor: ThemeColor.primaryColor,
+      surfaceTintColor: ThemeColor.primaryColor,
+      elevation: 0,
+      toolbarHeight: 88.h,
+      leadingWidth: 56.w,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios_new_outlined,
-            color: isDark ? Colors.white : Colors.black),
+        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
         onPressed: () => Navigator.pop(context),
+        style: IconButton.styleFrom(
+          backgroundColor: Colors.white.withValues(alpha: 0.2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+        ),
       ),
-      title: Row(
+      titleSpacing: 8.w,
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircleAvatar(
-            radius: 18.r,
-            backgroundColor: ThemeColor.primaryColor.withOpacity(0.1),
-            child: Icon(
-              Icons.smart_toy_outlined,
-              color: ThemeColor.primaryColor,
-              size: 20.sp,
+          Text(
+            'ANIS',
+            style: TextStyle(
+              fontSize: 22.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
-          SizedBox(width: 12.w),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'ANIS',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
-              ),
-              BlocBuilder<ChatBotCubit, ChatBotState>(
-                builder: (context, state) {
-                  return Text(
-                    state is ChatBotLoading ? 'Typing...' : 'Online',
-                    style: TextStyle(
-                      fontSize: 11.sp,
-                      color: state is ChatBotLoading
-                          ? ThemeColor.primaryColor
-                          : Colors.green,
-                    ),
-                  );
-                },
-              ),
-            ],
+          Text(
+            'Your AI travel assistant',
+            style: TextStyle(
+              fontSize: 13.sp,
+              color: Colors.white.withValues(alpha: 0.85),
+              height: 1.4,
+            ),
           ),
         ],
       ),
       actions: [
-        IconButton(
-          icon: Icon(Icons.delete_sweep_outlined,
-              color: isDark ? Colors.grey[400] : Colors.grey[600]),
-          onPressed: _showClearConfirmation,
+        Padding(
+          padding: EdgeInsets.only(right: 12.w),
+          child: IconButton(
+            icon: Icon(
+              Icons.delete_sweep_outlined,
+              color: Colors.white.withValues(alpha: 0.95),
+            ),
+            onPressed: _showClearConfirmation,
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -239,8 +236,8 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
             Container(
               padding: EdgeInsets.all(25.r),
               decoration: BoxDecoration(
-                color:
-                    ThemeColor.primaryColor.withOpacity(isDark ? 0.15 : 0.05),
+                color: ThemeColor.primaryColor
+                    .withValues(alpha: isDark ? 0.15 : 0.05),
                 shape: BoxShape.circle,
               ),
               child: Icon(

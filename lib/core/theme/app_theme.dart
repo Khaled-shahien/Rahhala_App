@@ -154,7 +154,13 @@ class AppTheme {
       foregroundColor: ThemeColor.onPrimary,
       elevation: 0,
       centerTitle: true,
-      titleTextStyle: AppTypography.titleLarge,
+      iconTheme: IconThemeData(color: ThemeColor.onPrimary),
+      actionsIconTheme: IconThemeData(color: ThemeColor.onPrimary),
+      titleTextStyle: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w700,
+        color: ThemeColor.onPrimary,
+      ),
     ),
     cardTheme: const CardThemeData(
       color: Colors.white,
@@ -198,11 +204,17 @@ class AppTheme {
       brightness: Brightness.dark,
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF1F1F1F),
-      foregroundColor: Colors.white,
+      backgroundColor: ThemeColor.primary,
+      foregroundColor: ThemeColor.onPrimary,
       elevation: 0,
       centerTitle: true,
-      titleTextStyle: AppTypography.titleLarge,
+      iconTheme: IconThemeData(color: ThemeColor.onPrimary),
+      actionsIconTheme: IconThemeData(color: ThemeColor.onPrimary),
+      titleTextStyle: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w700,
+        color: ThemeColor.onPrimary,
+      ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
