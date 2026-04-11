@@ -289,7 +289,7 @@ class _FavouritePlaceCard extends StatelessWidget {
                             color: Color(0xFF9A7B56), size: 14),
                         SizedBox(width: 4.w),
                         Text(
-                          '4.7',
+                          item.rating.toStringAsFixed(2),
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w700,
