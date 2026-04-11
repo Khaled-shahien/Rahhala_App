@@ -40,10 +40,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocProvider(
       create: (_) => sl<ForgotPasswordCubit>(),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         body: SafeArea(
           child: BlocConsumer<ForgotPasswordCubit, ForgotPasswordState>(
             listener: (context, state) {
@@ -99,14 +102,18 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     children: [
                                       IconButton(
                                         style: IconButton.styleFrom(
-                                          backgroundColor: Colors.grey[100],
+                                          backgroundColor: colorScheme
+                                              .surfaceContainerHighest
+                                              .withValues(alpha: 0.5),
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(12),
                                           ),
                                         ),
-                                        icon: const Icon(
-                                            Icons.arrow_back_ios_new),
+                                        icon: Icon(
+                                          Icons.arrow_back_ios_new,
+                                          color: colorScheme.onSurface,
+                                        ),
                                         onPressed: () => Navigator.pop(context),
                                       ),
                                       const SizedBox.shrink(),
@@ -120,14 +127,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                       vertical: 18.h,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: colorScheme.surface,
                                       borderRadius: BorderRadius.circular(22),
                                       border: Border.all(
-                                        color: Colors.grey[200]!,
+                                        color: colorScheme.outline.withValues(
+                                            alpha: isDark ? 0.35 : 0.2),
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.04),
+                                          color: Colors.black.withValues(
+                                              alpha: isDark ? 0.2 : 0.04),
                                           blurRadius: 22,
                                           offset: const Offset(0, 12),
                                         ),
@@ -155,12 +164,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                           ),
                                         ),
                                         SizedBox(height: 8.h),
-                                        const Text(
+                                        Text(
                                           "Enter your email address below and we'll send you a verification code to reset your password.",
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 16,
-                                            color: Colors.grey,
+                                            color: colorScheme.onSurfaceVariant,
                                             height: 1.5,
                                           ),
                                         ),
@@ -224,14 +233,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                       vertical: 18.h,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: colorScheme.surface,
                                       borderRadius: BorderRadius.circular(16),
                                       border: Border.all(
-                                        color: Colors.grey[200]!,
+                                        color: colorScheme.outline.withValues(
+                                            alpha: isDark ? 0.35 : 0.2),
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.03),
+                                          color: Colors.black.withValues(
+                                              alpha: isDark ? 0.16 : 0.03),
                                           blurRadius: 18,
                                           offset: const Offset(0, 10),
                                         ),
@@ -243,7 +254,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                           'Remembered your password?',
                                           style: TextStyle(
                                             fontSize: 14.sp,
-                                            color: Colors.grey[700],
+                                            color: colorScheme.onSurfaceVariant,
                                           ),
                                         ),
                                         SizedBox(height: 10.h),
@@ -270,7 +281,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ),
                       if (isLoading)
                         Container(
-                          color: Colors.black45,
+                          color: Colors.black
+                              .withValues(alpha: isDark ? 0.5 : 0.28),
                           alignment: Alignment.center,
                           child: const CircularProgressIndicator(
                               color: ThemeColor.primaryColor),

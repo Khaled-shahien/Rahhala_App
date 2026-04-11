@@ -83,6 +83,7 @@ class FavouriteModel {
   final String name;
   final String country;
   final String imageUrl;
+  final double rating;
   final String createdAt;
 
   FavouriteModel({
@@ -90,6 +91,7 @@ class FavouriteModel {
     required this.name,
     required this.country,
     required this.imageUrl,
+    required this.rating,
     required this.createdAt,
   });
 
@@ -99,6 +101,7 @@ class FavouriteModel {
       name: (json['name'] ?? '').toString(),
       country: (json['country'] ?? '').toString(),
       imageUrl: (json['imageUrl'] ?? '').toString(),
+      rating: (json['rating'] as num?)?.toDouble() ?? 0,
       createdAt: (json['createdAt'] ?? '').toString(),
     );
   }

@@ -46,14 +46,14 @@ class ImageSearchResultsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: colorScheme.primary,
         elevation: 0,
         title: Text(
           'Searching...',
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
-            color: colorScheme.onSurface,
+            color: Colors.white,
           ),
         ),
       ),
@@ -83,27 +83,32 @@ class ImageSearchResultsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: colorScheme.primary,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: colorScheme.onSurface),
+          icon:
+              const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
           onPressed: () {
             context.read<ImageSearchCubit>().reset();
             Navigator.of(context).pop();
           },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white.withValues(alpha: 0.2),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+            ),
+          ),
         ),
         title: Row(
           children: [
-            Icon(Icons.location_on_outlined,
-                color: ThemeColor.primaryColor, size: 20.sp),
+            Icon(Icons.location_on_outlined, color: Colors.white, size: 20.sp),
             SizedBox(width: 6.w),
             Text(
               'Matching Places',
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
+                color: Colors.white,
               ),
             ),
           ],
@@ -111,7 +116,7 @@ class ImageSearchResultsScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.camera_alt_outlined,
-                color: ThemeColor.primaryColor, size: 24.sp),
+                color: Colors.white, size: 24.sp),
             onPressed: () => _openCamera(context),
           ),
         ],
@@ -132,15 +137,21 @@ class ImageSearchResultsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: colorScheme.primary,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: colorScheme.onSurface),
+          icon:
+              const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
           onPressed: () {
             context.read<ImageSearchCubit>().reset();
             Navigator.of(context).pop();
           },
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white.withValues(alpha: 0.2),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+            ),
+          ),
         ),
       ),
       body: Center(
@@ -151,7 +162,7 @@ class ImageSearchResultsScreen extends StatelessWidget {
             children: [
               Icon(Icons.sentiment_dissatisfied_outlined,
                   size: 60.sp,
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.5)),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
               SizedBox(height: 16.h),
               Text(
                 'Join us! Log in to unlock more features and search by image',
@@ -193,7 +204,7 @@ class ImageSearchResultsScreen extends StatelessWidget {
         children: [
           Icon(Icons.search_off_outlined,
               size: 60.sp,
-              color: colorScheme.onSurfaceVariant.withOpacity(0.5)),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
           SizedBox(height: 16.h),
           Text(
             'No matching places found',

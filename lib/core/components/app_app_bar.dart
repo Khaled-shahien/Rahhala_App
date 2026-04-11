@@ -26,18 +26,22 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final resolvedForegroundColor =
+        foregroundColor ?? Theme.of(context).appBarTheme.foregroundColor;
     return AppBar(
       title: Text(
         title,
-        style: Theme.of(context).appBarTheme.titleTextStyle,
+        style: Theme.of(context)
+            .appBarTheme
+            .titleTextStyle
+            ?.copyWith(color: resolvedForegroundColor),
       ),
       actions: actions,
       leading: leading,
       centerTitle: centerTitle,
       backgroundColor:
           backgroundColor ?? Theme.of(context).appBarTheme.backgroundColor,
-      foregroundColor:
-          foregroundColor ?? Theme.of(context).appBarTheme.foregroundColor,
+      foregroundColor: resolvedForegroundColor,
       elevation: elevation ?? Theme.of(context).appBarTheme.elevation,
       bottom: bottom as PreferredSizeWidget?,
     );

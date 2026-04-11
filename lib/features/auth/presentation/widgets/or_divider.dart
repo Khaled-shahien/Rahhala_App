@@ -6,20 +6,29 @@ class OrDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       children: [
-        
-        Expanded(child: Divider(thickness: 1, color: Colors.grey.shade300)),
+        Expanded(
+          child: Divider(
+            thickness: 1,
+            color: colorScheme.outline.withValues(alpha: 0.4),
+          ),
+        ),
         Padding(
-          
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             text,
-            
-            style: TextStyle(color: Colors.grey.shade600),
+            style: TextStyle(color: colorScheme.onSurfaceVariant),
           ),
         ),
-        Expanded(child: Divider(thickness: 1, color: Colors.grey.shade300)),
+        Expanded(
+          child: Divider(
+            thickness: 1,
+            color: colorScheme.outline.withValues(alpha: 0.4),
+          ),
+        ),
       ],
     );
   }

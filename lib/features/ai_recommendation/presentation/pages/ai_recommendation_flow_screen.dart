@@ -64,13 +64,19 @@ class _AIRecommendationFlowScreenState
         backgroundColor: colorScheme.surface,
         appBar: AppBar(
           leading: IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back_ios_new_outlined,
-              color: colorScheme.onSurface,
+              color: Colors.white,
             ),
             onPressed: _onBackPressed,
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+            ),
           ),
-          backgroundColor: colorScheme.surface,
+          backgroundColor: colorScheme.primary,
           elevation: 0,
         ),
         body: PageView(

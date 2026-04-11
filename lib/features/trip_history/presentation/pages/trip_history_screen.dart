@@ -35,73 +35,69 @@ class _TripHistoryView extends StatelessWidget {
     return Scaffold(
       backgroundColor:
           isDark ? const Color(0xFF121212) : const Color(0xFFF8F4F0),
-      body: Column(
-        children: [
-          _buildHeader(context),
-          Expanded(
-            child: BlocBuilder<TripHistoryCubit, TripHistoryState>(
-              builder: (context, state) {
-                if (state is TripHistoryLoading) {
-                  return _buildShimmer(isDark);
-                } else if (state is TripHistoryLoaded) {
-                  final trips = state.response.trips;
-                  if (trips.isEmpty) return _buildEmpty(context, isDark);
-                  return _buildList(context, trips);
-                } else if (state is TripHistoryFailure) {
-                  return _buildError(context, state.message, isDark);
-                }
-                return const SizedBox.shrink();
-              },
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(context),
+            Expanded(
+              child: BlocBuilder<TripHistoryCubit, TripHistoryState>(
+                builder: (context, state) {
+                  if (state is TripHistoryLoading) {
+                    return _buildShimmer(isDark);
+                  } else if (state is TripHistoryLoaded) {
+                    final trips = state.response.trips;
+                    if (trips.isEmpty) return _buildEmpty(context, isDark);
+                    return _buildList(context, trips);
+                  } else if (state is TripHistoryFailure) {
+                    return _buildError(context, state.message, isDark);
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 16.h,
-        bottom: 20.h,
+        top: 16.h,
+        bottom: 16.h,
         left: 20.w,
         right: 20.w,
       ),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [
-            AppColors.lightBrown,
-            Color(0xFF96785A),
-          ],
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(50.r),
-          bottomRight: Radius.circular(50.r),
-        ),
+        color: AppColors.primary,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              padding: EdgeInsets.all(8.r),
-              child: Icon(Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white, size: 20.sp),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.white,
+              size: 22.sp,
+            ),
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.r),
+              ),
             ),
           ),
-          SizedBox(width: 14.w),
-          Container(
-            padding: EdgeInsets.all(10.r),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child:
-                Icon(Icons.history_rounded, color: Colors.white, size: 24.sp),
-          ),
-          SizedBox(width: 14.w),
+          SizedBox(width: 16.w),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -109,7 +105,7 @@ class _TripHistoryView extends StatelessWidget {
                 'Plan History',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 24.sp,
+                  fontSize: 22.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -121,8 +117,9 @@ class _TripHistoryView extends StatelessWidget {
                   return Text(
                     '$count saved plans',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: Colors.white.withValues(alpha: 0.85),
                       fontSize: 13.sp,
+                      height: 1.4,
                     ),
                   );
                 },

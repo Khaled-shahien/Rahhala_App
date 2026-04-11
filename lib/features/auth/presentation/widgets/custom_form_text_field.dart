@@ -61,6 +61,8 @@ class _CustomFormTextFieldState extends State<CustomFormTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return TextFormField(
       controller: widget.controller,
       obscureText: widget.obscureText,
@@ -81,7 +83,9 @@ class _CustomFormTextFieldState extends State<CustomFormTextField> {
         labelText: widget.labelText,
         hintText: widget.hintText,
         filled: true,
-        fillColor: Colors.grey.shade100,
+        fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+        labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+        hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
         prefixIcon: widget.prefixIcon != null
             ? Icon(widget.prefixIcon, color: ThemeColor.primaryColor)
             : null,

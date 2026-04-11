@@ -75,7 +75,10 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
           content: Text(
             'Are you sure you want to delete this review?',
             style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.7),
                 fontSize: 14.sp),
           ),
           actions: [
@@ -138,7 +141,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
         body: BlocBuilder<PlaceDetailsCubit, PlaceDetailsState>(
           builder: (context, state) {
             if (state is PlaceDetailsLoading) {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               );
             } else if (state is PlaceDetailsError) {
@@ -165,13 +168,16 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                     SliverAppBar(
                       expandedHeight: 250.h,
                       pinned: true,
-                      backgroundColor: AppColors.mediumBrown,
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.black26,
-                        child: IconButton(
-                          icon:
-                              const Icon(Icons.arrow_back, color: Colors.white),
-                          onPressed: () => Navigator.pop(context),
+                      backgroundColor: AppColors.primary,
+                      leading: IconButton(
+                        icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                            color: Colors.white),
+                        onPressed: () => Navigator.pop(context),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
                         ),
                       ),
                       flexibleSpace: FlexibleSpaceBar(
@@ -236,7 +242,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .onSurface
-                                    .withOpacity(0.8),
+                                    .withValues(alpha: 0.8),
                               ),
                             ),
                             SizedBox(height: 20.h),
@@ -402,7 +408,7 @@ class _EditReviewSheetState extends State<_EditReviewSheet> {
                   color: Theme.of(context)
                       .colorScheme
                       .onSurface
-                      .withOpacity(0.6))),
+                      .withValues(alpha: 0.6))),
           SizedBox(height: 8.h),
           Row(
             children: List.generate(5, (i) {
@@ -427,8 +433,10 @@ class _EditReviewSheetState extends State<_EditReviewSheet> {
             decoration: InputDecoration(
               hintText: 'Update your review...',
               hintStyle: TextStyle(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.4)),
               filled: true,
               fillColor: isDark ? const Color(0xFF2C2C2C) : Colors.grey[100],
               border: OutlineInputBorder(

@@ -14,14 +14,42 @@ class TripTypeSelectionScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: ThemeColor.primaryColor,
+        foregroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Theme.of(context).colorScheme.onSurface,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 88.h,
+        leadingWidth: 56.w,
+        leading: Padding(
+          padding: EdgeInsets.only(left: 12.w),
+          child: Icon(
+            Icons.alt_route_rounded,
+            color: Colors.white,
+            size: 22.sp,
           ),
-          onPressed: () => Navigator.pop(context),
+        ),
+        titleSpacing: 12.w,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Select Trip Type',
+              style: TextStyle(
+                fontSize: 22.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            Text(
+              'Choose how you want to plan your trip',
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: Colors.white.withValues(alpha: 0.85),
+                height: 1.4,
+              ),
+            ),
+          ],
         ),
       ),
       body: SafeArea(
@@ -30,24 +58,7 @@ class TripTypeSelectionScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Section
-              Text(
-                'Select Trip Type',
-                style: TextStyle(
-                  fontSize: 28.sp,
-                  fontWeight: FontWeight.bold,
-                  color: ThemeColor.primaryColor,
-                ),
-              ),
-              SizedBox(height: 12.h),
-              Text(
-                'Choose how you want to plan your trip',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-              SizedBox(height: 40.h),
+              SizedBox(height: 16.h),
 
               // Custom Trip Option
               _buildTripTypeCard(
@@ -110,11 +121,11 @@ class TripTypeSelectionScreen extends StatelessWidget {
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(24.r),
           border: Border.all(
-            color: Theme.of(context).dividerColor.withOpacity(0.1),
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -127,7 +138,7 @@ class TripTypeSelectionScreen extends StatelessWidget {
               width: 60.w,
               height: 60.w,
               decoration: BoxDecoration(
-                color: ThemeColor.primaryColor.withOpacity(0.1),
+                color: ThemeColor.primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16.r),
               ),
               child: Icon(
@@ -168,7 +179,7 @@ class TripTypeSelectionScreen extends StatelessWidget {
             Icon(
               Icons.arrow_forward_ios_rounded,
               size: 16.sp,
-              color: ThemeColor.primaryColor.withOpacity(0.5),
+              color: ThemeColor.primaryColor.withValues(alpha: 0.5),
             ),
           ],
         ),

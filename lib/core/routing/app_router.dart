@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
+import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/features/splash/presentation/pages/splash_screen.dart';
 import 'package:rahhala_app/features/onboarding/presentation/pages/onboarding_screen.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/welcome_page.dart';
@@ -130,7 +131,7 @@ class AppRouter {
       return Scaffold(
         appBar: AppBar(
           title: Text(l10n.commonError),
-          backgroundColor: const Color(0xFFCDAE8A),
+          backgroundColor: ThemeColor.primary,
           foregroundColor: Colors.white,
         ),
         body: Center(
@@ -170,7 +171,7 @@ class AppRouter {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.routerFeatureTitle(featureName)),
-        backgroundColor: const Color(0xFFCDAE8A),
+        backgroundColor: ThemeColor.primary,
         foregroundColor: Colors.white,
       ),
       body: Center(

@@ -48,12 +48,18 @@ class _CustomTripFlowScreenState extends State<CustomTripFlowScreen> {
               child: Scaffold(
                 backgroundColor: colorScheme.surface,
                 appBar: AppBar(
-                  backgroundColor: colorScheme.surface,
+                  backgroundColor: colorScheme.primary,
                   elevation: 0,
                   leading: IconButton(
                     icon: const Icon(Icons.arrow_back_ios_new_outlined,
                         color: Colors.white),
                     onPressed: () => Navigator.pop(context),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                    ),
                   ),
                 ),
                 body: CustomTripInputStep(onNext: goToSplash),
