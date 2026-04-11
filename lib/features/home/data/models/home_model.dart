@@ -121,6 +121,7 @@ class PlaceDetailsModel {
   final String id, name, country, description, imageUrl;
   final List<SubItemModel> hotels;
   final List<SubItemModel> restaurants;
+  final List<SubItemModel> activities;
   final List<ReviewModel> reviews;
   final RatingSummaryModel ratingSummary;
 
@@ -132,6 +133,7 @@ class PlaceDetailsModel {
     required this.imageUrl,
     required this.hotels,
     required this.restaurants,
+    required this.activities,
     required this.reviews,
     required this.ratingSummary,
   });
@@ -147,6 +149,8 @@ class PlaceDetailsModel {
             json["hotels"].map((x) => SubItemModel.fromJson(x))),
         restaurants: List<SubItemModel>.from(
             json["restaurants"].map((x) => SubItemModel.fromJson(x))),
+        activities: List<SubItemModel>.from(
+            json["activities"].map((x) => SubItemModel.fromJson(x))),
         reviews: List<ReviewModel>.from(
             json["reviews"].map((x) => ReviewModel.fromJson(x))),
         ratingSummary: RatingSummaryModel.fromJson(json["ratingSummary"]),

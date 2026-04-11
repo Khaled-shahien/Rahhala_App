@@ -189,7 +189,7 @@ class AppTheme {
       onPrimary: ThemeColor.onPrimary,
       secondary: ThemeColor.secondary,
       onSecondary: ThemeColor.onSecondary,
-      surface: const Color(0xFF1E1E1E), // لون الكروت في الضلمة
+      surface: const Color(0xFF1E1E1E),
       onSurface: Colors.white,
       background: const Color(0xFF121212),
       onBackground: Colors.white,

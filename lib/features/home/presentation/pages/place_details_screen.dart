@@ -254,6 +254,11 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                               items: place.hotels,
                             ),
                             SizedBox(height: 20.h),
+                            HorizontalSection(
+                              title: "Activities",
+                              items: place.activities,
+                            ),
+                            SizedBox(height: 20.h),
 
                             // Rating Summary
                             Text(
