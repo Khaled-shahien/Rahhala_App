@@ -27,13 +27,13 @@ class RatingSummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
         border: Border.all(
-          color: colorScheme.onSurface.withOpacity(0.05),
+          color: colorScheme.onSurface.withValues(alpha: 0.05),
           width: 1,
         ),
       ),
@@ -52,13 +52,13 @@ class RatingSummaryCard extends StatelessWidget {
           Text(
             "Based on $totalReviews reviews",
             style: TextStyle(
-                color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                 fontSize: 14.sp),
           ),
           SizedBox(height: 20.h),
           Divider(
             thickness: 0.8,
-            color: colorScheme.outlineVariant.withOpacity(0.3),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
           SizedBox(height: 15.h),
           Column(
@@ -87,7 +87,7 @@ class RatingSummaryCard extends StatelessWidget {
                           minHeight: 8.h,
                           backgroundColor: isDark
                               ? colorScheme.surfaceContainerHighest
-                                  .withOpacity(0.3)
+                                  .withValues(alpha: 0.3)
                               : Colors.grey[200],
                           valueColor: const AlwaysStoppedAnimation<Color>(
                               Color(0xFFB08968)),

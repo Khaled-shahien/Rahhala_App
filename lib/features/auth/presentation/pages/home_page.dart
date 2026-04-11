@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: ThemeColor.primaryColor.withOpacity(isDark ? 0.3 : 0.15),
+              color: ThemeColor.primaryColor.withValues(alpha: isDark ? 0.3 : 0.15),
               blurRadius: 20,
               offset: const Offset(0, -4),
             ),
@@ -157,7 +157,7 @@ class _HomePageState extends State<HomePage> {
                       gradient: LinearGradient(
                         colors: [
                           ThemeColor.primaryColor,
-                          ThemeColor.primaryColor.withOpacity(0.8)
+                          ThemeColor.primaryColor.withValues(alpha: 0.8)
                         ],
                       ),
                       borderRadius: BorderRadius.circular(20.r),
@@ -179,7 +179,7 @@ class _HomePageState extends State<HomePage> {
       icon,
       size: 30.sp,
       color:
-          _currentIndex == index ? Colors.white : Colors.white.withOpacity(0.7),
+          _currentIndex == index ? Colors.white : Colors.white.withValues(alpha: 0.7),
     );
   }
 }
@@ -247,7 +247,7 @@ class _HomeMainSection extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: ThemeColor.primaryColor.withOpacity(0.25),
+                        color: ThemeColor.primaryColor.withValues(alpha: 0.25),
                         blurRadius: 10,
                         spreadRadius: 3,
                       ),
@@ -255,7 +255,7 @@ class _HomeMainSection extends StatelessWidget {
                   ),
                   child: CircleAvatar(
                     radius: 30.r,
-                    backgroundColor: ThemeColor.primaryColor.withOpacity(0.15),
+                    backgroundColor: ThemeColor.primaryColor.withValues(alpha: 0.15),
                     backgroundImage:
                         (profileImageUrl != null && profileImageUrl!.isNotEmpty)
                             ? NetworkImage(profileImageUrl!)
@@ -272,7 +272,7 @@ class _HomeMainSection extends StatelessWidget {
           SizedBox(height: 16.h),
           const ImageSearchBar(),
           SizedBox(height: 24.h),
-          Expanded(child: const HomeScreen()),
+          const Expanded(child: HomeScreen()),
         ],
       ),
     );

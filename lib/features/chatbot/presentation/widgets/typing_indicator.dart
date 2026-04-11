@@ -10,8 +10,8 @@ class TypingIndicator extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final bubbleColor = isDark ? const Color(0xFF2C2C2C) : Colors.white;
-    final dotColor = ThemeColor.primaryColor.withOpacity(isDark ? 0.8 : 0.6);
-    final iconBgColor = ThemeColor.primaryColor.withOpacity(isDark ? 0.2 : 0.1);
+    final dotColor = ThemeColor.primaryColor.withValues(alpha: isDark ? 0.8 : 0.6);
+    final iconBgColor = ThemeColor.primaryColor.withValues(alpha: isDark ? 0.2 : 0.1);
 
     return Row(
       children: [
@@ -42,7 +42,7 @@ class TypingIndicator extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),

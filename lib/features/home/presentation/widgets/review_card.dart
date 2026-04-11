@@ -49,13 +49,13 @@ class ReviewCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.06),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
             blurRadius: 12.r,
             offset: Offset(0, 4.h),
           ),
         ],
         border: Border.all(
-          color: colorScheme.onSurface.withOpacity(0.05),
+          color: colorScheme.onSurface.withValues(alpha: 0.05),
           width: 1,
         ),
       ),
@@ -69,7 +69,7 @@ class ReviewCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 22.r,
-                  backgroundColor: colorScheme.primary.withOpacity(0.1),
+                  backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
                   backgroundImage: (review.userImageUrl != null &&
                           review.userImageUrl!.isNotEmpty)
                       ? NetworkImage(review.userImageUrl!)
@@ -115,8 +115,8 @@ class ReviewCard extends StatelessWidget {
                                     ? review.createdAt.substring(0, 10)
                                     : review.createdAt),
                             style: TextStyle(
-                              color:
-                                  colorScheme.onSurfaceVariant.withOpacity(0.7),
+                              color: colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.7),
                               fontSize: 11.sp,
                             ),
                           ),
@@ -136,7 +136,7 @@ class ReviewCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14.sp,
                 height: 1.4.h,
-                color: colorScheme.onSurface.withOpacity(0.9),
+                color: colorScheme.onSurface.withValues(alpha: 0.9),
               ),
             ),
             if (canManage) ...[

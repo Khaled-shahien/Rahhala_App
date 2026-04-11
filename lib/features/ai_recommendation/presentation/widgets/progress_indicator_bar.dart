@@ -13,7 +13,7 @@ class ProgressIndicatorBar extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // الألوان بناءً على المود
-    final activeColor = const Color(0xFFA88866); // اللون البني بتاعنا
+    const activeColor = Color(0xFFA88866); // اللون البني بتاعنا
     final inactiveCircleBg = isDark ? const Color(0xFF2C2C2C) : Colors.white;
     final inactiveLineColor = isDark ? Colors.white10 : Colors.grey.shade300;
     final inactiveTextColor = isDark ? Colors.white54 : const Color(0xFFA88866);
@@ -40,7 +40,7 @@ class ProgressIndicatorBar extends StatelessWidget {
                 boxShadow: isDark && isCompletedOrCurrent
                     ? [
                         BoxShadow(
-                            color: activeColor.withOpacity(0.2),
+                            color: activeColor.withValues(alpha: 0.2),
                             blurRadius: 8,
                             offset: const Offset(0, 2))
                       ]

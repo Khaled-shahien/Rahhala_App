@@ -485,7 +485,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         onChanged: (value) {
                           themeController.toggleTheme(value);
                         },
-                        activeColor: ThemeColor.primaryColor,
+                        activeThumbColor: ThemeColor.primaryColor,
                       ),
                     );
                   },

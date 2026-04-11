@@ -90,10 +90,10 @@ class TripInfoScreen extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
           decoration: BoxDecoration(
-            color: colorScheme.primary.withOpacity(0.1),
+            color: colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(18.r),
             border: Border.all(
-              color: colorScheme.primary.withOpacity(0.5),
+              color: colorScheme.primary.withValues(alpha: 0.5),
               width: 1.8.w,
             ),
           ),
@@ -107,7 +107,7 @@ class TripInfoScreen extends StatelessWidget {
                   style: TextStyle(
                     color: selectedCountry != null
                         ? colorScheme.onSurface
-                        : colorScheme.onSurface.withOpacity(0.6),
+                        : colorScheme.onSurface.withValues(alpha: 0.6),
                     fontSize: 17.sp,
                     fontWeight: FontWeight.w500,
                   ),
@@ -181,10 +181,10 @@ class TripInfoScreen extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: colorScheme.primary.withOpacity(0.1),
+        color: colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(18.r),
         border: Border.all(
-          color: colorScheme.primary.withOpacity(0.5),
+          color: colorScheme.primary.withValues(alpha: 0.5),
           width: 1.8.w,
         ),
       ),
@@ -193,7 +193,7 @@ class TripInfoScreen extends StatelessWidget {
         hint: Text(
           'Select a season',
           style: TextStyle(
-            color: colorScheme.onSurface.withOpacity(0.6),
+            color: colorScheme.onSurface.withValues(alpha: 0.6),
             fontSize: 17.sp,
           ),
         ),

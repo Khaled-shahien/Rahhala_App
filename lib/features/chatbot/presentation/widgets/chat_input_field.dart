@@ -23,7 +23,7 @@ class ChatInputField extends StatelessWidget {
         isDark ? const Color(0xFF2C2C2C) : const Color(0xFFF9F9F9);
     final textColor = isDark ? Colors.white : Colors.black87;
     final hintColor = isDark ? Colors.white38 : Colors.grey.shade400;
-    final borderColor = const Color(0xFFD1B89A);
+    const borderColor = Color(0xFFD1B89A);
 
     return Container(
       padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 24.h),
@@ -31,7 +31,7 @@ class ChatInputField extends StatelessWidget {
         color: backgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.03),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.03),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
