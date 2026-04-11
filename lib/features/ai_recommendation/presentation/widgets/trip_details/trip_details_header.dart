@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
-import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_model.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_details_theme.dart';
 

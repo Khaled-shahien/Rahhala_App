@@ -182,8 +182,8 @@ class _PinterestCameraScreenState extends State<PinterestCameraScreen>
                   return Container(
                     decoration: BoxDecoration(
                       color: isDark
-                          ? colorScheme.surface.withOpacity(0.95)
-                          : Colors.black.withOpacity(0.85),
+                          ? colorScheme.surface.withValues(alpha: 0.95)
+                          : Colors.black.withValues(alpha: 0.85),
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(20.r)),
                     ),
@@ -195,7 +195,7 @@ class _PinterestCameraScreenState extends State<PinterestCameraScreen>
                           height: 4.h,
                           decoration: BoxDecoration(
                             color: isDark
-                                ? colorScheme.onSurfaceVariant.withOpacity(0.4)
+                                ? colorScheme.onSurfaceVariant.withValues(alpha: 0.4)
                                 : Colors.white38,
                             borderRadius: BorderRadius.circular(2.r),
                           ),

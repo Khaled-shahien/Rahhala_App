@@ -24,8 +24,9 @@ class _CustomTripFlowScreenState extends State<CustomTripFlowScreen> {
         builder: (innerContext) {
           void goToSplash() {
             final cubit = innerContext.read<CustomTripCubit>();
-            if (cubit.selectedRegion == null || cubit.selectedRegion!.isEmpty)
+            if (cubit.selectedRegion == null || cubit.selectedRegion!.isEmpty) {
               return;
+            }
             cubit.generateTripPlan();
             Navigator.of(context).push(
               MaterialPageRoute(
