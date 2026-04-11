@@ -156,6 +156,12 @@ class AppTheme {
       centerTitle: true,
       titleTextStyle: AppTypography.titleLarge,
     ),
+    cardTheme: const CardThemeData(
+      color: Colors.white,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16))),
+    ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: ThemeColor.neutral100,
