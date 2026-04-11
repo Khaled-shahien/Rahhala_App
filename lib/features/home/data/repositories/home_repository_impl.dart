@@ -1,6 +1,6 @@
-import '../../domain/repositories/home_repository.dart';
+import 'package:rahhala_app/features/home/data/models/home_model.dart';
+import 'package:rahhala_app/features/home/domain/repositories/home_repository.dart';
 import '../datasource/home_remote_data_source.dart';
-import '../models/home_model.dart';
 
 class HomeRepositoryImpl implements HomeRepository {
   final HomeRemoteDataSource remoteDataSource;
@@ -8,55 +8,49 @@ class HomeRepositoryImpl implements HomeRepository {
   HomeRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<List<PlaceModel>> getHomePlaces() async {
-    try {
-      return await remoteDataSource.getHomePlaces();
-    } catch (e) {
-      rethrow;
-    }
+  Future<HomeResponse> getHomePlaces({int page = 1, int pageSize = 8}) async {
+    return await remoteDataSource.getHomePlaces(page: page, pageSize: pageSize);
+  }
+
+  @override
+  Future<List<PlaceModel>> getHomePlacesList() async {
+    final response = await remoteDataSource.getHomePlaces();
+    return response.places;
   }
 
   @override
   Future<List<FavouriteModel>> getFavourites() async {
-    try {
-      return await remoteDataSource.getFavourites();
-    } catch (e) {
-      rethrow;
-    }
+    return await remoteDataSource.getFavourites();
   }
 
   @override
   Future<void> addFavourite(String placeId) async {
-    return await remoteDataSource.addFavourite(placeId);
+    await remoteDataSource.addFavourite(placeId);
   }
 
   @override
   Future<void> removeFavourite(String placeId) async {
-    return await remoteDataSource.removeFavourite(placeId);
+    await remoteDataSource.removeFavourite(placeId);
   }
 
   @override
   Future<PlaceDetailsModel> getPlaceDetails(String id) async {
-    try {
-      return await remoteDataSource.getPlaceDetails(id);
-    } catch (e) {
-      rethrow;
-    }
+    return await remoteDataSource.getPlaceDetails(id);
   }
 
   @override
   Future<void> addReview(String placeId, ReviewRequest reviewRequest) async {
-    return await remoteDataSource.addReview(placeId, reviewRequest);
+    await remoteDataSource.addReview(placeId, reviewRequest);
   }
 
   @override
   Future<void> updateReview(
       String reviewId, ReviewRequest reviewRequest) async {
-    return await remoteDataSource.updateReview(reviewId, reviewRequest);
+    await remoteDataSource.updateReview(reviewId, reviewRequest);
   }
 
   @override
   Future<void> deleteReview(String reviewId) async {
-    return await remoteDataSource.deleteReview(reviewId);
+    await remoteDataSource.deleteReview(reviewId);
   }
 }

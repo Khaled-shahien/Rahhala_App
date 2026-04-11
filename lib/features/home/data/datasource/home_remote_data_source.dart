@@ -3,7 +3,7 @@ import 'package:rahhala_app/features/home/data/models/home_model.dart';
 import '../../../../core/network/api_consumer.dart';
 
 abstract class HomeRemoteDataSource {
-  Future<List<PlaceModel>> getHomePlaces();
+  Future<HomeResponse> getHomePlaces({int page = 1, int pageSize = 8});
   Future<List<FavouriteModel>> getFavourites();
   Future<void> addFavourite(String placeId);
   Future<void> removeFavourite(String placeId);
@@ -19,9 +19,12 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
   HomeRemoteDataSourceImpl({required this.api});
 
   @override
-  Future<List<PlaceModel>> getHomePlaces() async {
-    final response = await api.get('/api/Home/GetHome');
-    return HomeResponse.fromJson(response).places;
+  Future<HomeResponse> getHomePlaces({int page = 1, int pageSize = 8}) async {
+    final response = await api.get(
+      '/api/Home/GetHome',
+      queryParameters: {'page': page, 'pagesize': pageSize},
+    );
+    return HomeResponse.fromJson(response);
   }
 
   @override

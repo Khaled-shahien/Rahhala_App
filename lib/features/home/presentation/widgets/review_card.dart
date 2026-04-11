@@ -98,7 +98,7 @@ class ReviewCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              displayName, // HEAD (محافظين عليه)
+                              displayName,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15.sp,
@@ -122,10 +122,7 @@ class ReviewCard extends StatelessWidget {
                           ),
                         ],
                       ),
-
                       SizedBox(height: 4.h),
-
-                      // FEATURE من النسخة التانية (لو مش موجود عندك تجاهله)
                       if (review.rating != null)
                         RatingStars(rating: review.rating),
                     ],
@@ -134,7 +131,6 @@ class ReviewCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 12.h),
-            // نص التعليق
             Text(
               review.comment,
               style: TextStyle(

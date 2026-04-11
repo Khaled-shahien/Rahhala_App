@@ -1,12 +1,21 @@
 class HomeResponse {
   final bool success;
+  final int page;
+  final int pageSize;
   final List<PlaceModel> places;
 
-  HomeResponse({required this.success, required this.places});
+  HomeResponse({
+    required this.success,
+    required this.page,
+    required this.pageSize,
+    required this.places,
+  });
 
   factory HomeResponse.fromJson(Map<String, dynamic> json) {
     return HomeResponse(
       success: json['success'] ?? false,
+      page: json['page'] ?? 1,
+      pageSize: json['pageSize'] ?? 8,
       places: (json['youMightAlsoLike'] as List)
           .map((item) => PlaceModel.fromJson(item))
           .toList(),
@@ -164,11 +173,12 @@ class SubItemModel {
   final String id, name, imageUrl;
   final double rating;
 
-  SubItemModel(
-      {required this.id,
-      required this.name,
-      required this.imageUrl,
-      required this.rating});
+  SubItemModel({
+    required this.id,
+    required this.name,
+    required this.imageUrl,
+    required this.rating,
+  });
 
   factory SubItemModel.fromJson(Map<String, dynamic> json) => SubItemModel(
         id: json["id"],
@@ -210,10 +220,11 @@ class RatingSummaryModel {
   final int totalReviews;
   final Map<int, double> distribution;
 
-  RatingSummaryModel(
-      {required this.average,
-      required this.totalReviews,
-      required this.distribution});
+  RatingSummaryModel({
+    required this.average,
+    required this.totalReviews,
+    required this.distribution,
+  });
 
   factory RatingSummaryModel.fromJson(Map<String, dynamic> json) {
     Map<int, double> dist = {};

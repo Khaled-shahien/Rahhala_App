@@ -1,11 +1,11 @@
-import '../../data/models/home_model.dart';
+import 'package:rahhala_app/features/home/data/models/home_model.dart';
 
 abstract class HomeRepository {
-  Future<List<PlaceModel>> getHomePlaces();
+  Future<HomeResponse> getHomePlaces({int page = 1, int pageSize = 8});
+  Future<List<PlaceModel>> getHomePlacesList();
   Future<List<FavouriteModel>> getFavourites();
   Future<void> addFavourite(String placeId);
   Future<void> removeFavourite(String placeId);
-
   Future<PlaceDetailsModel> getPlaceDetails(String id);
   Future<void> addReview(String placeId, ReviewRequest reviewRequest);
   Future<void> updateReview(String reviewId, ReviewRequest reviewRequest);
