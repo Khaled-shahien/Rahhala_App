@@ -48,18 +48,23 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     return s;
   }
 
-  Widget _rule({required bool ok, required String text}) {
+  Widget _rule({
+    required bool ok,
+    required String text,
+    required Color textColor,
+    required Color inactiveIconColor,
+  }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 6.h),
       child: Row(
         children: [
           Icon(ok ? Icons.check_circle : Icons.radio_button_unchecked,
-              size: 16, color: ok ? Colors.green : Colors.grey),
+              size: 16, color: ok ? Colors.green : inactiveIconColor),
           SizedBox(width: 8.w),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(fontSize: 12.sp, color: Colors.grey[700]),
+              style: TextStyle(fontSize: 12.sp, color: textColor),
             ),
           ),
         ],
@@ -69,10 +74,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocProvider(
       create: (_) => sl<ResetPasswordCubit>(),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         body: SafeArea(
           child: BlocConsumer<ResetPasswordCubit, ResetPasswordState>(
             listener: (context, state) {
@@ -127,14 +135,18 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                     children: [
                                       IconButton(
                                         style: IconButton.styleFrom(
-                                          backgroundColor: Colors.grey[100],
+                                          backgroundColor: colorScheme
+                                              .surfaceContainerHighest
+                                              .withValues(alpha: 0.5),
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(12),
                                           ),
                                         ),
-                                        icon: const Icon(
-                                            Icons.arrow_back_ios_new),
+                                        icon: Icon(
+                                          Icons.arrow_back_ios_new,
+                                          color: colorScheme.onSurface,
+                                        ),
                                         onPressed: () => Navigator.pop(context),
                                       ),
                                       const SizedBox.shrink(),
@@ -148,14 +160,16 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                       vertical: 18.h,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: colorScheme.surface,
                                       borderRadius: BorderRadius.circular(22),
                                       border: Border.all(
-                                        color: Colors.grey[200]!,
+                                        color: colorScheme.outline.withValues(
+                                            alpha: isDark ? 0.35 : 0.2),
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.04),
+                                          color: Colors.black.withValues(
+                                              alpha: isDark ? 0.2 : 0.04),
                                           blurRadius: 22,
                                           offset: const Offset(0, 12),
                                         ),
@@ -175,12 +189,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                           ),
                                         ),
                                         SizedBox(height: 10.h),
-                                        const Text(
+                                        Text(
                                           'Use 8+ chars with upper/lowercase, number & symbol',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 13,
-                                            color: Colors.grey,
+                                            color: colorScheme.onSurfaceVariant,
                                           ),
                                         ),
                                         SizedBox(height: 24.h),
@@ -195,7 +209,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                               _obscurePassword
                                                   ? Icons.visibility_off
                                                   : Icons.visibility,
-                                              color: Colors.grey,
+                                              color:
+                                                  colorScheme.onSurfaceVariant,
                                             ),
                                             onPressed: () => setState(() =>
                                                 _obscurePassword =
@@ -212,11 +227,16 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                         SizedBox(height: 12.h),
                                         Container(
                                           decoration: BoxDecoration(
-                                            color: Colors.grey.shade50,
+                                            color: colorScheme
+                                                .surfaceContainerHighest
+                                                .withValues(alpha: 0.2),
                                             borderRadius:
                                                 BorderRadius.circular(10),
                                             border: Border.all(
-                                              color: Colors.grey[200]!,
+                                              color: colorScheme.outline
+                                                  .withValues(
+                                                      alpha:
+                                                          isDark ? 0.35 : 0.2),
                                             ),
                                           ),
                                           padding: EdgeInsets.symmetric(
@@ -235,8 +255,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                                       ? 0
                                                       : max(0.2, strength),
                                                   minHeight: 8,
-                                                  backgroundColor:
-                                                      Colors.grey.shade300,
+                                                  backgroundColor: colorScheme
+                                                      .outline
+                                                      .withValues(alpha: 0.3),
                                                   valueColor:
                                                       AlwaysStoppedAnimation<
                                                           Color>(
@@ -251,26 +272,46 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                               SizedBox(height: 12.h),
                                               _rule(
                                                   ok: pw.length >= 8,
-                                                  text: '8 or more characters'),
+                                                  text: '8 or more characters',
+                                                  textColor: colorScheme
+                                                      .onSurfaceVariant,
+                                                  inactiveIconColor: colorScheme
+                                                      .onSurfaceVariant),
                                               _rule(
                                                   ok: RegExp(r'[A-Z]')
                                                       .hasMatch(pw),
                                                   text:
-                                                      'At least 1 uppercase letter'),
+                                                      'At least 1 uppercase letter',
+                                                  textColor: colorScheme
+                                                      .onSurfaceVariant,
+                                                  inactiveIconColor: colorScheme
+                                                      .onSurfaceVariant),
                                               _rule(
                                                   ok: RegExp(r'[a-z]')
                                                       .hasMatch(pw),
                                                   text:
-                                                      'At least 1 lowercase letter'),
+                                                      'At least 1 lowercase letter',
+                                                  textColor: colorScheme
+                                                      .onSurfaceVariant,
+                                                  inactiveIconColor: colorScheme
+                                                      .onSurfaceVariant),
                                               _rule(
                                                   ok: RegExp(r'\d')
                                                       .hasMatch(pw),
-                                                  text: 'At least 1 number'),
+                                                  text: 'At least 1 number',
+                                                  textColor: colorScheme
+                                                      .onSurfaceVariant,
+                                                  inactiveIconColor: colorScheme
+                                                      .onSurfaceVariant),
                                               _rule(
                                                   ok: RegExp(r'[^A-Za-z0-9]')
                                                       .hasMatch(pw),
                                                   text:
-                                                      'At least 1 special character'),
+                                                      'At least 1 special character',
+                                                  textColor: colorScheme
+                                                      .onSurfaceVariant,
+                                                  inactiveIconColor: colorScheme
+                                                      .onSurfaceVariant),
                                             ],
                                           ),
                                         ),
@@ -287,7 +328,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                               _obscureConfirmPassword
                                                   ? Icons.visibility_off
                                                   : Icons.visibility,
-                                              color: Colors.grey,
+                                              color:
+                                                  colorScheme.onSurfaceVariant,
                                             ),
                                             onPressed: () => setState(() =>
                                                 _obscureConfirmPassword =
@@ -342,7 +384,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       ),
                       if (isLoading)
                         Container(
-                          color: Colors.black45,
+                          color: Colors.black
+                              .withValues(alpha: isDark ? 0.5 : 0.28),
                           alignment: Alignment.center,
                           child: const CircularProgressIndicator(
                               color: ThemeColor.primaryColor),

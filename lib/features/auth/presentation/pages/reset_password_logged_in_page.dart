@@ -52,19 +52,31 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
     super.dispose();
   }
 
-  Widget _rule({required bool ok, required String text}) {
+  Widget _rule({
+    required bool ok,
+    required String text,
+    required Color textColor,
+    required Color inactiveIconColor,
+  }) {
     return Row(
       children: [
         Icon(ok ? Icons.check_circle : Icons.radio_button_unchecked,
-            size: 18, color: ok ? Colors.green : Colors.grey),
+            size: 18, color: ok ? Colors.green : inactiveIconColor),
         SizedBox(width: 6.w),
-        Expanded(child: Text(text, style: TextStyle(fontSize: 12.sp))),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 12.sp, color: textColor),
+          ),
+        ),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final pw = _new.text;
     final s = _score(pw);
     final strength = s / 5;
@@ -73,12 +85,12 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
       create: (_) => sl<ProfileCubit>(),
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          foregroundColor: ThemeColor.charcoalColor,
+          backgroundColor: colorScheme.surface,
+          foregroundColor: colorScheme.onSurface,
           elevation: 0,
           title: const Text('Reset Password'),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         body: SafeArea(
           child: BlocConsumer<ProfileCubit, ProfileState>(
             listener: (context, state) {
@@ -127,14 +139,16 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                       vertical: 18.h,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: colorScheme.surface,
                                       borderRadius: BorderRadius.circular(22),
                                       border: Border.all(
-                                        color: Colors.grey[200]!,
+                                        color: colorScheme.outline
+                                            .withValues(alpha: isDark ? 0.35 : 0.2),
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.04),
+                                          color: Colors.black
+                                              .withValues(alpha: isDark ? 0.2 : 0.04),
                                           blurRadius: 22,
                                           offset: const Offset(0, 12),
                                         ),
@@ -148,7 +162,7 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                           'Your new password must be different from previous used password',
                                           style: TextStyle(
                                             fontSize: 12.sp,
-                                            color: Colors.grey[700],
+                                            color: colorScheme.onSurfaceVariant,
                                             height: 1.4,
                                           ),
                                         ),
@@ -164,7 +178,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                               _currentVisible
                                                   ? Icons.visibility
                                                   : Icons.visibility_off,
-                                              color: Colors.grey,
+                                                color:
+                                                  colorScheme.onSurfaceVariant,
                                             ),
                                             onPressed: () => setState(() =>
                                                 _currentVisible =
@@ -191,7 +206,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                               _newVisible
                                                   ? Icons.visibility
                                                   : Icons.visibility_off,
-                                              color: Colors.grey,
+                                                color:
+                                                  colorScheme.onSurfaceVariant,
                                             ),
                                             onPressed: () => setState(() =>
                                                 _newVisible = !_newVisible),
@@ -207,11 +223,14 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                         SizedBox(height: 10.h),
                                         Container(
                                           decoration: BoxDecoration(
-                                            color: Colors.grey.shade50,
+                                            color: colorScheme
+                                                .surfaceContainerHighest
+                                                .withValues(alpha: 0.2),
                                             borderRadius:
                                                 BorderRadius.circular(10),
                                             border: Border.all(
-                                              color: Colors.grey[200]!,
+                                              color: colorScheme.outline
+                                                  .withValues(alpha: isDark ? 0.35 : 0.2),
                                             ),
                                           ),
                                           padding: EdgeInsets.symmetric(
@@ -231,7 +250,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                       : max(0.2, strength),
                                                   minHeight: 8,
                                                   backgroundColor:
-                                                      Colors.grey.shade300,
+                                                      colorScheme.outline
+                                                        .withValues(alpha: 0.3),
                                                   valueColor:
                                                       AlwaysStoppedAnimation<
                                                           Color>(
@@ -246,26 +266,46 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                               SizedBox(height: 10.h),
                                               _rule(
                                                   ok: pw.length >= 8,
-                                                  text: '8 or more characters'),
+                                                  text: '8 or more characters',
+                                                  textColor:
+                                                    colorScheme.onSurfaceVariant,
+                                                  inactiveIconColor:
+                                                    colorScheme.onSurfaceVariant),
                                               _rule(
                                                   ok: RegExp(r'[A-Z]')
                                                       .hasMatch(pw),
                                                   text:
-                                                      'At least 1 uppercase letter'),
+                                                    'At least 1 uppercase letter',
+                                                  textColor:
+                                                    colorScheme.onSurfaceVariant,
+                                                  inactiveIconColor:
+                                                    colorScheme.onSurfaceVariant),
                                               _rule(
                                                   ok: RegExp(r'[a-z]')
                                                       .hasMatch(pw),
                                                   text:
-                                                      'At least 1 lowercase letter'),
+                                                    'At least 1 lowercase letter',
+                                                  textColor:
+                                                    colorScheme.onSurfaceVariant,
+                                                  inactiveIconColor:
+                                                    colorScheme.onSurfaceVariant),
                                               _rule(
                                                   ok: RegExp(r'\d')
                                                       .hasMatch(pw),
-                                                  text: 'At least 1 number'),
+                                                  text: 'At least 1 number',
+                                                  textColor:
+                                                    colorScheme.onSurfaceVariant,
+                                                  inactiveIconColor:
+                                                    colorScheme.onSurfaceVariant),
                                               _rule(
                                                   ok: RegExp(r'[^A-Za-z0-9]')
                                                       .hasMatch(pw),
                                                   text:
-                                                      'At least 1 special character'),
+                                                    'At least 1 special character',
+                                                  textColor:
+                                                    colorScheme.onSurfaceVariant,
+                                                  inactiveIconColor:
+                                                    colorScheme.onSurfaceVariant),
                                             ],
                                           ),
                                         ),
@@ -282,7 +322,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                               _confirmVisible
                                                   ? Icons.visibility
                                                   : Icons.visibility_off,
-                                              color: Colors.grey,
+                                                color:
+                                                  colorScheme.onSurfaceVariant,
                                             ),
                                             onPressed: () => setState(() =>
                                                 _confirmVisible =
@@ -333,7 +374,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                       ),
                       if (isLoading)
                         Container(
-                          color: Colors.black45,
+                          color: Colors.black
+                              .withValues(alpha: isDark ? 0.5 : 0.28),
                           alignment: Alignment.center,
                           child: const CircularProgressIndicator(
                               color: ThemeColor.primaryColor),

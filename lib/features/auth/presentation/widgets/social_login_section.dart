@@ -15,6 +15,8 @@ class SocialLoginSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Row(
@@ -22,7 +24,7 @@ class SocialLoginSection extends StatelessWidget {
           children: [
             Text(
               promptText,
-              style: const TextStyle(color: Colors.grey),
+              style: TextStyle(color: colorScheme.onSurfaceVariant),
             ),
             TextButton(
               onPressed: onActionTap,
@@ -40,5 +42,4 @@ class SocialLoginSection extends StatelessWidget {
       ],
     );
   }
-
 }

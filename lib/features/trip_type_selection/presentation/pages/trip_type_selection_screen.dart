@@ -16,13 +16,7 @@ class TripTypeSelectionScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
       ),
       body: SafeArea(
         child: Padding(
@@ -110,11 +104,11 @@ class TripTypeSelectionScreen extends StatelessWidget {
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(24.r),
           border: Border.all(
-            color: Theme.of(context).dividerColor.withOpacity(0.1),
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -127,7 +121,7 @@ class TripTypeSelectionScreen extends StatelessWidget {
               width: 60.w,
               height: 60.w,
               decoration: BoxDecoration(
-                color: ThemeColor.primaryColor.withOpacity(0.1),
+                color: ThemeColor.primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16.r),
               ),
               child: Icon(
@@ -168,7 +162,7 @@ class TripTypeSelectionScreen extends StatelessWidget {
             Icon(
               Icons.arrow_forward_ios_rounded,
               size: 16.sp,
-              color: ThemeColor.primaryColor.withOpacity(0.5),
+              color: ThemeColor.primaryColor.withValues(alpha: 0.5),
             ),
           ],
         ),

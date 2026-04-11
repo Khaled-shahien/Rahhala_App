@@ -50,6 +50,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   }
 
   Widget _buildOtpField(int index) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SizedBox(
       width: 45.w, // Reduced width to prevent overflow
       child: TextFormField(
@@ -70,10 +72,13 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         decoration: InputDecoration(
           counterText: "",
           filled: true,
-          fillColor: Colors.grey.shade100,
+          fillColor:
+              colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),
-            borderSide: BorderSide(color: Colors.grey.shade300),
+            borderSide: BorderSide(
+              color: colorScheme.outline.withValues(alpha: 0.4),
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),
@@ -105,12 +110,15 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocProvider(
       create: (_) => sl<VerifyOtpCubit>(),
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: colorScheme.surface,
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -195,14 +203,18 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                   children: [
                                     IconButton(
                                       style: IconButton.styleFrom(
-                                        backgroundColor: Colors.grey[100],
+                                        backgroundColor: colorScheme
+                                            .surfaceContainerHighest
+                                            .withValues(alpha: 0.5),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
                                         ),
                                       ),
-                                      icon:
-                                          const Icon(Icons.arrow_back_ios_new),
+                                      icon: Icon(
+                                        Icons.arrow_back_ios_new,
+                                        color: colorScheme.onSurface,
+                                      ),
                                       onPressed: () => Navigator.pop(context),
                                     ),
                                     const SizedBox.shrink(),
@@ -216,15 +228,17 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                     vertical: 16.h, // Reduced padding
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: colorScheme.surface,
                                     borderRadius: BorderRadius.circular(
                                         20), // Reduced radius
                                     border: Border.all(
-                                      color: Colors.grey[200]!,
+                                      color: colorScheme.outline.withValues(
+                                          alpha: isDark ? 0.35 : 0.2),
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.04),
+                                        color: Colors.black.withValues(
+                                            alpha: isDark ? 0.2 : 0.04),
                                         blurRadius: 20, // Reduced blur
                                         offset: const Offset(
                                             0, 10), // Reduced offset
@@ -254,7 +268,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                         style: const TextStyle(
                                           fontSize:
                                               15, // Slightly reduced font size
-                                          color: Colors.grey,
+                                          color: ThemeColor.neutral600,
                                         ),
                                       ),
                                       SizedBox(height: 22.h), // Reduced height
@@ -264,11 +278,15 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                           vertical: 12.h, // Reduced padding
                                         ),
                                         decoration: BoxDecoration(
-                                          color: Colors.grey.shade50,
+                                          color: colorScheme
+                                              .surfaceContainerHighest
+                                              .withValues(alpha: 0.2),
                                           borderRadius: BorderRadius.circular(
                                               14), // Reduced radius
                                           border: Border.all(
-                                            color: Colors.grey[200]!,
+                                            color: colorScheme.outline
+                                                .withValues(
+                                                    alpha: isDark ? 0.35 : 0.2),
                                           ),
                                         ),
                                         child: Row(
@@ -302,7 +320,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                           content,
                           if (isLoading)
                             Container(
-                              color: Colors.black45,
+                              color: Colors.black
+                                  .withValues(alpha: isDark ? 0.5 : 0.28),
                               alignment: Alignment.center,
                               child: const CircularProgressIndicator(
                                 color: ThemeColor.primaryColor,
