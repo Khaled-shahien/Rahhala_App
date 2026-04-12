@@ -99,7 +99,8 @@ class _HomePageState extends State<HomePage> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: ThemeColor.primaryColor.withValues(alpha: isDark ? 0.3 : 0.15),
+              color: ThemeColor.primaryColor
+                  .withValues(alpha: isDark ? 0.3 : 0.15),
               blurRadius: 20,
               offset: const Offset(0, -4),
             ),
@@ -178,8 +179,9 @@ class _HomePageState extends State<HomePage> {
     return Icon(
       icon,
       size: 30.sp,
-      color:
-          _currentIndex == index ? Colors.white : Colors.white.withValues(alpha: 0.7),
+      color: _currentIndex == index
+          ? Colors.white
+          : Colors.white.withValues(alpha: 0.7),
     );
   }
 }
@@ -255,7 +257,8 @@ class _HomeMainSection extends StatelessWidget {
                   ),
                   child: CircleAvatar(
                     radius: 30.r,
-                    backgroundColor: ThemeColor.primaryColor.withValues(alpha: 0.15),
+                    backgroundColor:
+                        ThemeColor.primaryColor.withValues(alpha: 0.15),
                     backgroundImage:
                         (profileImageUrl != null && profileImageUrl!.isNotEmpty)
                             ? NetworkImage(profileImageUrl!)

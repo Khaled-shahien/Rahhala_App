@@ -50,6 +50,7 @@ class HomeCubit extends Cubit<HomeState> {
       );
       _places = response.places;
       _hasMore = response.places.length >= _pageSize;
+
       emit(HomeSuccess(places: List.from(_places), hasMore: _hasMore));
     } catch (e) {
       emit(HomeError(e.toString()));
@@ -66,6 +67,8 @@ class HomeCubit extends Cubit<HomeState> {
       hasMore: _hasMore,
       isLoadingMore: true,
     ));
+
+    await Future.delayed(const Duration(milliseconds: 1000));
 
     try {
       _currentPage++;
@@ -100,6 +103,7 @@ class HomeCubit extends Cubit<HomeState> {
             ? place.copyWith(isFavourite: !isCurrentlyFavourite)
             : place)
         .toList();
+
     emit(HomeSuccess(places: List.from(_places), hasMore: _hasMore));
 
     try {
