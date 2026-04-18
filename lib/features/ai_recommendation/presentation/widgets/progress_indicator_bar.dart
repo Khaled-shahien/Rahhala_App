@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:rahhala_app/core/constants/app_colors.dart'; // تأكدي من المسار ده للألوان الثابتة
+// تأكدي من المسار ده للألوان الثابتة
 
 class ProgressIndicatorBar extends StatelessWidget {
   final int currentStep;

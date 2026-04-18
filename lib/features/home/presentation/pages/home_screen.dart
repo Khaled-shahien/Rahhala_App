@@ -173,10 +173,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding:
                       EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20.r),
                     border:
-                        Border.all(color: AppColors.primary.withOpacity(0.3)),
+                        Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -333,7 +333,7 @@ class _DotsLoadingIndicatorState extends State<_DotsLoadingIndicator>
               width: 8.w,
               height: 8.w,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.6 + i * 0.2),
+                color: AppColors.primary.withValues(alpha: 0.6 + i * 0.2),
                 shape: BoxShape.circle,
               ),
             ),

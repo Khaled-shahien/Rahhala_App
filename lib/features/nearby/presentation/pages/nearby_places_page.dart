@@ -127,7 +127,7 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
           ...loaded.response.sections.entries
               .where((e) => e.value.isNotEmpty)
               .map((e) => e.key)
-              .toList(),
+              ,
         ];
 
         return Scaffold(

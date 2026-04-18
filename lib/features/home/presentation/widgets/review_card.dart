@@ -123,8 +123,7 @@ class ReviewCard extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 4.h),
-                      if (review.rating != null)
-                        RatingStars(rating: review.rating),
+                      RatingStars(rating: review.rating),
                     ],
                   ),
                 ),
