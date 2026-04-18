@@ -9,6 +9,7 @@ import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/image_search/presentation/widgets/image_search_bar.dart';
+import 'package:rahhala_app/features/nearby/presentation/pages/nearby_screen.dart';
 import 'package:rahhala_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:rahhala_app/features/trip_type_selection/presentation/pages/trip_type_selection_screen.dart';
 import 'package:rahhala_app/features/chatbot/presentation/pages/chat_bot_screen.dart';
@@ -62,10 +63,8 @@ class _HomePageState extends State<HomePage> {
 
     setState(() => _currentIndex = index);
 
-    if (index == 2) {
-      HapticFeedback.mediumImpact();
-      _notifyComingSoon(l10n.homeSearchSoon);
-    }
+    ////////
+    HapticFeedback.mediumImpact();
   }
 
   @override
@@ -87,7 +86,7 @@ class _HomePageState extends State<HomePage> {
         profileImageUrl: profileImageUrl,
       ),
       const FavouritesScreen(),
-      _SoonPage(title: l10n.homeSearch),
+      const NearbyScreen(),
       const TripTypeSelectionScreen(),
       const ProfilePage(embedded: true),
     ];

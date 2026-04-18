@@ -12,6 +12,10 @@ import 'package:rahhala_app/features/home/presentation/cubit/favourites_cubit.da
 import 'package:rahhala_app/features/image_search/data/repositories/image_search_repository_impl.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_cubit.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_repository.dart';
+import 'package:rahhala_app/features/nearby/data/datasource/nearby_remote_data_source.dart';
+import 'package:rahhala_app/features/nearby/data/repositories/nearby_repository_impl.dart';
+import 'package:rahhala_app/features/nearby/domain/cubit/nearby_cubit.dart';
+import 'package:rahhala_app/features/nearby/domain/repositories/nearby_repository.dart';
 import 'package:rahhala_app/features/trip_history/data/repositories/trip_history_repository_impl.dart';
 import 'package:rahhala_app/features/trip_history/domain/cubits/trip_history_cubit.dart';
 import 'package:rahhala_app/features/trip_history/domain/trip_history_repository.dart';
@@ -212,5 +216,15 @@ Future<void> setupServiceLocator() async {
 
   sl.registerFactory<FavouritesCubit>(
     () => FavouritesCubit(sl<HomeRepository>()),
+  );
+
+  sl.registerLazySingleton<NearbyRemoteDataSource>(
+    () => NearbyRemoteDataSourceImpl(api: sl<ApiConsumer>()),
+  );
+  sl.registerLazySingleton<NearbyRepository>(
+    () => NearbyRepositoryImpl(remoteDataSource: sl<NearbyRemoteDataSource>()),
+  );
+  sl.registerFactory<NearbyCubit>(
+    () => NearbyCubit(repository: sl<NearbyRepository>()),
   );
 }

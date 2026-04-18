@@ -6,7 +6,7 @@ class AppAssets {
 
   static const String imagesLogo = "assets/images/logo.svg";
   static const String noplans = "assets/images/no_saved_plans.png";
-
+  static const String location = "assets/images/location.png";
   static const String imagesOnboarding1 = "assets/images/1.png";
 
   static const String imagesOnboarding2 = "assets/images/2.png";
