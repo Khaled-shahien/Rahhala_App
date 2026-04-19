@@ -26,6 +26,7 @@ class TripDetailsStrings {
   static const String travelTips = 'Travel tips';
   static const String emergencyContact = 'Emergency Contact';
   static const String noInfo = 'No information available';
+  static const String dayRoute = "day's Route";
   static const String transportRoutes = 'Transportation Routes';
   static const String tripRegenerated = 'Trip plan regenerated successfully!';
   static const String saveFailed = 'Failed to save trip.';

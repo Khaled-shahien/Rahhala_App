@@ -38,7 +38,7 @@ class _NearbyBody extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: AppColors.primary),
+                  const CircularProgressIndicator(color: AppColors.primary),
                   SizedBox(height: 16.h),
                   Text(
                     state is NearbyLocationLoading

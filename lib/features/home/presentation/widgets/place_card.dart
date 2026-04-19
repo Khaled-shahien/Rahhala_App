@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/features/home/data/models/home_model.dart';
-import '../../data/models/place_model.dart';
 
 class PlaceCard extends StatelessWidget {
   final PlaceModel place;

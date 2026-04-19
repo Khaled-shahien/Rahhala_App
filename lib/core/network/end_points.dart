@@ -33,6 +33,7 @@ class EndPoints {
   static String favouriteByPlaceId(String placeId) => '$favourites/$placeId';
 
   static const String nearbyPlaces = '/api/places/nearby';
+  static const String getActivityRoute = '/api/activityroute/get-route';
 }
 
 class ApiKey {

@@ -88,6 +88,7 @@ class TripHistoryRepositoryImpl implements TripHistoryRepository {
                               .map((activity) => {
                                     'time': activity.time,
                                     'place': activity.place,
+                                    'coordinates': activity.coordinates,
                                     'description': activity.description,
                                     'estimatedCost': activity.estimatedCost,
                                     'image': activity.image,
