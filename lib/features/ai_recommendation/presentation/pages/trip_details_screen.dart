@@ -130,6 +130,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                         .map((activity) => {
                               'time': activity.time,
                               'place': activity.place,
+                              'coordinates': activity.coordinates,
                               'description': activity.description,
                               'estimatedCost': activity.estimatedCost,
                               'image': activity.image,
@@ -313,7 +314,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                       ...plan.days.map((day) => TripDaySection(day: day)),
                       SizedBox(height: 16.h),
                       _buildEmergencyContactSection(
-                        emergencyContact: plan.emergencyContact ?? '',
+                        emergencyContact: plan.emergencyContact,
                       ),
                       SizedBox(height: 32.h),
                     ],

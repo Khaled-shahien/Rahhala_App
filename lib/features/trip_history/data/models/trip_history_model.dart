@@ -167,6 +167,7 @@ class TripHistoryDay {
 class TripHistoryActivity {
   final String time;
   final String place;
+  final String? coordinates;
   final String description;
   final String? image;
   final String estimatedCost;
@@ -174,6 +175,7 @@ class TripHistoryActivity {
   const TripHistoryActivity({
     required this.time,
     required this.place,
+    this.coordinates,
     required this.description,
     required this.image,
     required this.estimatedCost,
@@ -183,6 +185,7 @@ class TripHistoryActivity {
     return TripHistoryActivity(
       time: json['time'] ?? '',
       place: json['place'] ?? '',
+      coordinates: json['coordinates']?.toString(),
       description: json['description'] ?? '',
       image: json['image'],
       estimatedCost: json['estimatedCost'] ?? '',

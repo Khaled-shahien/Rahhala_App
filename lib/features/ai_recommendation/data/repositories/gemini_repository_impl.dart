@@ -132,6 +132,7 @@ class GeminiRepositoryImpl implements GeminiRepository {
                   return {
                     'time': activity.time,
                     'place': activity.place,
+                    'coordinates': activity.coordinates,
                     'description': activity.description,
                     'estimatedCost': activity.estimatedCost,
                     'transportation': activity.transportation.map((transport) {
