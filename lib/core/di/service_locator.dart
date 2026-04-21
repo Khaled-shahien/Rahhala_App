@@ -44,6 +44,7 @@ import 'package:rahhala_app/features/profile/domain/edit_profile/edit_profile_cu
 import 'package:rahhala_app/features/ai_recommendation/data/repositories/gemini_repository.dart';
 import 'package:rahhala_app/features/ai_recommendation/data/repositories/gemini_repository_impl.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_cubit.dart';
+import 'package:rahhala_app/features/ai_recommendation/presentation/cubit/navigation_voice_cubit.dart';
 
 // Custom Trip imports
 import 'package:rahhala_app/features/custom_trip/data/sources/trip_api_service.dart';
@@ -125,6 +126,7 @@ Future<void> setupServiceLocator() async {
       () => GeminiRepositoryImpl(apiConsumer: sl<ApiConsumer>()));
   sl.registerFactory<AiTripCubit>(
       () => AiTripCubit(geminiRepository: sl<GeminiRepository>()));
+  sl.registerLazySingleton<NavigationVoiceCubit>(() => NavigationVoiceCubit());
 
   // Custom Trip registration
   sl.registerLazySingleton<TripApiService>(
