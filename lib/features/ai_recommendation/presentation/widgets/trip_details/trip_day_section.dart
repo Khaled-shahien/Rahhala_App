@@ -1,14 +1,102 @@
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/core/network/api_consumer.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_model.dart';
+import 'package:rahhala_app/features/ai_recommendation/presentation/cubit/navigation_voice_cubit.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/expansion_tile_components.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_details_theme.dart';
+
+List<LatLng> _decodePolylinePoints(String encoded) {
+  final points = <LatLng>[];
+  int index = 0;
+  int lat = 0;
+  int lng = 0;
+
+  while (index < encoded.length) {
+    int result = 0;
+    int shift = 0;
+    int byte;
+    do {
+      byte = encoded.codeUnitAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+    final deltaLat = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+    lat += deltaLat;
+
+    result = 0;
+    shift = 0;
+    do {
+      byte = encoded.codeUnitAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+    final deltaLng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+    lng += deltaLng;
+
+    points.add(LatLng(lat / 1e5, lng / 1e5));
+  }
+
+  return points;
+}
+
+LatLng? _extractStepPoint(dynamic value) {
+  if (value is Map<String, dynamic>) {
+    final lat = (value['lat'] as num?)?.toDouble() ??
+        (value['latitude'] as num?)?.toDouble();
+    final lng = (value['lng'] as num?)?.toDouble() ??
+        (value['longitude'] as num?)?.toDouble();
+    if (lat != null && lng != null) {
+      return LatLng(lat, lng);
+    }
+  }
+  return null;
+}
+
+List<_RouteStepData> _extractRouteSteps(dynamic rawSteps) {
+  if (rawSteps is! List) {
+    return const [];
+  }
+
+  final steps = <_RouteStepData>[];
+  for (final step in rawSteps) {
+    if (step is! Map<String, dynamic>) {
+      continue;
+    }
+
+    final instruction = step['instruction']?.toString().trim() ?? '';
+    if (instruction.isEmpty) {
+      continue;
+    }
+
+    steps.add(
+      _RouteStepData(
+        instruction: instruction,
+        duration: step['duration']?.toString().trim().isNotEmpty == true
+            ? step['duration'].toString().trim()
+            : '--',
+        distance: step['distance']?.toString().trim().isNotEmpty == true
+            ? step['distance'].toString().trim()
+            : '--',
+        startLocation: _extractStepPoint(step['startLocation']),
+        endLocation: _extractStepPoint(step['endLocation']),
+      ),
+    );
+  }
+
+  return steps;
+}
 
 class TripDaySection extends StatelessWidget {
   const TripDaySection({
@@ -258,6 +346,7 @@ class _DayRouteMapSectionState extends State<_DayRouteMapSection> {
       String instruction = 'Follow the route';
       String instructionDuration = totalDuration;
       final steps = response['steps'];
+      final extractedSteps = _extractRouteSteps(steps);
       if (steps is List &&
           steps.isNotEmpty &&
           steps.first is Map<String, dynamic>) {
@@ -279,10 +368,11 @@ class _DayRouteMapSectionState extends State<_DayRouteMapSection> {
           totalDuration: totalDuration,
           nextInstruction: instruction,
           nextInstructionDuration: instructionDuration,
+          steps: extractedSteps,
         );
       }
 
-      final decoded = _decodePolyline(encoded);
+      final decoded = _decodePolylinePoints(encoded);
       final points = decoded.length >= 2 ? decoded : waypoints;
       return _RouteResponseData(
         polylinePoints: points,
@@ -290,6 +380,7 @@ class _DayRouteMapSectionState extends State<_DayRouteMapSection> {
         totalDuration: totalDuration,
         nextInstruction: instruction,
         nextInstructionDuration: instructionDuration,
+        steps: extractedSteps,
       );
     } catch (error) {
       AppLogger.instance.w('Trip route API failed, using fallback polyline');
@@ -299,42 +390,9 @@ class _DayRouteMapSectionState extends State<_DayRouteMapSection> {
         totalDuration: '--',
         nextInstruction: 'Follow the route',
         nextInstructionDuration: '--',
+        steps: const [],
       );
     }
-  }
-
-  List<LatLng> _decodePolyline(String encoded) {
-    final points = <LatLng>[];
-    int index = 0;
-    int lat = 0;
-    int lng = 0;
-
-    while (index < encoded.length) {
-      int result = 0;
-      int shift = 0;
-      int byte;
-      do {
-        byte = encoded.codeUnitAt(index++) - 63;
-        result |= (byte & 0x1f) << shift;
-        shift += 5;
-      } while (byte >= 0x20);
-      final deltaLat = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
-      lat += deltaLat;
-
-      result = 0;
-      shift = 0;
-      do {
-        byte = encoded.codeUnitAt(index++) - 63;
-        result |= (byte & 0x1f) << shift;
-        shift += 5;
-      } while (byte >= 0x20);
-      final deltaLng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
-      lng += deltaLng;
-
-      points.add(LatLng(lat / 1e5, lng / 1e5));
-    }
-
-    return points;
   }
 
   @override
@@ -426,9 +484,13 @@ class _DayRouteMapSectionState extends State<_DayRouteMapSection> {
                         child: InkWell(
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute<void>(
-                              builder: (_) => _FullScreenDayRouteMap(
-                                waypoints: _waypoints,
-                                routeData: routeData,
+                              builder: (_) =>
+                                  BlocProvider<NavigationVoiceCubit>.value(
+                                value: sl<NavigationVoiceCubit>(),
+                                child: _FullScreenDayRouteMap(
+                                  waypoints: _waypoints,
+                                  routeData: routeData,
+                                ),
                               ),
                             ),
                           ),
@@ -483,6 +545,7 @@ class _RouteResponseData {
     required this.totalDuration,
     required this.nextInstruction,
     required this.nextInstructionDuration,
+    required this.steps,
   });
 
   final List<LatLng> polylinePoints;
@@ -490,9 +553,26 @@ class _RouteResponseData {
   final String totalDuration;
   final String nextInstruction;
   final String nextInstructionDuration;
+  final List<_RouteStepData> steps;
 }
 
-class _FullScreenDayRouteMap extends StatelessWidget {
+class _RouteStepData {
+  const _RouteStepData({
+    required this.instruction,
+    required this.duration,
+    required this.distance,
+    this.startLocation,
+    this.endLocation,
+  });
+
+  final String instruction;
+  final String duration;
+  final String distance;
+  final LatLng? startLocation;
+  final LatLng? endLocation;
+}
+
+class _FullScreenDayRouteMap extends StatefulWidget {
   const _FullScreenDayRouteMap({
     required this.waypoints,
     required this.routeData,
@@ -502,17 +582,607 @@ class _FullScreenDayRouteMap extends StatelessWidget {
   final _RouteResponseData? routeData;
 
   @override
+  State<_FullScreenDayRouteMap> createState() => _FullScreenDayRouteMapState();
+}
+
+class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
+  static const double _offRouteThresholdMeters = 90;
+
+  final Distance _distance = const Distance();
+  final MapController _mapController = MapController();
+  final FlutterTts _tts = FlutterTts();
+
+  StreamSubscription<Position>? _positionSub;
+
+  late List<LatLng> _routePoints;
+  late String _totalDistance;
+  late String _remainingDistance;
+  late String _eta;
+  late String _nextInstruction;
+  late String _nextInstructionDuration;
+
+  List<_RouteStepData> _steps = const [];
+  Position? _currentPosition;
+
+  bool _isNavigating = false;
+  bool _isFollowingUser = false;
+  bool _isRecentering = false;
+  bool _isRerouting = false;
+  bool _lockRouteToWaypoints = false;
+  bool _isAdvancingLeg = false;
+  int _activeLegStartIndex = 0;
+  int _currentStepIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _hydrateFromInitialRoute();
+    _configureTts();
+  }
+
+  @override
+  void dispose() {
+    _positionSub?.cancel();
+    _tts.stop();
+    super.dispose();
+  }
+
+  void _hydrateFromInitialRoute() {
+    final routeData = widget.routeData;
+    _routePoints = routeData?.polylinePoints ?? widget.waypoints;
+    _totalDistance = routeData?.totalDistance ?? '--';
+    _remainingDistance = routeData?.totalDistance ?? '--';
+    _eta = routeData?.totalDuration ?? '--';
+    _nextInstruction = routeData?.nextInstruction ?? 'Follow the route';
+    _nextInstructionDuration = routeData?.nextInstructionDuration ?? '--';
+    _steps = routeData?.steps ?? const [];
+  }
+
+  Future<void> _configureTts() async {
+    await _tts.setSpeechRate(0.46);
+    await _tts.setVolume(1.0);
+    await _tts.setPitch(1.0);
+    await _tts.setLanguage('en-US');
+  }
+
+  LatLng _centerFromCurrentRoute() {
+    if (_routePoints.isEmpty) {
+      return widget.waypoints.isNotEmpty
+          ? _calculateCenter(widget.waypoints)
+          : const LatLng(30.0444, 31.2357);
+    }
+    return _calculateCenter(_routePoints);
+  }
+
+  LatLng _calculateCenter(List<LatLng> points) {
+    var sumLat = 0.0;
+    var sumLng = 0.0;
+    for (final point in points) {
+      sumLat += point.latitude;
+      sumLng += point.longitude;
+    }
+    return LatLng(sumLat / points.length, sumLng / points.length);
+  }
+
+  Future<Position?> _requestCurrentPosition() async {
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('GPS is disabled. Please enable it.')),
+        );
+      }
+      return null;
+    }
+
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.denied) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Location permission denied.')),
+        );
+      }
+      return null;
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location permission denied permanently.'),
+          ),
+        );
+      }
+      return null;
+    }
+
+    return Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.best),
+    );
+  }
+
+  void _ensureLocationStream() {
+    if (_positionSub != null) {
+      return;
+    }
+
+    _positionSub = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+        distanceFilter: 5,
+      ),
+    ).listen(
+      _onLocationUpdate,
+      onError: (_) {
+        if (!mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Unable to read live location updates.')),
+        );
+      },
+    );
+  }
+
+  Future<void> _animateCameraTo(
+    LatLng target, {
+    double? zoom,
+    Duration duration = const Duration(milliseconds: 550),
+  }) async {
+    final startCenter = _mapController.camera.center;
+    final startZoom = _mapController.camera.zoom;
+    final endZoom = zoom ?? startZoom;
+    final totalMs = math.max(1, duration.inMilliseconds);
+    const frameMs = 16;
+    final steps = math.max(1, totalMs ~/ frameMs);
+
+    for (var i = 1; i <= steps; i++) {
+      final t = i / steps;
+      final eased = Curves.easeInOut.transform(t);
+      final lat = startCenter.latitude +
+          (target.latitude - startCenter.latitude) * eased;
+      final lng = startCenter.longitude +
+          (target.longitude - startCenter.longitude) * eased;
+      final z = startZoom + (endZoom - startZoom) * eased;
+      _mapController.move(LatLng(lat, lng), z);
+      await Future<void>.delayed(const Duration(milliseconds: frameMs));
+    }
+  }
+
+  Future<void> _onRecenterPressed() async {
+    if (_isRecentering) {
+      return;
+    }
+
+    setState(() => _isRecentering = true);
+    try {
+      final position = await _requestCurrentPosition();
+      if (position == null) {
+        return;
+      }
+
+      _currentPosition = position;
+      _isFollowingUser = true;
+      _ensureLocationStream();
+      await _animateCameraTo(
+        LatLng(position.latitude, position.longitude),
+        zoom: 16,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isRecentering = false);
+      }
+    }
+  }
+
+  Future<void> _onToggleNavigation() async {
+    if (_isNavigating) {
+      _stopNavigation();
+      return;
+    }
+
+    if (widget.waypoints.length < 2) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Cannot start navigation without destination.')),
+        );
+      }
+      return;
+    }
+
+    final position = await _requestCurrentPosition();
+    if (position == null) {
+      return;
+    }
+
+    _activeLegStartIndex = 0;
+    final startPoint = widget.waypoints[_activeLegStartIndex];
+    final destination = widget.waypoints[_activeLegStartIndex + 1];
+
+    final routeData = await _fetchRouteForNavigation(
+      startPoint,
+      destination,
+    );
+
+    if (routeData == null || routeData.polylinePoints.length < 2) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content:
+                  Text('No valid route found. Check internet and try again.')),
+        );
+      }
+      return;
+    }
+
+    _ensureLocationStream();
+    _currentPosition = position;
+
+    setState(() {
+      _isNavigating = true;
+      _isFollowingUser = true;
+      _lockRouteToWaypoints = true;
+      _routePoints = routeData.polylinePoints;
+      _steps = routeData.steps;
+      _totalDistance = routeData.totalDistance;
+      _remainingDistance = routeData.totalDistance;
+      _eta = routeData.totalDuration;
+      _currentStepIndex = 0;
+      _nextInstruction = routeData.nextInstruction;
+      _nextInstructionDuration = routeData.nextInstructionDuration;
+    });
+
+    await _animateCameraTo(
+      startPoint,
+      zoom: 16,
+    );
+    await _maybeSpeakCurrentInstruction();
+  }
+
+  void _stopNavigation() {
+    _tts.stop();
+    setState(() {
+      _isNavigating = false;
+      _isFollowingUser = false;
+      _isRerouting = false;
+      _lockRouteToWaypoints = false;
+      _isAdvancingLeg = false;
+      _activeLegStartIndex = 0;
+      _currentStepIndex = 0;
+      _hydrateFromInitialRoute();
+    });
+  }
+
+  String _pointLabel(int index) => String.fromCharCode(65 + index);
+
+  Future<void> _advanceToNextLeg() async {
+    if (!_isNavigating || _isAdvancingLeg) {
+      return;
+    }
+
+    final isFinalLeg = _activeLegStartIndex >= widget.waypoints.length - 2;
+    if (isFinalLeg) {
+      _stopNavigation();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You have reached your destination.')),
+        );
+      }
+      return;
+    }
+
+    _isAdvancingLeg = true;
+    final nextLegStartIndex = _activeLegStartIndex + 1;
+    final from = widget.waypoints[nextLegStartIndex];
+    final to = widget.waypoints[nextLegStartIndex + 1];
+
+    final routeData = await _fetchRouteForNavigation(from, to);
+
+    if (!_isNavigating || !mounted) {
+      _isAdvancingLeg = false;
+      return;
+    }
+
+    if (routeData == null || routeData.polylinePoints.length < 2) {
+      _isAdvancingLeg = false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not load next leg route. Please try again.'),
+        ),
+      );
+      return;
+    }
+
+    _activeLegStartIndex = nextLegStartIndex;
+    setState(() {
+      _routePoints = routeData.polylinePoints;
+      _steps = routeData.steps;
+      _totalDistance = routeData.totalDistance;
+      _remainingDistance = routeData.totalDistance;
+      _eta = routeData.totalDuration;
+      _currentStepIndex = 0;
+      _nextInstruction = routeData.nextInstruction;
+      _nextInstructionDuration = routeData.nextInstructionDuration;
+    });
+
+    _isAdvancingLeg = false;
+    await _maybeSpeakCurrentInstruction();
+
+    if (mounted) {
+      final fromLabel = _pointLabel(_activeLegStartIndex);
+      final toLabel = _pointLabel(_activeLegStartIndex + 1);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Reached $fromLabel. Continuing to $toLabel.')),
+      );
+    }
+  }
+
+  Future<_RouteResponseData?> _fetchRouteForNavigation(
+    LatLng from,
+    LatLng to,
+  ) async {
+    try {
+      final api = sl<ApiConsumer>();
+      final response = await api.post(
+        EndPoints.getActivityRoute,
+        data: {
+          'travelMode': 'driving',
+          'waypoints': [
+            {'lat': from.latitude, 'lng': from.longitude, 'order': 1},
+            {'lat': to.latitude, 'lng': to.longitude, 'order': 2},
+          ],
+        },
+      );
+
+      if (response is! Map<String, dynamic>) {
+        return null;
+      }
+
+      final canDrawRoute = response['canDrawRoute'] == true;
+      final encoded = response['polyline']?.toString();
+      final totalDistance = response['totalDistance']?.toString() ?? '--';
+      final totalDuration = response['totalDuration']?.toString() ?? '--';
+      final steps = _extractRouteSteps(response['steps']);
+
+      final firstStep = steps.isNotEmpty ? steps.first : null;
+      final nextInstruction = firstStep?.instruction ?? 'Follow the route';
+      final nextInstructionDuration = firstStep?.duration ?? totalDuration;
+
+      if (!canDrawRoute || encoded == null || encoded.isEmpty) {
+        return _RouteResponseData(
+          polylinePoints: [from, to],
+          totalDistance: totalDistance,
+          totalDuration: totalDuration,
+          nextInstruction: nextInstruction,
+          nextInstructionDuration: nextInstructionDuration,
+          steps: steps,
+        );
+      }
+
+      final decoded = _decodePolylinePoints(encoded);
+      return _RouteResponseData(
+        polylinePoints: decoded.length >= 2 ? decoded : [from, to],
+        totalDistance: totalDistance,
+        totalDuration: totalDuration,
+        nextInstruction: nextInstruction,
+        nextInstructionDuration: nextInstructionDuration,
+        steps: steps,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _onLocationUpdate(Position position) {
+    _currentPosition = position;
+    if (!_isNavigating) {
+      if (_isFollowingUser) {
+        unawaited(
+          _animateCameraTo(
+            LatLng(position.latitude, position.longitude),
+            zoom: 16,
+          ),
+        );
+      }
+      setState(() {});
+      return;
+    }
+
+    final current = LatLng(position.latitude, position.longitude);
+    _updateNavigationMetrics(current, speedMps: position.speed);
+
+    if (_isFollowingUser) {
+      unawaited(_animateCameraTo(current, zoom: 16));
+    }
+
+    final distanceFromRoute = _distanceToPolylineMeters(current, _routePoints);
+    if (!_lockRouteToWaypoints &&
+        distanceFromRoute > _offRouteThresholdMeters &&
+        !_isRerouting) {
+      unawaited(_recalculateRouteFromCurrent(current));
+    }
+
+    setState(() {});
+  }
+
+  Future<void> _recalculateRouteFromCurrent(LatLng current) async {
+    if (_isRerouting || widget.waypoints.isEmpty) {
+      return;
+    }
+
+    _isRerouting = true;
+    final destination = widget.waypoints.last;
+    final routeData = await _fetchRouteForNavigation(current, destination);
+    _isRerouting = false;
+
+    if (routeData == null || !_isNavigating || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _routePoints = routeData.polylinePoints;
+      _steps = routeData.steps;
+      _totalDistance = routeData.totalDistance;
+      _remainingDistance = routeData.totalDistance;
+      _eta = routeData.totalDuration;
+      _currentStepIndex = 0;
+      _nextInstruction = routeData.nextInstruction;
+      _nextInstructionDuration = routeData.nextInstructionDuration;
+    });
+
+    unawaited(_maybeSpeakCurrentInstruction());
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Route recalculated.')),
+    );
+  }
+
+  void _updateNavigationMetrics(LatLng current, {required double speedMps}) {
+    if (_routePoints.length < 2) {
+      return;
+    }
+
+    final nearestIndex = _nearestRouteIndex(current, _routePoints);
+    final remainingMeters = _polylineLength(_routePoints.sublist(nearestIndex));
+    final totalMeters = _polylineLength(_routePoints);
+
+    final safeSpeed = speedMps > 1.2 ? speedMps : 13.9;
+    final etaSeconds = (remainingMeters / safeSpeed).round();
+
+    _remainingDistance = _formatMeters(remainingMeters);
+    _totalDistance = _formatMeters(totalMeters);
+    _eta = _formatDuration(Duration(seconds: etaSeconds));
+
+    if (_steps.isNotEmpty) {
+      final nextStepIndex = _resolveStepIndex(current);
+      if (nextStepIndex != _currentStepIndex) {
+        _currentStepIndex = nextStepIndex;
+        unawaited(_maybeSpeakCurrentInstruction());
+      }
+      final step = _steps[_currentStepIndex.clamp(0, _steps.length - 1)];
+      _nextInstruction = step.instruction;
+      _nextInstructionDuration = step.duration;
+    }
+
+    if (remainingMeters <= 30) {
+      unawaited(_advanceToNextLeg());
+    }
+  }
+
+  int _resolveStepIndex(LatLng current) {
+    var index = _currentStepIndex;
+    while (index < _steps.length - 1) {
+      final end = _steps[index].endLocation;
+      if (end == null) {
+        break;
+      }
+
+      if (_distanceInMeters(current, end) <= 45) {
+        index += 1;
+      } else {
+        break;
+      }
+    }
+    return index;
+  }
+
+  double _distanceInMeters(LatLng a, LatLng b) {
+    return _distance.as(LengthUnit.Meter, a, b);
+  }
+
+  int _nearestRouteIndex(LatLng current, List<LatLng> points) {
+    var nearestIndex = 0;
+    var minDistance = double.infinity;
+    for (var i = 0; i < points.length; i++) {
+      final d = _distanceInMeters(current, points[i]);
+      if (d < minDistance) {
+        minDistance = d;
+        nearestIndex = i;
+      }
+    }
+    return nearestIndex;
+  }
+
+  double _polylineLength(List<LatLng> points) {
+    if (points.length < 2) {
+      return 0;
+    }
+
+    var total = 0.0;
+    for (var i = 0; i < points.length - 1; i++) {
+      total += _distanceInMeters(points[i], points[i + 1]);
+    }
+    return total;
+  }
+
+  double _distanceToPolylineMeters(LatLng current, List<LatLng> points) {
+    if (points.isEmpty) {
+      return double.infinity;
+    }
+
+    var min = double.infinity;
+    for (final point in points) {
+      final d = _distanceInMeters(current, point);
+      if (d < min) {
+        min = d;
+      }
+    }
+    return min;
+  }
+
+  String _formatMeters(double meters) {
+    if (meters >= 1000) {
+      return '${(meters / 1000).toStringAsFixed(1)} km';
+    }
+    return '${meters.round()} m';
+  }
+
+  String _formatDuration(Duration d) {
+    if (d.inHours >= 1) {
+      final minutes = d.inMinutes % 60;
+      return '${d.inHours}h ${minutes}m';
+    }
+    return '${d.inMinutes.clamp(1, 59)} mins';
+  }
+
+  Future<void> _maybeSpeakCurrentInstruction() async {
+    final isMuted = context.read<NavigationVoiceCubit>().isMuted;
+    if (isMuted || !_isNavigating || _nextInstruction.trim().isEmpty) {
+      return;
+    }
+
+    await _tts.stop();
+    await _tts.speak(_nextInstruction);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final polylinePoints = routeData?.polylinePoints ?? waypoints;
-    final center = _calculateCenter(waypoints);
+    final current = _currentPosition;
+    final center = current != null
+        ? LatLng(current.latitude, current.longitude)
+        : _centerFromCurrentRoute();
+    final remainingRoute = _routePoints.length >= 2 && current != null
+        ? _routePoints.sublist(_nearestRouteIndex(center, _routePoints))
+        : _routePoints;
 
     return Scaffold(
       body: Stack(
         children: [
           FlutterMap(
+            mapController: _mapController,
             options: MapOptions(
               initialCenter: center,
               initialZoom: 10,
+              onPositionChanged: (position, hasGesture) {
+                if (hasGesture && _isFollowingUser) {
+                  setState(() => _isFollowingUser = false);
+                }
+              },
               interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.drag |
                     InteractiveFlag.pinchZoom |
@@ -524,31 +1194,71 @@ class _FullScreenDayRouteMap extends StatelessWidget {
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.rahhala.app',
               ),
-              if (polylinePoints.length > 1)
+              if (_routePoints.length > 1)
                 PolylineLayer(
                   polylines: [
                     Polyline(
-                      points: polylinePoints,
+                      points: _routePoints,
+                      color: Colors.black.withValues(alpha: 0.22),
+                      strokeWidth: 7,
+                    ),
+                    Polyline(
+                      points: remainingRoute.length >= 2
+                          ? remainingRoute
+                          : _routePoints,
                       color: const Color(0xFF8D7358),
                       strokeWidth: 5,
                     ),
                   ],
                 ),
               MarkerLayer(
-                markers: waypoints.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final point = entry.value;
-                  final isFirst = index == 0;
-                  return Marker(
-                    point: point,
-                    width: 36.w,
-                    height: 36.h,
-                    child: _MapPointMarker(
-                      label: String.fromCharCode(65 + index),
-                      color: isFirst ? const Color(0xFF8D7358) : Colors.white,
+                markers: [
+                  ...widget.waypoints.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final point = entry.value;
+                    final isFirst = index == 0;
+                    return Marker(
+                      point: point,
+                      width: 36.w,
+                      height: 36.h,
+                      child: _MapPointMarker(
+                        label: String.fromCharCode(65 + index),
+                        color: isFirst ? const Color(0xFF8D7358) : Colors.white,
+                      ),
+                    );
+                  }),
+                  if (current != null)
+                    Marker(
+                      point: LatLng(current.latitude, current.longitude),
+                      width: 24.w,
+                      height: 24.h,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1565C0),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 3),
+                        ),
+                      ),
                     ),
-                  );
-                }).toList(),
+                  if (_isNavigating && _steps.isNotEmpty)
+                    if (_steps[_currentStepIndex.clamp(0, _steps.length - 1)]
+                            .endLocation !=
+                        null)
+                      Marker(
+                        point: _steps[
+                                _currentStepIndex.clamp(0, _steps.length - 1)]
+                            .endLocation!,
+                        width: 22.w,
+                        height: 22.h,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE65100),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                        ),
+                      ),
+                ],
               ),
             ],
           ),
@@ -584,7 +1294,7 @@ class _FullScreenDayRouteMap extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            routeData?.nextInstruction ?? 'Follow the route',
+                            _nextInstruction,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -595,7 +1305,7 @@ class _FullScreenDayRouteMap extends StatelessWidget {
                           ),
                           SizedBox(height: 2.h),
                           Text(
-                            'Continue for ${routeData?.nextInstructionDuration ?? '--'}',
+                            'Continue for $_nextInstructionDuration',
                             style: TextStyle(
                               fontSize: 12.sp,
                               color: brownTextColor.withValues(alpha: 0.75),
@@ -613,12 +1323,58 @@ class _FullScreenDayRouteMap extends StatelessWidget {
           Positioned(
             right: 14.w,
             top: 220.h,
-            child: const Column(
-              children: [
-                _RoundMapActionIcon(icon: Icons.my_location_outlined),
-                _RoundMapActionIcon(icon: Icons.volume_up_outlined),
-                _RoundMapActionIcon(icon: Icons.navigation_outlined),
-              ],
+            child: BlocBuilder<NavigationVoiceCubit, bool>(
+              builder: (context, isMuted) {
+                return Column(
+                  children: [
+                    _RoundMapActionIcon(
+                      icon: _isRecentering
+                          ? Icons.gps_fixed
+                          : Icons.my_location_outlined,
+                      onTap: _onRecenterPressed,
+                      tooltip: 'Recenter',
+                    ),
+                    _RoundMapActionIcon(
+                      icon: isMuted
+                          ? Icons.volume_off_outlined
+                          : Icons.volume_up_outlined,
+                      onTap: () async {
+                        final voiceCubit =
+                            this.context.read<NavigationVoiceCubit>();
+                        voiceCubit.toggleMute();
+                        final mutedNow = voiceCubit.isMuted;
+
+                        if (mutedNow) {
+                          await _tts.stop();
+                        } else {
+                          await _maybeSpeakCurrentInstruction();
+                        }
+                        if (!mounted) {
+                          return;
+                        }
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              mutedNow
+                                  ? 'Voice instructions muted'
+                                  : 'Voice instructions enabled',
+                            ),
+                            duration: const Duration(milliseconds: 1200),
+                          ),
+                        );
+                      },
+                      tooltip: isMuted ? 'Unmute' : 'Mute',
+                    ),
+                    _RoundMapActionIcon(
+                      icon: _isNavigating
+                          ? Icons.stop_circle_outlined
+                          : Icons.navigation_outlined,
+                      onTap: _onToggleNavigation,
+                      tooltip: _isNavigating ? 'End Trip' : 'Start Navigation',
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           Positioned(
@@ -634,55 +1390,106 @@ class _FullScreenDayRouteMap extends StatelessWidget {
                   topRight: Radius.circular(18.r),
                 ),
               ),
-              child: Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: _BottomStatCard(
-                      icon: Icons.pin_drop_outlined,
-                      value: routeData?.totalDistance ?? '--',
-                      label: 'Total Distance',
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _BottomStatCard(
+                          icon: Icons.pin_drop_outlined,
+                          value: _totalDistance,
+                          label: 'Total Distance',
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: _BottomStatCard(
+                          icon: Icons.near_me_outlined,
+                          value: _remainingDistance,
+                          label: 'Remaining',
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: _BottomStatCard(
+                          icon: Icons.access_time,
+                          value: _eta,
+                          label: 'ETA',
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: _BottomStatCard(
-                      icon: Icons.near_me_outlined,
-                      value: routeData?.totalDistance ?? '--',
-                      label: 'Remaining',
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: _BottomStatCard(
-                      icon: Icons.access_time,
-                      value: routeData?.totalDuration ?? '--',
-                      label: 'ETA',
+                  SizedBox(height: 10.h),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: brownTextColor,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14.r),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 10.h),
+                      ),
+                      onPressed: _onToggleNavigation,
+                      icon: Icon(
+                        _isNavigating
+                            ? Icons.stop_circle_outlined
+                            : Icons.navigation_outlined,
+                      ),
+                      label: Text(
+                        _isNavigating ? 'End Trip' : 'Start Navigation',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
           ),
+          if (_isRerouting)
+            Positioned(
+              top: 108.h,
+              left: 16.w,
+              right: 16.w,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.65),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Text(
+                  'Rerouting...',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12.sp,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
   }
-
-  LatLng _calculateCenter(List<LatLng> points) {
-    var sumLat = 0.0;
-    var sumLng = 0.0;
-    for (final point in points) {
-      sumLat += point.latitude;
-      sumLng += point.longitude;
-    }
-    return LatLng(sumLat / points.length, sumLng / points.length);
-  }
 }
 
 class _RoundMapActionIcon extends StatelessWidget {
-  const _RoundMapActionIcon({required this.icon});
+  const _RoundMapActionIcon({
+    required this.icon,
+    required this.onTap,
+    required this.tooltip,
+  });
 
   final IconData icon;
+  final VoidCallback onTap;
+  final String tooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -692,9 +1499,12 @@ class _RoundMapActionIcon extends StatelessWidget {
         shape: BoxShape.circle,
         color: Colors.white.withValues(alpha: 0.9),
       ),
-      child: IconButton(
-        onPressed: () {},
-        icon: Icon(icon, color: brownTextColor),
+      child: Tooltip(
+        message: tooltip,
+        child: IconButton(
+          onPressed: onTap,
+          icon: Icon(icon, color: brownTextColor),
+        ),
       ),
     );
   }
