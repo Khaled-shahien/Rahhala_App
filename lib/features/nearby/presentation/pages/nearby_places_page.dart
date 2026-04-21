@@ -126,8 +126,7 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
           'All',
           ...loaded.response.sections.entries
               .where((e) => e.value.isNotEmpty)
-              .map((e) => e.key)
-              ,
+              .map((e) => e.key),
         ];
 
         return Scaffold(
@@ -279,7 +278,7 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
             mapController: _mapController,
             options: MapOptions(
               initialCenter: LatLng(widget.latitude, widget.longitude),
-              initialZoom: 15,
+              initialZoom: 16.2,
               onTap: (_, __) => _clearFocus(),
               interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
