@@ -587,6 +587,8 @@ class _FullScreenDayRouteMap extends StatefulWidget {
 
 class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
   static const double _offRouteThresholdMeters = 90;
+  static const Color _plannedRouteColor = Color(0xFF8D7358);
+  static const Color _currentLegColor = Color(0xFF1565C0);
 
   final Distance _distance = const Distance();
   final MapController _mapController = MapController();
@@ -595,6 +597,7 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
   StreamSubscription<Position>? _positionSub;
 
   late List<LatLng> _routePoints;
+  late List<LatLng> _plannedRoutePoints;
   late String _totalDistance;
   late String _remainingDistance;
   late String _eta;
@@ -629,6 +632,7 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
 
   void _hydrateFromInitialRoute() {
     final routeData = widget.routeData;
+    _plannedRoutePoints = routeData?.polylinePoints ?? widget.waypoints;
     _routePoints = routeData?.polylinePoints ?? widget.waypoints;
     _totalDistance = routeData?.totalDistance ?? '--';
     _remainingDistance = routeData?.totalDistance ?? '--';
@@ -801,12 +805,13 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
       return;
     }
 
-    _activeLegStartIndex = 0;
-    final startPoint = widget.waypoints[_activeLegStartIndex];
-    final destination = widget.waypoints[_activeLegStartIndex + 1];
+    final currentPoint = LatLng(position.latitude, position.longitude);
+    final destination = widget.waypoints.first;
+
+    _activeLegStartIndex = -1;
 
     final routeData = await _fetchRouteForNavigation(
-      startPoint,
+      currentPoint,
       destination,
     );
 
@@ -839,7 +844,7 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
     });
 
     await _animateCameraTo(
-      startPoint,
+      currentPoint,
       zoom: 16,
     );
     await _maybeSpeakCurrentInstruction();
@@ -878,7 +883,8 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
     }
 
     _isAdvancingLeg = true;
-    final nextLegStartIndex = _activeLegStartIndex + 1;
+    final nextLegStartIndex =
+        _activeLegStartIndex < 0 ? 0 : _activeLegStartIndex + 1;
     final from = widget.waypoints[nextLegStartIndex];
     final to = widget.waypoints[nextLegStartIndex + 1];
 
@@ -1169,6 +1175,9 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
     final remainingRoute = _routePoints.length >= 2 && current != null
         ? _routePoints.sublist(_nearestRouteIndex(center, _routePoints))
         : _routePoints;
+    final routeColor = _activeLegStartIndex < 0
+      ? _currentLegColor
+      : _plannedRouteColor;
 
     return Scaffold(
       body: Stack(
@@ -1194,6 +1203,16 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.rahhala.app',
               ),
+              if (_isNavigating && _plannedRoutePoints.length > 1)
+                PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: _plannedRoutePoints,
+                      color: _plannedRouteColor.withValues(alpha: 0.55),
+                      strokeWidth: 6,
+                    ),
+                  ],
+                ),
               if (_routePoints.length > 1)
                 PolylineLayer(
                   polylines: [
@@ -1206,7 +1225,7 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
                       points: remainingRoute.length >= 2
                           ? remainingRoute
                           : _routePoints,
-                      color: const Color(0xFF8D7358),
+                      color: routeColor,
                       strokeWidth: 5,
                     ),
                   ],
