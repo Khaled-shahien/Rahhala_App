@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:rahhala_app/core/constants/app_assets.dart';
 import 'package:rahhala_app/features/onboarding/presentation/pages/onboarding_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -80,25 +82,12 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo container with improved styling
-              Container(
-                width: 140.w,
-                height: 140.w,
-                decoration: BoxDecoration(
-                  color: ThemeColor.primaryColor.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: ThemeColor.primaryColor.withValues(alpha: 0.2),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.flight_takeoff_rounded,
-                  size: 70.sp,
-                  color: ThemeColor.primaryColor,
+              SizedBox(
+                width: 210.w,
+                height: 210.w,
+                child: SvgPicture.asset(
+                  AppAssets.imagesLogo,
+                  fit: BoxFit.contain,
                 ),
               ),
               SizedBox(height: 32.h),

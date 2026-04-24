@@ -1175,9 +1175,8 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
     final remainingRoute = _routePoints.length >= 2 && current != null
         ? _routePoints.sublist(_nearestRouteIndex(center, _routePoints))
         : _routePoints;
-    final routeColor = _activeLegStartIndex < 0
-      ? _currentLegColor
-      : _plannedRouteColor;
+    final routeColor =
+        _activeLegStartIndex < 0 ? _currentLegColor : _plannedRouteColor;
 
     return Scaffold(
       body: Stack(
