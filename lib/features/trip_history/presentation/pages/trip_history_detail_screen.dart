@@ -323,9 +323,9 @@ class _TripHistoryDetailView extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(
-              left: 20.w,
-              right: 20.w,
+            padding: EdgeInsetsDirectional.only(
+              start: 20.w,
+              end: 20.w,
               top: MediaQuery.of(context).padding.top + 20.h,
               bottom: 30.h,
             ),
@@ -523,7 +523,7 @@ class _TripHistoryDetailView extends StatelessWidget {
                   SizedBox(height: 12.h),
                 Padding(
                   padding:
-                      EdgeInsets.only(left: 45.w, right: 12.w, bottom: 12.h),
+                      EdgeInsetsDirectional.only(start: 45.w, end: 12.w, bottom: 12.h),
                   child: Text(
                     act.description,
                     style: TextStyle(
@@ -596,8 +596,8 @@ class _TripHistoryDetailView extends StatelessWidget {
         collapsedIconColor: Colors.transparent,
         children: [
           Container(
-            padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.w),
-            alignment: Alignment.centerLeft,
+            padding: EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 16.w),
+            alignment: AlignmentDirectional.centerStart,
             child: Text(content,
                 style:
                     TextStyle(fontSize: 13.sp, color: _primaryText(context))),

@@ -11,6 +11,7 @@ import 'package:rahhala_app/features/nearby/data/models/nearby_place_model.dart'
 import 'package:rahhala_app/features/nearby/domain/cubit/nearby_cubit.dart';
 import 'package:rahhala_app/features/nearby/domain/cubit/nearby_state.dart';
 import 'package:rahhala_app/features/nearby/presentation/widgets/nearby_place_card.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class NearbyPlacesPage extends StatefulWidget {
   final double latitude;
@@ -146,7 +147,7 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
                   child: Row(
                     children: [
                       Text(
-                        '${loaded.filteredPlaces.length} places found',
+                        context.l10n.nearbyPlacesFound(loaded.filteredPlaces.length),
                         style: AppTextStyles.cairoMedium(
                             fontSize: 13, color: AppColors.textSecondary),
                       ),
@@ -225,14 +226,14 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Nearby Places',
+                context.l10n.nearbyTitle,
                 style: AppTextStyles.cairoBold(
                   fontSize: 23,
                   color: colorScheme.onSurface,
                 ),
               ),
               Text(
-                'Around your location',
+                context.l10n.nearbySubtitle,
                 style: AppTextStyles.cairoRegular(
                     fontSize: 12, color: AppColors.textSecondary),
               ),
@@ -446,7 +447,7 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
                                 color: Colors.white, size: 14.sp),
                             SizedBox(width: 4.w),
                             Text(
-                              'Go',
+                              context.l10n.nearbyGo,
                               style: AppTextStyles.cairoBold(
                                   fontSize: 12, color: Colors.white),
                             ),
@@ -487,7 +488,7 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
                       size: 12.sp, color: AppColors.primary),
                   SizedBox(width: 4.w),
                   Text(
-                    '${loaded.response.count} nearby',
+                    context.l10n.nearbyCount(loaded.response.count),
                     style: AppTextStyles.cairoMedium(
                       fontSize: 11,
                       color: isDark ? Colors.white : AppColors.textPrimary,
@@ -575,7 +576,7 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
           ),
           SizedBox(height: 12.h),
           Text(
-            'No places found in this category',
+            context.l10n.nearbyNoPlaces,
             style: AppTextStyles.cairoMedium(
                 fontSize: 14, color: AppColors.textSecondary),
           ),

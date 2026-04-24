@@ -8,6 +8,7 @@ import 'package:rahhala_app/features/nearby/domain/cubit/nearby_cubit.dart';
 import 'package:rahhala_app/features/nearby/domain/cubit/nearby_state.dart';
 import 'package:rahhala_app/features/nearby/presentation/pages/nearby_permission_page.dart';
 import 'package:rahhala_app/features/nearby/presentation/pages/nearby_places_page.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class NearbyScreen extends StatelessWidget {
   const NearbyScreen({super.key});
@@ -42,8 +43,8 @@ class _NearbyBody extends StatelessWidget {
                   SizedBox(height: 16.h),
                   Text(
                     state is NearbyLocationLoading
-                        ? 'Getting your location...'
-                        : 'Finding nearby places...',
+                        ? context.l10n.nearbyGettingLocation
+                        : context.l10n.nearbyFindingPlaces,
                     style: AppTextStyles.cairoRegular(
                         fontSize: 14, color: AppColors.textSecondary),
                   ),
@@ -97,7 +98,7 @@ class _NearbyBody extends StatelessWidget {
                           borderRadius: BorderRadius.circular(30.r),
                         ),
                       ),
-                      child: Text('Try Again',
+                      child: Text(context.l10n.commonTryAgain,
                           style: AppTextStyles.cairoBold(
                               fontSize: 14, color: Colors.white)),
                     ),
@@ -130,8 +131,8 @@ class _NearbyBody extends StatelessWidget {
                     SizedBox(height: 16.h),
                     Text(
                       state is NearbyLocationPermanentlyDenied
-                          ? 'Location permission permanently denied.\nPlease enable it from device settings.'
-                          : 'Location permission was denied.',
+                          ? context.l10n.nearbyPermPermanentDenied
+                          : context.l10n.nearbyPermDenied,
                       style: AppTextStyles.cairoRegular(
                           fontSize: 14, color: AppColors.textSecondary),
                       textAlign: TextAlign.center,
@@ -147,7 +148,7 @@ class _NearbyBody extends StatelessWidget {
                           borderRadius: BorderRadius.circular(30.r),
                         ),
                       ),
-                      child: Text('Try Again',
+                      child: Text(context.l10n.commonTryAgain,
                           style: AppTextStyles.cairoBold(
                               fontSize: 14, color: Colors.white)),
                     ),

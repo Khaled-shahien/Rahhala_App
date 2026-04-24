@@ -368,9 +368,9 @@ class _EditReviewSheetState extends State<_EditReviewSheet> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
-      padding: EdgeInsets.only(
-        left: 20.w,
-        right: 20.w,
+      padding: EdgeInsetsDirectional.only(
+        start: 20.w,
+        end: 20.w,
         top: 20.h,
         bottom: MediaQuery.of(context).viewInsets.bottom + 24.h,
       ),

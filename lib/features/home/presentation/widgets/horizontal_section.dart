@@ -29,7 +29,7 @@ class HorizontalSection extends StatelessWidget {
               final item = items[index];
               return Container(
                 width: 140.w,
-                margin: EdgeInsets.only(right: 10.w),
+                margin: EdgeInsetsDirectional.only(end: 10.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

@@ -717,7 +717,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   // Activity description
                   Padding(
                     padding:
-                        EdgeInsets.only(left: 45.w, right: 12.w, bottom: 12.h),
+                        EdgeInsetsDirectional.only(start: 45.w, end: 12.w, bottom: 12.h),
                     child: Text(
                       act.description,
                       style:

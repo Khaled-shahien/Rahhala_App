@@ -16,7 +16,7 @@ class LanguagePickerBottomSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 20.h),
+        padding: EdgeInsetsDirectional.fromSTEB(16.w, 12.h, 16.w, 20.h),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

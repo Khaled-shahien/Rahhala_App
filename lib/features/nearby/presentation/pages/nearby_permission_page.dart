@@ -8,6 +8,7 @@ import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
 import 'package:rahhala_app/features/nearby/domain/cubit/nearby_cubit.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class NearbyPermissionPage extends StatelessWidget {
   const NearbyPermissionPage({super.key});
@@ -25,14 +26,14 @@ class NearbyPermissionPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(20.r),
           ),
           title: Text(
-            'Login Required',
+            context.l10n.nearbyLoginRequired,
             style: AppTextStyles.cairoBold(
               fontSize: 18,
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
           ),
           content: Text(
-            'You need to login first to discover nearby places.',
+            context.l10n.nearbyLoginMessage,
             style: AppTextStyles.cairoRegular(
               fontSize: 14,
               color: AppColors.textSecondary,
@@ -42,7 +43,7 @@ class NearbyPermissionPage extends StatelessWidget {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text(
-                'Cancel',
+                context.l10n.commonCancel,
                 style: AppTextStyles.cairoMedium(
                   fontSize: 14,
                   color: AppColors.neutralGray,
@@ -66,7 +67,7 @@ class NearbyPermissionPage extends StatelessWidget {
                 elevation: 0,
               ),
               child: Text(
-                'Login',
+                context.l10n.commonLogin,
                 style: AppTextStyles.cairoBold(
                   fontSize: 14,
                   color: Colors.white,
@@ -122,7 +123,7 @@ class NearbyPermissionPage extends StatelessWidget {
             ),
             SizedBox(height: 32.h),
             Text(
-              "See what's Good nearby",
+              context.l10n.nearbyPermissionTitle,
               style: AppTextStyles.cairoBold(
                 fontSize: 20,
                 color: colorScheme.onSurface,
@@ -131,7 +132,7 @@ class NearbyPermissionPage extends StatelessWidget {
             ),
             SizedBox(height: 8.h),
             Text(
-              'Allow location access\nto discover places around you',
+              context.l10n.nearbyPermissionDesc,
               style: AppTextStyles.cairoRegular(
                 fontSize: 14,
                 color: AppColors.textSecondary,
@@ -156,7 +157,7 @@ class NearbyPermissionPage extends StatelessWidget {
                     shadowColor: AppColors.primary.withValues(alpha: 0.4),
                   ),
                   child: Text(
-                    'Allow access',
+                    context.l10n.nearbyAllowAccess,
                     style: AppTextStyles.cairoBold(
                       fontSize: 16,
                       color: Colors.white,

@@ -9,6 +9,7 @@ import 'package:rahhala_app/features/onboarding/data/models/onboarding_model.dar
 import 'package:rahhala_app/features/onboarding/presentation/widgets/onboarding_page_widget.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/welcome_page.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -34,7 +35,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextPage() {
-    if (_currentPage < onboardingPages.length - 1) {
+    if (_currentPage < getOnboardingPages(context.l10n).length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOut,
@@ -129,7 +130,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         ),
                         child: Text(
-                          'Skip',
+                          context.l10n.onboardingSkip,
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.w600,
@@ -169,11 +170,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         child: PageView.builder(
                           controller: _pageController,
                           onPageChanged: _onPageChanged,
-                          itemCount: onboardingPages.length,
+                          itemCount: getOnboardingPages(context.l10n).length,
                           physics: const BouncingScrollPhysics(),
                           itemBuilder: (context, index) {
                             return OnboardingPageWidget(
-                              page: onboardingPages[index],
+                              page: getOnboardingPages(context.l10n)[index],
                             );
                           },
                         ),
@@ -184,16 +185,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 SafeArea(
                   top: false,
                   child: Padding(
-                    padding: EdgeInsets.only(
-                      left: 24.w,
-                      right: 24.w,
+                    padding: EdgeInsetsDirectional.only(
+                      start: 24.w,
+                      end: 24.w,
                       bottom: 30.h,
                       top: 20.h,
                     ),
                     child: Column(
                       children: [
                         Text(
-                          'Thoughtfully crafted journeys, just for you',
+                          context.l10n.onboardingTagline,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14.sp,
@@ -208,7 +209,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           children: [
                             SmoothPageIndicator(
                               controller: _pageController,
-                              count: onboardingPages.length,
+                              count: getOnboardingPages(context.l10n).length,
                               effect: ExpandingDotsEffect(
                                 activeDotColor: ThemeColor.primaryColor,
                                 dotColor: Colors.grey[300]!,
@@ -234,7 +235,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildNextButton() {
-    final isLastPage = _currentPage == onboardingPages.length - 1;
+    final isLastPage = _currentPage == getOnboardingPages(context.l10n).length - 1;
 
     return GestureDetector(
       onTap: _nextPage,
@@ -265,7 +266,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              isLastPage ? 'Start' : 'Next',
+              isLastPage ? context.l10n.onboardingStart : context.l10n.onboardingNext,
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w700,

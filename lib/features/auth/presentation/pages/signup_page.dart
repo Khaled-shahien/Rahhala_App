@@ -14,7 +14,7 @@ import 'package:rahhala_app/core/utils/token_storage.dart';
 
 import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/otp_verification_page.dart';
-import 'package:rahhala_app/features/auth/presentation/constants/auth_strings.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_button.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_form_text_field.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/or_divider.dart';
@@ -90,7 +90,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     showAppNotification(
       context: listenerContext,
-      title: AuthStrings.successTitle,
+      title: context.l10n.commonSuccess,
       message: state.model.message,
     );
 
@@ -144,7 +144,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 HapticFeedback.mediumImpact();
                 showAppNotification(
                   context: context,
-                  title: AuthStrings.errorTitle,
+                  title: context.l10n.commonError,
                   message: state.errorMessage,
                   isError: true,
                 );
@@ -231,8 +231,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                           ),
                                         ),
                                         SizedBox(height: 10.h),
-                                        const Text(
-                                          AuthStrings.createAccountTitle,
+                                        Text(
+                                          context.l10n.authCreateAccountTitle,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 28,
@@ -242,7 +242,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 6.h),
                                         Text(
-                                          AuthStrings.createAccountSubtitle,
+                                          context.l10n.authCreateAccountSubtitle,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 16,
@@ -251,8 +251,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 24.h),
                                         CustomFormTextField(
-                                          labelText: AuthStrings.fullNameLabel,
-                                          hintText: AuthStrings.fullNameHint,
+                                          labelText: context.l10n.authFullNameLabel,
+                                          hintText: context.l10n.authFullNameHint,
                                           controller: _nameController,
                                           prefixIcon: Icons.person_outline,
                                           validator: AppValidators.validateName,
@@ -260,8 +260,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
-                                          labelText: AuthStrings.emailLabel,
-                                          hintText: AuthStrings.emailHint,
+                                          labelText: context.l10n.authEmailLabel,
+                                          hintText: context.l10n.authEmailHint,
                                           controller: _emailController,
                                           keyboardType:
                                               TextInputType.emailAddress,
@@ -276,8 +276,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
                                           labelText:
-                                              AuthStrings.phoneNumberLabel,
-                                          hintText: AuthStrings.phoneNumberHint,
+                                              context.l10n.authPhoneLabel,
+                                          hintText: context.l10n.authPhoneHint,
                                           controller: _phoneController,
                                           keyboardType: TextInputType.phone,
                                           prefixIcon: Icons.phone_outlined,
@@ -294,8 +294,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
-                                          labelText: AuthStrings.passwordLabel,
-                                          hintText: AuthStrings.passwordHint,
+                                          labelText: context.l10n.authPasswordLabel,
+                                          hintText: context.l10n.authPasswordHint,
                                           controller: _passwordController,
                                           obscureText: _obscurePassword,
                                           prefixIcon: Icons.lock_outline,
@@ -321,9 +321,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
                                           labelText:
-                                              AuthStrings.confirmPasswordLabel,
+                                              context.l10n.authConfirmPasswordLabel,
                                           hintText:
-                                              AuthStrings.confirmPasswordHint,
+                                              context.l10n.authConfirmPasswordHint,
                                           controller:
                                               _confirmPasswordController,
                                           obscureText: _obscureConfirmPassword,
@@ -366,8 +366,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                           child: AbsorbPointer(
                                             child: CustomFormTextField(
                                               labelText:
-                                                  AuthStrings.countryLabel,
-                                              hintText: AuthStrings.countryHint,
+                                                  context.l10n.authCountryLabel,
+                                              hintText: context.l10n.authCountryHint,
                                               controller:
                                                   _countryController, // 5. . "ŝ^" "S
                                               prefixIcon: Icons.public,
@@ -420,8 +420,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                                   }
                                                 },
                                           text: isLoading
-                                              ? AuthStrings.createAccountLoading
-                                              : AuthStrings.createAccount,
+                                              ? context.l10n.authCreatingAccount
+                                              : context.l10n.authCreateAccount,
                                         ),
                                       ],
                                     ),
@@ -450,8 +450,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                     ),
                                     child: Column(
                                       children: [
-                                        const OrDivider(
-                                            text: AuthStrings.orDivider),
+                                        OrDivider(
+                                            text: context.l10n.commonOr),
                                         SizedBox(height: 18.h),
                                         _buildSocialLoginSection(),
                                       ],
@@ -492,7 +492,7 @@ class _SignUpPageState extends State<SignUpPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              AuthStrings.alreadyHaveAccount,
+              context.l10n.authAlreadyHaveAccount,
               style: TextStyle(
                 fontSize: 14,
                 color: colorScheme.onSurfaceVariant,
@@ -500,8 +500,8 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
             TextButton(
               onPressed: _navigateToLogin,
-              child: const Text(
-                AuthStrings.logIn,
+              child: Text(
+                context.l10n.authLogIn,
                 style: TextStyle(
                   color: ThemeColor.primaryColor,
                   fontWeight: FontWeight.bold,

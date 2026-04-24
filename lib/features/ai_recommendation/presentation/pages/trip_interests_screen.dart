@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_cubit.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_state.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/pages/trip_splash_screen.dart';
@@ -9,10 +10,27 @@ import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/butt
 class TripInterestsScreen extends StatelessWidget {
   const TripInterestsScreen({super.key});
 
+  /// Maps internal interest keys to localized display labels.
+  Map<String, String> _interestDisplayLabels(BuildContext context) {
+    final l10n = context.l10n;
+    return {
+      'Nature': l10n.tripInterestNature,
+      'Adventure': l10n.tripInterestAdventure,
+      'Relaxation': l10n.tripInterestRelaxation,
+      'Historical sites': l10n.tripInterestHistorical,
+      'Morning activity': l10n.tripInterestMorning,
+      'Night activity': l10n.tripInterestNight,
+      'Shopping': l10n.tripInterestShopping,
+      'Hidden gems': l10n.tripInterestHiddenGems,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<AiTripCubit>();
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+    final displayLabels = _interestDisplayLabels(context);
 
     return BlocBuilder<AiTripCubit, AiTripState>(
       builder: (context, state) {
@@ -28,7 +46,7 @@ class TripInterestsScreen extends StatelessWidget {
             children: [
               SizedBox(height: 30.h),
               Text(
-                'What are you most\nexcited to do on your trip?',
+                l10n.tripInterestsTitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 24.sp,
@@ -54,7 +72,7 @@ class TripInterestsScreen extends StatelessWidget {
 
                   return _buildInterestToggle(
                     context,
-                    interest,
+                    displayLabels[interest] ?? interest,
                     isSelected,
                     () => cubit.toggleInterest(interest),
                   );
@@ -75,6 +93,7 @@ class TripInterestsScreen extends StatelessWidget {
                     ),
                   );
                 },
+                text: l10n.commonNext,
               ),
               SizedBox(height: 44.h),
             ],

@@ -11,6 +11,7 @@ import 'package:rahhala_app/features/auth/presentation/widgets/custom_button.dar
 import 'package:rahhala_app/features/auth/domain/verify_otp/verify_otp_cubit.dart';
 import 'package:rahhala_app/features/auth/domain/verify_otp/verify_otp_state.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 enum VerifyFlow { signUp, resetPassword }
 
@@ -127,7 +128,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                     if (state is VerifyOtpSuccess) {
                       showAppNotification(
                         context: context,
-                        title: 'Verified',
+                        title: context.l10n.authVerified,
                         message: state.model.message,
                         isError: false,
                       );
@@ -144,7 +145,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                       HapticFeedback.mediumImpact();
                       showAppNotification(
                         context: context,
-                        title: 'Error',
+                        title: context.l10n.commonError,
                         message: state.errorMessage,
                         isError: true,
                       );
@@ -159,8 +160,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                         HapticFeedback.mediumImpact();
                         showAppNotification(
                           context: context,
-                          title: 'Error',
-                          message: 'Please enter the 6-digit code.',
+                          title: context.l10n.commonError,
+                          message: context.l10n.authEnterOtp,
                           isError: true,
                         );
                         return;
@@ -249,8 +250,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
                                     children: [
-                                      const Text(
-                                        'Verify Code',
+                                      Text(
+                                        context.l10n.authVerifyCodeTitle,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize:
@@ -262,8 +263,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                       SizedBox(height: 8.h), // Reduced height
                                       Text(
                                         widget.flow == VerifyFlow.signUp
-                                            ? "Enter the 6-digit verification code sent to your email to activate your account."
-                                            : "Enter the 6-digit verification code sent to your email to reset your password.",
+                                            ? context.l10n.authVerifyCodeSignUpDesc
+                                            : context.l10n.authVerifyCodeResetDesc,
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                           fontSize:
@@ -300,8 +301,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                       CustomButton(
                                         onTap: isLoading ? null : onVerifyTap,
                                         text: widget.flow == VerifyFlow.signUp
-                                            ? 'Verify Code'
-                                            : 'Continue',
+                                            ? context.l10n.authVerifyCodeTitle
+                                            : context.l10n.authContinue,
                                       ),
                                     ],
                                   ),

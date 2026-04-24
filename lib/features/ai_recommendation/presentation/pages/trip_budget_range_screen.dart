@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_cubit.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_state.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/button.dart';
@@ -10,12 +11,25 @@ class TripBudgetRangeScreen extends StatelessWidget {
 
   const TripBudgetRangeScreen({super.key, required this.onNext});
 
+  /// Maps internal budget range keys to localized display labels.
+  Map<String, String> _budgetDisplayLabels(BuildContext context) {
+    final l10n = context.l10n;
+    return {
+      'Less 5000': l10n.tripBudgetLess5000,
+      'From 5000 to 10000': l10n.tripBudgetFrom5kTo10k,
+      'From 10000 to 15000': l10n.tripBudgetFrom10kTo15k,
+      'From 15000 to 20000': l10n.tripBudgetFrom15kTo20k,
+      'More than 20000': l10n.tripBudgetMoreThan20k,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<AiTripCubit>();
-
+    final l10n = context.l10n;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final displayLabels = _budgetDisplayLabels(context);
 
     return BlocBuilder<AiTripCubit, AiTripState>(
       builder: (context, state) {
@@ -31,7 +45,7 @@ class TripBudgetRangeScreen extends StatelessWidget {
             children: [
               SizedBox(height: 30.h),
               Text(
-                'Your Budget range',
+                l10n.tripBudgetTitle,
                 style: TextStyle(
                     fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
@@ -40,13 +54,14 @@ class TripBudgetRangeScreen extends StatelessWidget {
               SizedBox(height: 44.h),
               ...cubit.budgetRanges.map((range) => _buildBudgetToggle(
                     context,
-                    range,
+                    displayLabels[range] ?? range,
                     state.selectedRange == range,
                     () => cubit.selectRange(range),
                   )),
               SizedBox(height: 44.h),
               NextButton(
                 onPressed: onNext,
+                text: l10n.commonNext,
               ),
               SizedBox(height: 44.h),
             ],

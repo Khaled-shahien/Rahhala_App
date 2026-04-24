@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_text_styles.dart';
 import 'package:rahhala_app/features/custom_trip/presentation/constants/egypt_governorates.dart';
 import 'package:rahhala_app/features/custom_trip/presentation/cubit/custom_trip_cubit.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class CustomTripInputStep extends StatelessWidget {
   final VoidCallback onNext;
@@ -28,7 +29,7 @@ class CustomTripInputStep extends StatelessWidget {
               _buildProgressIndicator(),
               SizedBox(height: 36.h),
               Text(
-                'Where do you want to go?',
+                context.l10n.customTripWhereToGo,
                 style: AppTextStyles.heading.copyWith(
                   color: colorScheme.onSurface,
                 ),
@@ -38,15 +39,15 @@ class CustomTripInputStep extends StatelessWidget {
                   context, state.selectedRegion, cubit, colorScheme),
               SizedBox(height: 44.h),
               Text(
-                'How many days?',
+                context.l10n.customTripHowManyDays,
                 style: AppTextStyles.heading.copyWith(
                   color: colorScheme.onSurface,
                 ),
               ),
               SizedBox(height: 20.h),
-              _buildDaysSelector(state.numberOfDays, cubit, colorScheme),
+              _buildDaysSelector(context, state.numberOfDays, cubit, colorScheme),
               SizedBox(height: 60.h),
-              _buildNextButton(state, onNext),
+              _buildNextButton(context, state, onNext),
               SizedBox(height: 44.h),
             ],
           ),
@@ -60,7 +61,7 @@ class CustomTripInputStep extends StatelessWidget {
       children: List.generate(1, (i) {
         return Expanded(
           child: Container(
-            margin: EdgeInsets.only(right: i < 2 ? 8.w : 0),
+            margin: EdgeInsetsDirectional.only(end: i < 2 ? 8.w : 0),
             height: 4.h,
             decoration: BoxDecoration(
               color: const Color(0xFFA88866),
@@ -98,7 +99,7 @@ class CustomTripInputStep extends StatelessWidget {
               SizedBox(width: 12.w),
               Expanded(
                 child: Text(
-                  selected ?? 'Select a governorate',
+                  selected ?? context.l10n.customTripSelectGovernorate,
                   style: TextStyle(
                     color: selected != null
                         ? colorScheme.onSurface
@@ -149,7 +150,7 @@ class CustomTripInputStep extends StatelessWidget {
                 ),
                 SizedBox(height: 16.h),
                 Text(
-                  'Select Governorate',
+                  context.l10n.customTripSelectGovernorateTitle,
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
@@ -204,7 +205,7 @@ class CustomTripInputStep extends StatelessWidget {
   }
 
   Widget _buildDaysSelector(
-      int days, CustomTripCubit cubit, ColorScheme colorScheme) {
+      BuildContext context, int days, CustomTripCubit cubit, ColorScheme colorScheme) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
       decoration: BoxDecoration(
@@ -219,7 +220,7 @@ class CustomTripInputStep extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Total days',
+            context.l10n.customTripTotalDays,
             style: TextStyle(
               fontSize: 17.sp,
               fontWeight: FontWeight.w500,
@@ -270,7 +271,7 @@ class CustomTripInputStep extends StatelessWidget {
     );
   }
 
-  Widget _buildNextButton(CustomTripState state, VoidCallback onNext) {
+  Widget _buildNextButton(BuildContext context, CustomTripState state, VoidCallback onNext) {
     final isEnabled =
         state.selectedRegion != null && state.selectedRegion!.isNotEmpty;
 
@@ -288,7 +289,7 @@ class CustomTripInputStep extends StatelessWidget {
           elevation: 0,
         ),
         child: Text(
-          'Next',
+          context.l10n.commonNext,
           style: TextStyle(
             color: Colors.white,
             fontSize: 18.sp,

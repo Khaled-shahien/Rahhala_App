@@ -221,7 +221,7 @@ class _ProfilePageState extends State<ProfilePage> {
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
+            padding: EdgeInsetsDirectional.fromSTEB(20.w, 16.h, 20.w, 24.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -267,11 +267,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 // Profile Header Original
                 Container(
-                  padding: EdgeInsets.fromLTRB(20.w, 22.h, 20.w, 24.h),
+                  padding: EdgeInsetsDirectional.fromSTEB(20.w, 22.h, 20.w, 24.h),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                      begin: AlignmentDirectional.topStart,
+                      end: AlignmentDirectional.bottomEnd,
                       colors: [
                         ThemeColor.primaryColor.withValues(alpha: 0.08),
                         Theme.of(context).cardTheme.color!,

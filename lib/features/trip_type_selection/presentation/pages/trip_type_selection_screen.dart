@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 import 'package:rahhala_app/features/custom_trip/presentation/pages/custom_trip_flow_screen.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/pages/ai_recommendation_flow_screen.dart';
@@ -21,7 +22,7 @@ class TripTypeSelectionScreen extends StatelessWidget {
         toolbarHeight: 88.h,
         leadingWidth: 56.w,
         leading: Padding(
-          padding: EdgeInsets.only(left: 12.w),
+          padding: EdgeInsetsDirectional.only(start: 12.w),
           child: Icon(
             Icons.alt_route_rounded,
             color: Colors.white,
@@ -34,7 +35,7 @@ class TripTypeSelectionScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Select Trip Type',
+              context.l10n.tripTypeSelectTitle,
               style: TextStyle(
                 fontSize: 22.sp,
                 fontWeight: FontWeight.bold,
@@ -42,7 +43,7 @@ class TripTypeSelectionScreen extends StatelessWidget {
               ),
             ),
             Text(
-              'Choose how you want to plan your trip',
+              context.l10n.tripTypeSelectSubtitle,
               style: TextStyle(
                 fontSize: 13.sp,
                 color: Colors.white.withValues(alpha: 0.85),
@@ -64,9 +65,9 @@ class TripTypeSelectionScreen extends StatelessWidget {
               _buildTripTypeCard(
                 context,
                 icon: Icons.edit_document,
-                title: 'Custom Trip',
+                title: context.l10n.tripTypeCustom,
                 description:
-                    'Plan your trip yourself with full control over every detail',
+                    context.l10n.tripTypeCustomDesc,
                 onTap: () {
                   HapticFeedback.mediumImpact();
                   Navigator.push(
@@ -84,8 +85,8 @@ class TripTypeSelectionScreen extends StatelessWidget {
               _buildTripTypeCard(
                 context,
                 icon: Icons.auto_awesome,
-                title: 'General Trip',
-                description: 'Let AI create a personalized trip plan for you',
+                title: context.l10n.tripTypeGeneral,
+                description: context.l10n.tripTypeGeneralDesc,
                 onTap: () {
                   HapticFeedback.mediumImpact();
                   Navigator.push(

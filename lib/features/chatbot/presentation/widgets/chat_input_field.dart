@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class ChatInputField extends StatelessWidget {
   final TextEditingController controller;
@@ -26,7 +27,7 @@ class ChatInputField extends StatelessWidget {
     const borderColor = Color(0xFFD1B89A);
 
     return Container(
-      padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 24.h),
+      padding: EdgeInsetsDirectional.fromSTEB(16.w, 8.h, 16.w, 24.h),
       decoration: BoxDecoration(
         color: backgroundColor,
         boxShadow: [
@@ -48,7 +49,7 @@ class ChatInputField extends StatelessWidget {
                 minLines: 1,
                 style: TextStyle(fontSize: 15.sp, color: textColor),
                 decoration: InputDecoration(
-                  hintText: 'Type your message...',
+                  hintText: context.l10n.chatbotTypeMessage,
                   hintStyle: TextStyle(fontSize: 14.sp, color: hintColor),
                   filled: true,
                   fillColor: inputFillColor,
@@ -66,7 +67,7 @@ class ChatInputField extends StatelessWidget {
                       EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
 
                   suffixIcon: Padding(
-                    padding: EdgeInsets.only(right: 4.w),
+                    padding: EdgeInsetsDirectional.only(end: 4.w),
                     child: IconButton(
                       icon: Icon(
                         Icons.attach_file_outlined,

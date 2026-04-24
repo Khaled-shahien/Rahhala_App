@@ -15,6 +15,7 @@ import 'package:rahhala_app/features/auth/presentation/widgets/custom_form_text_
 import 'package:rahhala_app/features/profile/domain/profile/profile_cubit.dart';
 import 'package:rahhala_app/features/profile/domain/profile/profile_state.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class ResetPasswordLoggedInPage extends StatefulWidget {
   const ResetPasswordLoggedInPage({super.key});
@@ -92,14 +93,14 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
               if (state is ProfileActionSuccess) {
                 showAppNotification(
                     context: context,
-                    title: 'Success',
+                    title: context.l10n.commonSuccess,
                     message: state.model.message);
                 Navigator.pop(context);
               } else if (state is ProfileFailure) {
                 HapticFeedback.mediumImpact();
                 showAppNotification(
                     context: context,
-                    title: 'Error',
+                    title: context.l10n.commonError,
                     message: state.message,
                     isError: true);
               }
@@ -145,7 +146,7 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Reset Password',
+                               context.l10n.authResetPasswordTitle,
                               style: TextStyle(
                                 fontSize: 22.sp,
                                 fontWeight: FontWeight.bold,
@@ -153,7 +154,7 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                               ),
                             ),
                             Text(
-                              'Update your account password',
+                              context.l10n.authUpdateAccountPassword,
                               style: TextStyle(
                                 fontSize: 13.sp,
                                 color: Colors.white.withValues(alpha: 0.85),
@@ -217,7 +218,7 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                 CrossAxisAlignment.stretch,
                                             children: [
                                               Text(
-                                                'Your new password must be different from previous used password',
+                                                context.l10n.authNewPasswordMustDiffer,
                                                 style: TextStyle(
                                                   fontSize: 12.sp,
                                                   color: colorScheme
@@ -228,9 +229,9 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                               SizedBox(height: 16.h),
                                               CustomFormTextField(
                                                 controller: _current,
-                                                labelText: 'Current password',
+                                                labelText: context.l10n.authCurrentPassword,
                                                 hintText:
-                                                    'Enter current password',
+                                                    context.l10n.authCurrentPasswordHint,
                                                 obscureText: !_currentVisible,
                                                 prefixIcon: Icons.lock_outline,
                                                 suffixIcon: IconButton(
@@ -247,7 +248,7 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                 ),
                                                 validator: (v) =>
                                                     (v == null || v.isEmpty)
-                                                        ? 'Password is required'
+                                                        ? context.l10n.authPasswordRequired
                                                         : null,
                                                 textInputAction:
                                                     TextInputAction.next,
@@ -258,8 +259,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                               SizedBox(height: 14.h),
                                               CustomFormTextField(
                                                 controller: _new,
-                                                labelText: 'New password',
-                                                hintText: 'Enter new password',
+                                                labelText: context.l10n.authNewPassword,
+                                                hintText: context.l10n.authNewPasswordHint,
                                                 obscureText: !_newVisible,
                                                 prefixIcon:
                                                     Icons.lock_reset_outlined,
@@ -342,7 +343,7 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                     _rule(
                                                         ok: pw.length >= 8,
                                                         text:
-                                                            '8 or more characters',
+                                                            context.l10n.passwordRule8Chars,
                                                         textColor: colorScheme
                                                             .onSurfaceVariant,
                                                         inactiveIconColor:
@@ -352,7 +353,7 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                         ok: RegExp(r'[A-Z]')
                                                             .hasMatch(pw),
                                                         text:
-                                                            'At least 1 uppercase letter',
+                                                            context.l10n.passwordRuleUppercase,
                                                         textColor: colorScheme
                                                             .onSurfaceVariant,
                                                         inactiveIconColor:
@@ -362,7 +363,7 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                         ok: RegExp(r'[a-z]')
                                                             .hasMatch(pw),
                                                         text:
-                                                            'At least 1 lowercase letter',
+                                                            context.l10n.passwordRuleLowercase,
                                                         textColor: colorScheme
                                                             .onSurfaceVariant,
                                                         inactiveIconColor:
@@ -372,7 +373,7 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                         ok: RegExp(r'\d')
                                                             .hasMatch(pw),
                                                         text:
-                                                            'At least 1 number',
+                                                            context.l10n.passwordRuleNumber,
                                                         textColor: colorScheme
                                                             .onSurfaceVariant,
                                                         inactiveIconColor:
@@ -383,7 +384,7 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                                 r'[^A-Za-z0-9]')
                                                             .hasMatch(pw),
                                                         text:
-                                                            'At least 1 special character',
+                                                            context.l10n.passwordRuleSpecial,
                                                         textColor: colorScheme
                                                             .onSurfaceVariant,
                                                         inactiveIconColor:
@@ -396,9 +397,9 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                               CustomFormTextField(
                                                 controller: _confirm,
                                                 labelText:
-                                                    'Confirm new password',
+                                                    context.l10n.authConfirmNewPassword,
                                                 hintText:
-                                                    'Re-enter new password',
+                                                    context.l10n.authConfirmNewPasswordHint,
                                                 obscureText: !_confirmVisible,
                                                 prefixIcon: Icons
                                                     .enhanced_encryption_outlined,
@@ -448,8 +449,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                             );
                                                       },
                                                 text: isLoading
-                                                    ? 'Updating...'
-                                                    : 'Reset password',
+                                                    ? context.l10n.authUpdating
+                                                    : context.l10n.authResetPassword,
                                               ),
                                             ],
                                           ),

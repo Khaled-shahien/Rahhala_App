@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_assets.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
-import 'package:rahhala_app/features/auth/presentation/constants/auth_strings.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -52,7 +52,7 @@ class WelcomePage extends StatelessWidget {
                   children: [
                     SizedBox(height: 210.h),
                     Text(
-                      AuthStrings.welcomeSlogan,
+                      context.l10n.authWelcomeSlogan,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: brandDarkBlue.withValues(alpha: 0.8),
@@ -83,7 +83,7 @@ class WelcomePage extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              AuthStrings.getStarted,
+                              context.l10n.authGetStarted,
                               style: TextStyle(
                                   fontSize: 23.sp, fontWeight: FontWeight.bold),
                             ),
@@ -104,7 +104,7 @@ class WelcomePage extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              AuthStrings.guest,
+                              context.l10n.authGuest,
                               style: TextStyle(
                                 color: brandDarkBlue,
                                 fontSize: 26.sp,

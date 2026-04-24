@@ -8,6 +8,7 @@ import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/home/data/models/home_model.dart';
 import 'package:rahhala_app/features/home/presentation/cubit/favourites_cubit.dart';
 import 'package:rahhala_app/features/home/presentation/pages/place_details_screen.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class FavouritesScreen extends StatefulWidget {
   const FavouritesScreen({super.key});
@@ -58,7 +59,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
                 child: Text(
-                  'Please log in to view and manage your favourites.',
+                  context.l10n.favouritesLoginPrompt,
                   textAlign: TextAlign.center,
                   style:
                       TextStyle(fontSize: 16.sp, color: Colors.grey.shade700),
@@ -77,7 +78,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                   ElevatedButton(
                     onPressed: () =>
                         context.read<FavouritesCubit>().getFavourites(),
-                    child: const Text('Try Again'),
+                    child: Text(context.l10n.commonTryAgain),
                   ),
                 ],
               ),
@@ -98,7 +99,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                       padding: EdgeInsets.only(top: 30.h),
                       child: Center(
                         child: Text(
-                          'No favourites yet.',
+                          context.l10n.favouritesEmpty,
                           style: TextStyle(
                             fontSize: 16.sp,
                             color: Colors.grey.shade700,
@@ -166,7 +167,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Your Favorites',
+                          context.l10n.favouritesTitle,
                           style: TextStyle(
                             fontSize: 22.sp,
                             fontWeight: FontWeight.bold,
@@ -174,7 +175,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                           ),
                         ),
                         Text(
-                          'All your saved journeys in one place',
+                          context.l10n.favouritesSubtitle,
                           style: TextStyle(
                             fontSize: 13.sp,
                             color: Colors.white.withValues(alpha: 0.85),
@@ -265,7 +266,7 @@ class _FavouritePlaceCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(12.w, 10.h, 12.w, 12.h),
+              padding: EdgeInsetsDirectional.fromSTEB(12.w, 10.h, 12.w, 12.h),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -283,7 +284,7 @@ class _FavouritePlaceCard extends StatelessWidget {
                         ),
                         SizedBox(height: 4.h),
                         Text(
-                          'Saved on ${item.createdAt.length >= 10 ? item.createdAt.substring(0, 10) : item.createdAt}',
+                          context.l10n.favouritesSavedOn(item.createdAt.length >= 10 ? item.createdAt.substring(0, 10) : item.createdAt),
                           style: TextStyle(
                             fontSize: 13.sp,
                             color: Colors.grey.shade600,

@@ -77,10 +77,10 @@ class _CustomCountryDropdownState extends State<CustomCountryDropdown> {
       isScrollControlled: true,
       builder: (_) {
         return Padding(
-          padding: EdgeInsets.only(
+          padding: EdgeInsetsDirectional.only(
             top: 16.h,
-            left: 16.w,
-            right: 16.w,
+            start: 16.w,
+            end: 16.w,
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
           child: Column(
@@ -215,7 +215,7 @@ class _CustomCountryDropdownState extends State<CustomCountryDropdown> {
         SizedBox(height: 5.h),
         if (_errorText != null)
           Padding(
-            padding: EdgeInsets.only(top: 4.h, left: 4.w),
+            padding: EdgeInsetsDirectional.only(top: 4.h, start: 4.w),
             child: Text(
               _errorText!,
               style: TextStyle(color: Colors.red, fontSize: 12.sp),

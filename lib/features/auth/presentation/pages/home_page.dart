@@ -49,10 +49,10 @@ class _HomePageState extends State<HomePage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
         ),
-        margin: EdgeInsets.only(
+        margin: EdgeInsetsDirectional.only(
           bottom: 90.h,
-          right: 20.w,
-          left: 20.w,
+          end: 20.w,
+          start: 20.w,
         ),
       ),
     );

@@ -14,6 +14,7 @@ import 'package:rahhala_app/features/auth/presentation/widgets/custom_form_text_
 import 'package:rahhala_app/features/auth/domain/forgot_password/forgot_password_cubit.dart';
 import 'package:rahhala_app/features/auth/domain/forgot_password/forgot_password_state.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -53,7 +54,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               if (state is ForgotPasswordSuccess) {
                 showAppNotification(
                     context: context,
-                    title: 'Success',
+                    title: context.l10n.commonSuccess,
                     message: state.model.message);
                 Navigator.push(
                   context,
@@ -68,7 +69,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 HapticFeedback.mediumImpact();
                 showAppNotification(
                     context: context,
-                    title: 'Error',
+                    title: context.l10n.commonError,
                     message: state.errorMessage,
                     isError: true);
               }
@@ -154,8 +155,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                           ),
                                         ),
                                         SizedBox(height: 10.h),
-                                        const Text(
-                                          'Forgot Password',
+                                        Text(
+                                          context.l10n.authForgotPasswordTitle,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 28,
@@ -165,7 +166,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                         ),
                                         SizedBox(height: 8.h),
                                         Text(
-                                          "Enter your email address below and we'll send you a verification code to reset your password.",
+                                          context.l10n.authForgotPasswordDesc,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 16,
@@ -176,8 +177,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                         SizedBox(height: 26.h),
                                         CustomFormTextField(
                                           controller: _emailController,
-                                          labelText: 'Email Address',
-                                          hintText: 'Enter your email',
+                                          labelText: context.l10n.authEmailAddress,
+                                          hintText: context.l10n.authEmailHint,
                                           keyboardType:
                                               TextInputType.emailAddress,
                                           prefixIcon: Icons.email_outlined,
@@ -220,8 +221,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                                   }
                                                 },
                                           text: isLoading
-                                              ? 'Sending...'
-                                              : 'Send Code',
+                                              ? context.l10n.authSendingCode
+                                              : context.l10n.authSendCode,
                                         ),
                                       ],
                                     ),
@@ -251,7 +252,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     child: Column(
                                       children: [
                                         Text(
-                                          'Remembered your password?',
+                                          context.l10n.authRememberedPassword,
                                           style: TextStyle(
                                             fontSize: 14.sp,
                                             color: colorScheme.onSurfaceVariant,
@@ -261,8 +262,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.pop(context),
-                                          child: const Text(
-                                            "Back to Login",
+                                          child: Text(
+                                            context.l10n.authBackToLogin,
                                             style: TextStyle(
                                               color: ThemeColor.primaryColor,
                                               fontWeight: FontWeight.w600,

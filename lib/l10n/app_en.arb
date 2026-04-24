@@ -1,6 +1,7 @@
 {
   "@@locale": "en",
   "appTitle": "Rahhala App",
+
   "commonCancel": "Cancel",
   "commonBack": "Go Back",
   "commonError": "Error",
@@ -8,6 +9,11 @@
   "commonComingSoon": "Coming Soon...",
   "commonGotIt": "Got it",
   "commonUnknownError": "Unknown error",
+  "commonOr": "Or",
+  "commonDelete": "Delete",
+  "commonLogin": "Login",
+  "commonTryAgain": "Try Again",
+
   "routerPageNotFound": "Page Not Found",
   "routerGoHome": "Go Home",
   "routerFeatureTitle": "{featureName}",
@@ -30,6 +36,99 @@
       "id": {}
     }
   },
+
+  "splashAppName": "Rahhala",
+  "splashSubtitle": "Your Travel Companion",
+
+  "onboardingSkip": "Skip",
+  "onboardingNext": "Next",
+  "onboardingStart": "Start",
+  "onboardingTagline": "Thoughtfully crafted journeys, just for you",
+  "onboardingTitle1": "Discover",
+  "onboardingSubtitle1": "Amazing\nDestinations",
+  "onboardingDesc1": "From the Nile to the desert — your\nEgyptian journey begins.",
+  "onboardingTitle2": "Designing",
+  "onboardingSubtitle2": "Your Trip",
+  "onboardingDesc2": "Finding destinations and experiences\nthat match your vibe.",
+  "onboardingTitle3": "Ready to",
+  "onboardingSubtitle3": "Explore ?",
+  "onboardingDesc3": "Your personalized adventure awaits —\nlet's start the journey!",
+
+  "authWelcomeBackTitle": "Welcome Back",
+  "authWelcomeBackSubtitle": "Log in to continue exploring curated trips.",
+  "authEmailLabel": "Email",
+  "authEmailHint": "Enter your email",
+  "authPasswordLabel": "Password",
+  "authPasswordHint": "Enter your password",
+  "authHidePassword": "Hide password",
+  "authShowPassword": "Show password",
+  "authForgotPassword": "Forgot Password?",
+  "authLoggingIn": "Logging In...",
+  "authLogIn": "Log In",
+  "authWelcomeBackNotifTitle": "Welcome Back",
+  "authWelcomeBackNotifMessage": "Let's explore something new today.",
+  "authWelcomeBackUser": "Welcome Back, {name}!",
+  "@authWelcomeBackUser": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "authSecureSignIn": "Secure sign-in to continue your journey.",
+  "authCreateAccountTitle": "Create Account",
+  "authCreateAccountSubtitle": "Fill in your information below to sign up",
+  "authFullNameLabel": "Full Name",
+  "authFullNameHint": "Enter your full name",
+  "authPhoneLabel": "Phone Number",
+  "authPhoneHint": "Enter your phone number",
+  "authConfirmPasswordLabel": "Confirm Password",
+  "authConfirmPasswordHint": "Re-enter your password",
+  "authCountryLabel": "Country",
+  "authCountryHint": "Select your country",
+  "authCreatingAccount": "Creating...",
+  "authCreateAccount": "Create Account",
+  "authAlreadyHaveAccount": "Already have an account?",
+  "authSignUp": "Sign Up",
+  "authGuest": "Guest",
+  "authGetStarted": "Get Started",
+  "authWelcomeSlogan": "Every place has a story..Start yours today!",
+  "authDontHaveAccount": "Don't have an account?",
+
+  "authForgotPasswordTitle": "Forgot Password",
+  "authForgotPasswordDesc": "Enter your email address below and we'll send you a verification code to reset your password.",
+  "authEmailAddress": "Email Address",
+  "authSendingCode": "Sending...",
+  "authSendCode": "Send Code",
+  "authRememberedPassword": "Remembered your password?",
+  "authBackToLogin": "Back to Login",
+
+  "authVerifyCodeTitle": "Verify Code",
+  "authVerifyCodeSignUpDesc": "Enter the 6-digit verification code sent to your email to activate your account.",
+  "authVerifyCodeResetDesc": "Enter the 6-digit verification code sent to your email to reset your password.",
+  "authVerified": "Verified",
+  "authEnterOtp": "Please enter the 6-digit code.",
+  "authContinue": "Continue",
+
+  "authResetPasswordTitle": "Reset Password",
+  "authResetPasswordHint": "Use 8+ chars with upper/lowercase, number & symbol",
+  "authNewPassword": "New Password",
+  "authNewPasswordHint": "Enter new password",
+  "authConfirmNewPassword": "Confirm new password",
+  "authConfirmNewPasswordHint": "Re-enter new password",
+  "authResetting": "Resetting...",
+  "authResetPassword": "Reset Password",
+  "authUpdating": "Updating...",
+  "authUpdateAccountPassword": "Update your account password",
+  "authNewPasswordMustDiffer": "Your new password must be different from previous used password",
+  "authCurrentPassword": "Current password",
+  "authCurrentPasswordHint": "Enter current password",
+  "authPasswordRequired": "Password is required",
+
+  "passwordRule8Chars": "8 or more characters",
+  "passwordRuleUppercase": "At least 1 uppercase letter",
+  "passwordRuleLowercase": "At least 1 lowercase letter",
+  "passwordRuleNumber": "At least 1 number",
+  "passwordRuleSpecial": "At least 1 special character",
+
   "profileTitle": "Profile",
   "profileNoEmail": "No email",
   "profileAccount": "Account",
@@ -54,6 +153,7 @@
   "profileLanguageBottomSheetSubtitle": "Changes are applied instantly",
   "languageEnglish": "English",
   "languageArabic": "Arabic",
+
   "homeWelcomeGuest": "Welcome, Guest!",
   "homeWelcomeUser": "Hi, {name}!",
   "@homeWelcomeUser": {
@@ -76,5 +176,172 @@
       "title": {}
     }
   },
-  "splashSubtitle": "Your Travel Companion"
+
+  "tripTypeSelectTitle": "Select Trip Type",
+  "tripTypeSelectSubtitle": "Choose how you want to plan your trip",
+  "tripTypeCustom": "Custom Trip",
+  "tripTypeCustomDesc": "Plan your trip yourself with full control over every detail",
+  "tripTypeGeneral": "General Trip",
+  "tripTypeGeneralDesc": "Let AI create a personalized trip plan for you",
+
+  "chatbotName": "ANIS",
+  "chatbotSubtitle": "Your AI travel assistant",
+  "chatbotWelcome": "Welcome to ANIS!",
+  "chatbotHelp": "I am here to help you plan your next trip. Try one of the suggestions below:",
+  "chatbotSuggestion1": "Plan a trip to Dubai",
+  "chatbotSuggestion2": "What are the best hotels in Mecca?",
+  "chatbotSuggestion3": "Suggest family-friendly entertainment places",
+  "chatbotClearTitle": "Clear Conversation",
+  "chatbotClearMessage": "Are you sure you want to delete all messages? This action cannot be undone.",
+  "chatbotTypeMessage": "Type your message...",
+
+  "nearbyTitle": "Nearby Places",
+  "nearbySubtitle": "Around your location",
+  "nearbyGettingLocation": "Getting your location...",
+  "nearbyFindingPlaces": "Finding nearby places...",
+  "nearbyPermissionTitle": "See what's Good nearby",
+  "nearbyPermissionDesc": "Allow location access\nto discover places around you",
+  "nearbyAllowAccess": "Allow access",
+  "nearbyLoginRequired": "Login Required",
+  "nearbyLoginMessage": "You need to login first to discover nearby places.",
+  "nearbyPermDenied": "Location permission was denied.",
+  "nearbyPermPermanentDenied": "Location permission permanently denied.\nPlease enable it from device settings.",
+  "nearbyPlacesFound": "{count} places found",
+  "@nearbyPlacesFound": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "nearbyCount": "{count} nearby",
+  "@nearbyCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "nearbyNoPlaces": "No places found in this category",
+  "nearbyGo": "Go",
+  "nearbyCategoryAll": "All",
+
+  "editProfileTitle": "Edit Profile",
+  "editProfileSave": "Save Changes",
+  "editProfileSaving": "Saving...",
+
+  "tripHistoryTitle": "Plan History",
+  "tripHistorySavedPlans": "{count} saved plans",
+  "@tripHistorySavedPlans": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tripHistoryNoPlans": "No Plans Yet",
+  "tripHistoryNoPlansDesc": "You haven't created any travel plans yet. Generate your first trip and start exploring amazing destinations.",
+  "tripHistoryGenerateFirst": "Generate Your First Trip",
+  "tripHistoryLoginPrompt": "Join us! Log in to unlock more features and view your trips!",
+  "tripHistoryLoginNow": "Login Now",
+  "tripHistoryDaysCount": "{count} days",
+  "@tripHistoryDaysCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tripHistoryCreated": "Created {timeAgo}",
+  "@tripHistoryCreated": {
+    "placeholders": {
+      "timeAgo": {}
+    }
+  },
+  "tripHistoryMonthsAgo": "{count} months ago",
+  "@tripHistoryMonthsAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tripHistoryWeeksAgo": "{count} weeks ago",
+  "@tripHistoryWeeksAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tripHistoryDaysAgo": "{count} days ago",
+  "@tripHistoryDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tripHistoryToday": "Today",
+
+  "tripInfoWhereToGo": "Where do you want to go?",
+  "tripInfoSelectCountry": "Select a country",
+  "tripInfoWhenToGo": "When do you want to go?",
+  "tripInfoTotalDays": "Total days",
+  "tripInfoSelectSeason": "Select a season",
+  "tripInfoSeasonWinter": "Winter (December - February)",
+  "tripInfoSeasonSpring": "Spring (March - May)",
+  "tripInfoSeasonSummer": "Summer (June - August)",
+  "tripInfoSeasonAutumn": "Autumn (September - November)",
+
+  "tripBudgetTitle": "Your Budget range",
+  "tripBudgetLess5000": "Less 5000",
+  "tripBudgetFrom5kTo10k": "From 5000 to 10000",
+  "tripBudgetFrom10kTo15k": "From 10000 to 15000",
+  "tripBudgetFrom15kTo20k": "From 15000 to 20000",
+  "tripBudgetMoreThan20k": "More than 20000",
+
+  "tripInterestsTitle": "What are you most\nexcited to do on your trip?",
+  "tripInterestNature": "Nature",
+  "tripInterestAdventure": "Adventure",
+  "tripInterestRelaxation": "Relaxation",
+  "tripInterestHistorical": "Historical sites",
+  "tripInterestMorning": "Morning",
+  "tripInterestNight": "Night activity",
+  "tripInterestShopping": "Shopping",
+  "tripInterestHiddenGems": "Hidden gems",
+
+  "commonNext": "Next",
+
+  "customTripWhereToGo": "Where do you want to go?",
+  "customTripSelectGovernorate": "Select a governorate",
+  "customTripSelectGovernorateTitle": "Select Governorate",
+  "customTripHowManyDays": "How many days?",
+  "customTripTotalDays": "Total days",
+
+  "editProfileTitle": "Edit Profile",
+  "editProfileSubtitle": "Update your personal information",
+  "editProfilePersonalInfo": "Personal Information",
+  "editProfileFullName": "Full Name",
+  "editProfileFullNameHint": "Enter your full name",
+  "editProfileEmail": "Email",
+  "editProfileEmailHint": "Your email",
+  "editProfileBirthDate": "Birth Date",
+  "editProfileBirthDateHint": "Select date",
+  "editProfileGender": "Gender",
+  "editProfileGenderHint": "Select",
+  "editProfileSelectGender": "Select Gender",
+  "editProfileGenderMale": "Male",
+  "editProfileGenderFemale": "Female",
+  "editProfileGenderOther": "Other",
+  "editProfileContactInfo": "Contact Information",
+  "editProfilePhone": "Phone Number",
+  "editProfilePhoneHint": "Enter your phone number",
+  "editProfileCountry": "Country",
+  "editProfileCountryHint": "Select your country",
+  "editProfileSearchCountry": "Search country",
+  "editProfileSaveChanges": "Save Changes",
+  "editProfileSaving": "Saving...",
+  "editProfileChooseGallery": "Choose from gallery",
+  "editProfileTakePhoto": "Take a photo",
+  "editProfileUploadError": "Failed to upload photo",
+  "editProfileSaved": "Saved",
+  "editProfileUpdated": "Updated",
+
+  "favouritesTitle": "Your Favorites",
+  "favouritesSubtitle": "All your saved journeys in one place",
+  "favouritesEmpty": "No favourites yet.",
+  "favouritesLoginPrompt": "Please log in to view and manage your favourites.",
+  "favouritesSavedOn": "Saved on {date}",
+  "@favouritesSavedOn": {
+    "placeholders": {
+      "date": {}
+    }
+  }
 }

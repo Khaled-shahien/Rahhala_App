@@ -12,7 +12,7 @@ import 'package:rahhala_app/core/utils/user_session.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/auth/domain/login/login_cubit.dart';
 import 'package:rahhala_app/features/auth/domain/login/login_state.dart';
-import 'package:rahhala_app/features/auth/presentation/constants/auth_strings.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/signup_page.dart';
@@ -147,11 +147,12 @@ class _LoginPageState extends State<LoginPage> {
 
     if (!mounted || !listenerContext.mounted) return;
 
+    final l10n = listenerContext.l10n;
     showAppNotification(
       context: listenerContext,
       title:
-          'Welcome Back, ${sl<TokenStorage>().fullName ?? email.split('@').first}!',
-      message: AuthStrings.welcomeBackNotificationMessage,
+          l10n.authWelcomeBackUser(sl<TokenStorage>().fullName ?? email.split('@').first),
+      message: l10n.authWelcomeBackNotifMessage,
     );
 
     if (!mounted || !listenerContext.mounted) return;
@@ -181,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
                 HapticFeedback.mediumImpact();
                 showAppNotification(
                   context: context,
-                  title: AuthStrings.errorTitle,
+                  title: context.l10n.commonError,
                   message: state.errorMessage,
                   isError: true,
                 );
@@ -300,7 +301,7 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                       SizedBox(height: 10.h),
                                       Text(
-                                        AuthStrings.welcomeBackTitle,
+                                        context.l10n.authWelcomeBackTitle,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 24.sp,
@@ -310,7 +311,7 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                       SizedBox(height: 6.h),
                                       Text(
-                                        AuthStrings.welcomeBackSubtitle,
+                                        context.l10n.authWelcomeBackSubtitle,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 14.sp,
@@ -328,8 +329,8 @@ class _LoginPageState extends State<LoginPage> {
                                               CrossAxisAlignment.stretch,
                                           children: [
                                             CustomFormTextField(
-                                              labelText: AuthStrings.emailLabel,
-                                              hintText: AuthStrings.emailHint,
+                                              labelText: context.l10n.authEmailLabel,
+                                              hintText: context.l10n.authEmailHint,
                                               controller: _emailController,
                                               keyboardType:
                                                   TextInputType.emailAddress,
@@ -345,9 +346,9 @@ class _LoginPageState extends State<LoginPage> {
                                             SizedBox(height: 16.h),
                                             CustomFormTextField(
                                               labelText:
-                                                  AuthStrings.passwordLabel,
+                                                  context.l10n.authPasswordLabel,
                                               hintText:
-                                                  AuthStrings.passwordHint,
+                                                  context.l10n.authPasswordHint,
                                               controller: _passwordController,
                                               obscureText: !_isPasswordVisible,
                                               prefixIcon: Icons.lock_outline,
@@ -363,10 +364,10 @@ class _LoginPageState extends State<LoginPage> {
                                                 ),
                                                 color: ThemeColor.primaryColor,
                                                 tooltip: _isPasswordVisible
-                                                    ? AuthStrings
-                                                        .hidePasswordTooltip
-                                                    : AuthStrings
-                                                        .showPasswordTooltip,
+                                                    ? context.l10n
+                                                        .authHidePassword
+                                                    : context.l10n
+                                                        .authShowPassword,
                                               ),
                                               validator: AppValidators
                                                   .validateLoginPassword,
@@ -383,7 +384,7 @@ class _LoginPageState extends State<LoginPage> {
                                               children: [
                                                 Expanded(
                                                   child: Text(
-                                                    'Secure sign-in to continue your journey.',
+                                                    context.l10n.authSecureSignIn,
                                                     style: TextStyle(
                                                       fontSize: 12.sp,
                                                       color: colorScheme
@@ -395,8 +396,8 @@ class _LoginPageState extends State<LoginPage> {
                                                 TextButton(
                                                   onPressed:
                                                       _navigateToForgotPassword,
-                                                  child: const Text(
-                                                    AuthStrings.forgotPassword,
+                                                  child: Text(
+                                                    context.l10n.authForgotPassword,
                                                     style: TextStyle(
                                                       color: ThemeColor
                                                           .primaryColor,
@@ -414,8 +415,8 @@ class _LoginPageState extends State<LoginPage> {
                                                   : () =>
                                                       _submit(context, state),
                                               text: isLoading
-                                                  ? AuthStrings.loggingIn
-                                                  : AuthStrings.logIn,
+                                                  ? context.l10n.authLoggingIn
+                                                  : context.l10n.authLogIn,
                                             ),
                                           ],
                                         ),
@@ -447,12 +448,12 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   child: Column(
                                     children: [
-                                      const OrDivider(
-                                          text: AuthStrings.orDivider),
+                                      OrDivider(
+                                          text: context.l10n.commonOr),
                                       SizedBox(height: 18.h),
                                       SocialLoginSection(
-                                        promptText: AuthStrings.dontHaveAccount,
-                                        actionText: AuthStrings.signUp,
+                                        promptText: context.l10n.authDontHaveAccount,
+                                        actionText: context.l10n.authSignUp,
                                         onActionTap: _navigateToSignUp,
                                       ),
                                     ],

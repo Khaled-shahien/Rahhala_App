@@ -24,7 +24,7 @@ class OnboardingPageWidget extends StatelessWidget {
               _buildImagesLayout(),
               SizedBox(height: 24.h),
               Align(
-                alignment: Alignment.centerLeft,
+                alignment: AlignmentDirectional.centerStart,
                 child: Text(
                   page.title,
                   style: TextStyle(
@@ -37,7 +37,7 @@ class OnboardingPageWidget extends StatelessWidget {
               ),
               SizedBox(height: 3.h),
               Align(
-                alignment: Alignment.centerLeft,
+                alignment: AlignmentDirectional.centerStart,
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: 16.w,
@@ -45,9 +45,9 @@ class OnboardingPageWidget extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFC19A6B),
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(25.r),
-                      bottomRight: Radius.circular(25.r),
+                    borderRadius: BorderRadiusDirectional.only(
+                      topEnd: Radius.circular(25.r),
+                      bottomEnd: Radius.circular(25.r),
                     ),
                   ),
                   child: Text(
@@ -63,7 +63,7 @@ class OnboardingPageWidget extends StatelessWidget {
               ),
               SizedBox(height: 16.h),
               Align(
-                alignment: Alignment.centerLeft,
+                alignment: AlignmentDirectional.centerStart,
                 child: Text(
                   page.description,
                   style: TextStyle(

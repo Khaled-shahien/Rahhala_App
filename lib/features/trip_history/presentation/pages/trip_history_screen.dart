@@ -12,6 +12,7 @@ import 'package:rahhala_app/features/trip_history/data/models/trip_history_model
 import 'package:rahhala_app/features/trip_history/domain/cubits/trip_history_cubit.dart';
 import 'package:rahhala_app/features/trip_history/domain/cubits/trip_history_state.dart';
 import 'package:rahhala_app/features/trip_history/presentation/pages/trip_history_detail_screen.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class TripHistoryScreen extends StatelessWidget {
   const TripHistoryScreen({super.key});
@@ -65,11 +66,11 @@ class _TripHistoryView extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      padding: EdgeInsets.only(
+      padding: EdgeInsetsDirectional.only(
         top: 16.h,
         bottom: 16.h,
-        left: 20.w,
-        right: 20.w,
+        start: 20.w,
+        end: 20.w,
       ),
       decoration: BoxDecoration(
         color: AppColors.primary,
@@ -102,7 +103,7 @@ class _TripHistoryView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Plan History',
+                context.l10n.tripHistoryTitle,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 22.sp,
@@ -115,7 +116,7 @@ class _TripHistoryView extends StatelessWidget {
                       ? state.response.totalTrips
                       : 0;
                   return Text(
-                    '$count saved plans',
+                    context.l10n.tripHistorySavedPlans(count),
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.85),
                       fontSize: 13.sp,
@@ -166,7 +167,7 @@ class _TripHistoryView extends StatelessWidget {
             ),
             SizedBox(height: 24.h),
             Text(
-              'No Plans Yet',
+              context.l10n.tripHistoryNoPlans,
               style: TextStyle(
                 fontSize: 22.sp,
                 fontWeight: FontWeight.bold,
@@ -175,7 +176,7 @@ class _TripHistoryView extends StatelessWidget {
             ),
             SizedBox(height: 12.h),
             Text(
-              "You haven't created any travel plans yet. Generate your first trip and start exploring amazing destinations.",
+              context.l10n.tripHistoryNoPlansDesc,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14.sp,
@@ -203,7 +204,7 @@ class _TripHistoryView extends StatelessWidget {
               ),
               icon: const Icon(Icons.auto_awesome, color: Colors.white),
               label: Text(
-                'Generate Your First Trip',
+                context.l10n.tripHistoryGenerateFirst,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 15.sp,
@@ -229,7 +230,7 @@ class _TripHistoryView extends StatelessWidget {
                 color: isDark ? Colors.grey.shade600 : Colors.grey.shade400),
             SizedBox(height: 16.h),
             Text(
-              'Join us! Log in to unlock more features and view your trips!',
+              context.l10n.tripHistoryLoginPrompt,
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 15.sp,
@@ -253,7 +254,7 @@ class _TripHistoryView extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 14.h),
               ),
               child: Text(
-                'Login Now',
+                context.l10n.tripHistoryLoginNow,
                 style: TextStyle(color: Colors.white, fontSize: 15.sp),
               ),
             )
@@ -289,14 +290,14 @@ class _TripHistoryCard extends StatelessWidget {
 
   const _TripHistoryCard({required this.trip, required this.onTap});
 
-  String _timeAgo(String createdAt) {
+  String _timeAgo(BuildContext context, String createdAt) {
     try {
       final date = DateTime.parse(createdAt);
       final diff = DateTime.now().difference(date);
-      if (diff.inDays >= 30) return '${(diff.inDays / 30).floor()} months ago';
-      if (diff.inDays >= 7) return '${(diff.inDays / 7).floor()} weeks ago';
-      if (diff.inDays > 0) return '${diff.inDays} days ago';
-      return 'Today';
+      if (diff.inDays >= 30) return context.l10n.tripHistoryMonthsAgo((diff.inDays / 30).floor());
+      if (diff.inDays >= 7) return context.l10n.tripHistoryWeeksAgo((diff.inDays / 7).floor());
+      if (diff.inDays > 0) return context.l10n.tripHistoryDaysAgo(diff.inDays);
+      return context.l10n.tripHistoryToday;
     } catch (_) {
       return '';
     }
@@ -326,9 +327,9 @@ class _TripHistoryCard extends StatelessWidget {
         child: Row(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16.r),
-                bottomLeft: Radius.circular(16.r),
+              borderRadius: BorderRadiusDirectional.only(
+                topStart: Radius.circular(16.r),
+                bottomStart: Radius.circular(16.r),
               ),
               child: trip.countryImage != null && trip.countryImage!.isNotEmpty
                   ? CachedNetworkImage(
@@ -384,7 +385,7 @@ class _TripHistoryCard extends StatelessWidget {
                       children: [
                         _infoChip(
                           Icons.calendar_today_outlined,
-                          '${trip.numberOfDays} days',
+                          context.l10n.tripHistoryDaysCount(trip.numberOfDays),
                           isDark
                               ? const Color(0xFF422D00)
                               : const Color(0xFFFFF3E0),
@@ -407,7 +408,7 @@ class _TripHistoryCard extends StatelessWidget {
                     ),
                     SizedBox(height: 6.h),
                     Text(
-                      'Created ${_timeAgo(trip.createdAt)}',
+                      context.l10n.tripHistoryCreated(_timeAgo(context, trip.createdAt)),
                       style: TextStyle(
                           fontSize: 11.sp,
                           color: isDark
@@ -419,7 +420,7 @@ class _TripHistoryCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(right: 12.w),
+              padding: EdgeInsetsDirectional.only(end: 12.w),
               child: Icon(Icons.chevron_right_rounded,
                   color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
                   size: 20.sp),

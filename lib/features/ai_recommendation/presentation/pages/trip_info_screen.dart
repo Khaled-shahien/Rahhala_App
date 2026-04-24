@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_text_styles.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_cubit.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_state.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/button.dart';
@@ -16,12 +17,13 @@ class TripInfoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<AiTripCubit>();
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     final seasons = [
-      {'value': 'Winter', 'label': 'Winter (December - February)'},
-      {'value': 'Spring', 'label': 'Spring (March - May)'},
-      {'value': 'Summer', 'label': 'Summer (June - August)'},
-      {'value': 'Autumn', 'label': 'Autumn (September - November)'},
+      {'value': 'Winter', 'label': l10n.tripInfoSeasonWinter},
+      {'value': 'Spring', 'label': l10n.tripInfoSeasonSpring},
+      {'value': 'Summer', 'label': l10n.tripInfoSeasonSummer},
+      {'value': 'Autumn', 'label': l10n.tripInfoSeasonAutumn},
     ];
 
     return BlocBuilder<AiTripCubit, AiTripState>(
@@ -38,7 +40,7 @@ class TripInfoScreen extends StatelessWidget {
             children: [
               SizedBox(height: 20.h),
               Text(
-                'Where do you want to go?',
+                l10n.tripInfoWhereToGo,
                 style: AppTextStyles.heading
                     .copyWith(color: colorScheme.onSurface),
               ),
@@ -46,7 +48,7 @@ class TripInfoScreen extends StatelessWidget {
               _buildCountrySelector(context, state.destination, cubit),
               SizedBox(height: 44.h),
               Text(
-                'When do you want to go?',
+                l10n.tripInfoWhenToGo,
                 style: AppTextStyles.heading
                     .copyWith(color: colorScheme.onSurface),
               ),
@@ -58,6 +60,7 @@ class TripInfoScreen extends StatelessWidget {
               SizedBox(height: 76.h),
               NextButton(
                 onPressed: onNext,
+                text: l10n.commonNext,
               ),
               SizedBox(height: 44.h),
             ],
@@ -70,6 +73,7 @@ class TripInfoScreen extends StatelessWidget {
   Widget _buildCountrySelector(
       BuildContext context, String? selectedCountry, AiTripCubit cubit) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return GestureDetector(
       onTap: () {
@@ -103,7 +107,7 @@ class TripInfoScreen extends StatelessWidget {
               SizedBox(width: 12.w),
               Expanded(
                 child: Text(
-                  selectedCountry ?? 'Select a country',
+                  selectedCountry ?? l10n.tripInfoSelectCountry,
                   style: TextStyle(
                     color: selectedCountry != null
                         ? colorScheme.onSurface
@@ -123,12 +127,13 @@ class TripInfoScreen extends StatelessWidget {
 
   Widget _buildDaysSelector(BuildContext context, int days, AiTripCubit cubit) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'Total days',
+          l10n.tripInfoTotalDays,
           style: AppTextStyles.dayLabel.copyWith(color: colorScheme.onSurface),
         ),
         Row(
@@ -174,6 +179,7 @@ class TripInfoScreen extends StatelessWidget {
       String? selectedSeason,
       AiTripCubit cubit) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     final hasValidSelection = selectedSeason != null &&
         seasons.any((season) => season['value'] == selectedSeason);
 
@@ -191,7 +197,7 @@ class TripInfoScreen extends StatelessWidget {
       child: DropdownButton<String>(
         value: hasValidSelection ? selectedSeason : null,
         hint: Text(
-          'Select a season',
+          l10n.tripInfoSelectSeason,
           style: TextStyle(
             color: colorScheme.onSurface.withValues(alpha: 0.6),
             fontSize: 17.sp,

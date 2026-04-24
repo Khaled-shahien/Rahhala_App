@@ -9,6 +9,7 @@ import 'package:rahhala_app/features/chatbot/presentation/widgets/chat_bubble.da
 
 import 'package:rahhala_app/features/chatbot/presentation/widgets/typing_indicator.dart';
 import 'package:rahhala_app/features/chatbot/presentation/widgets/chat_input_field.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class ChatBotScreen extends StatelessWidget {
   const ChatBotScreen({super.key});
@@ -120,7 +121,7 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                   child: Align(
-                    alignment: Alignment.centerLeft,
+                    alignment: AlignmentDirectional.centerStart,
                     child: TypingIndicator(),
                   ),
                 ),
@@ -182,7 +183,7 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'ANIS',
+            context.l10n.chatbotName,
             style: TextStyle(
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
@@ -190,7 +191,7 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
             ),
           ),
           Text(
-            'Your AI travel assistant',
+            context.l10n.chatbotSubtitle,
             style: TextStyle(
               fontSize: 13.sp,
               color: Colors.white.withValues(alpha: 0.85),
@@ -201,7 +202,7 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
       ),
       actions: [
         Padding(
-          padding: EdgeInsets.only(right: 12.w),
+          padding: EdgeInsetsDirectional.only(end: 12.w),
           child: IconButton(
             icon: Icon(
               Icons.delete_sweep_outlined,
@@ -222,10 +223,11 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
 
   Widget _buildEmptyState(BuildContext context, ChatBotCubit cubit) {
     final isDark = _isDark(context);
+    final l10n = context.l10n;
     final suggestions = [
-      "Plan a trip to Dubai",
-      "What are the best hotels in Mecca?",
-      "Suggest family-friendly entertainment places"
+      l10n.chatbotSuggestion1,
+      l10n.chatbotSuggestion2,
+      l10n.chatbotSuggestion3
     ];
 
     return SingleChildScrollView(
@@ -248,7 +250,7 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
             ),
             SizedBox(height: 24.h),
             Text(
-              'Welcome to ANIS!',
+              context.l10n.chatbotWelcome,
               style: TextStyle(
                 fontSize: 22.sp,
                 fontWeight: FontWeight.bold,
@@ -257,7 +259,7 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
             ),
             SizedBox(height: 12.h),
             Text(
-              'I am here to help you plan your next trip. Try one of the suggestions below:',
+              context.l10n.chatbotHelp,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14.sp,
@@ -301,16 +303,16 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
         backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
-        title: Text('Clear Conversation',
+        title: Text(context.l10n.chatbotClearTitle,
             style: TextStyle(color: isDark ? Colors.white : Colors.black)),
         content: Text(
-          'Are you sure you want to delete all messages? This action cannot be undone.',
+          context.l10n.chatbotClearMessage,
           style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel',
+            child: Text(context.l10n.commonCancel,
                 style: TextStyle(
                     color: isDark ? Colors.grey[400] : Colors.grey[600])),
           ),

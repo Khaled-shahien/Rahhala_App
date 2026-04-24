@@ -17,6 +17,7 @@ import 'package:rahhala_app/features/auth/presentation/widgets/custom_form_text_
 import 'package:rahhala_app/features/profile/domain/edit_profile/edit_profile_cubit.dart';
 import 'package:rahhala_app/features/profile/domain/edit_profile/edit_profile_state.dart';
 import 'package:rahhala_app/features/profile/data/repositories/user_repository.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -203,14 +204,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ListTile(
                   leading: Icon(Icons.photo_library_outlined,
                       color: isDark ? Colors.white : null),
-                  title: Text('Choose from gallery',
+                  title: Text(context.l10n.editProfileChooseGallery,
                       style: TextStyle(color: isDark ? Colors.white : null)),
                   onTap: () => Navigator.pop(context, ImageSource.gallery),
                 ),
                 ListTile(
                   leading: Icon(Icons.photo_camera_outlined,
                       color: isDark ? Colors.white : null),
-                  title: Text('Take a photo',
+                  title: Text(context.l10n.editProfileTakePhoto,
                       style: TextStyle(color: isDark ? Colors.white : null)),
                   onTap: () => Navigator.pop(context, ImageSource.camera),
                 ),
@@ -239,13 +240,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
           HapticFeedback.mediumImpact();
           showAppNotification(
               context: context,
-              title: 'Error',
+              title: context.l10n.commonError,
               message: f.message,
               isError: true);
         },
         (ok) async {
           showAppNotification(
-              context: context, title: 'Updated', message: ok.message);
+              context: context, title: context.l10n.editProfileUpdated, message: ok.message);
           final detailsRes = await repo.getDetails();
           detailsRes.fold((_) {}, (details) async {
             if (details.profileImageUrl != null &&
@@ -268,8 +269,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       HapticFeedback.mediumImpact();
       showAppNotification(
           context: context,
-          title: 'Error',
-          message: 'Failed to upload photo',
+          title: context.l10n.commonError,
+          message: context.l10n.editProfileUploadError,
           isError: true);
     }
   }
@@ -302,7 +303,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 child: Column(
                   children: [
                     Text(
-                      'Select Gender',
+                      context.l10n.editProfileSelectGender,
                       style: TextStyle(
                         fontSize: 22.sp,
                         fontWeight: FontWeight.bold,
@@ -311,17 +312,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     SizedBox(height: 24.h),
                     ...[
-                      {'icon': Icons.male, 'label': 'Male'},
-                      {'icon': Icons.female, 'label': 'Female'},
-                      {'icon': Icons.transgender, 'label': 'Other'},
+                      {'icon': Icons.male, 'value': 'Male', 'label': context.l10n.editProfileGenderMale},
+                      {'icon': Icons.female, 'value': 'Female', 'label': context.l10n.editProfileGenderFemale},
+                      {'icon': Icons.transgender, 'value': 'Other', 'label': context.l10n.editProfileGenderOther},
                     ].map((item) => _buildGenderOption(
                           context: context,
                           icon: item['icon'] as IconData,
                           label: item['label'] as String,
-                          isSelected: _selectedGender == item['label'],
+                          isSelected: _selectedGender == item['value'],
                           onTap: () {
                             setState(() {
-                              _selectedGender = item['label'] as String;
+                              _selectedGender = item['value'] as String;
                               _genderController.text = item['label'] as String;
                             });
                             Navigator.of(context).pop();
@@ -431,14 +432,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
               if (state is EditProfileSuccess) {
                 showAppNotification(
                     context: context,
-                    title: 'Saved',
+                    title: context.l10n.editProfileSaved,
                     message: state.model.message);
                 Navigator.pop(context);
               } else if (state is EditProfileFailure) {
                 HapticFeedback.mediumImpact();
                 showAppNotification(
                     context: context,
-                    title: 'Error',
+                    title: context.l10n.commonError,
                     message: state.message,
                     isError: true);
               }
@@ -484,7 +485,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Edit Profile',
+                              context.l10n.editProfileTitle,
                               style: TextStyle(
                                 fontSize: 22.sp,
                                 fontWeight: FontWeight.bold,
@@ -492,7 +493,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               ),
                             ),
                             Text(
-                              'Update your personal information',
+                              context.l10n.editProfileSubtitle,
                               style: TextStyle(
                                 fontSize: 13.sp,
                                 color: Colors.white.withValues(alpha: 0.85),
@@ -614,13 +615,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             ),
                             SizedBox(height: 36.h),
 
-                            _buildSectionTitle(context, 'Personal Information'),
+                            _buildSectionTitle(context, context.l10n.editProfilePersonalInfo),
                             SizedBox(height: 18.h),
 
                             CustomFormTextField(
                               controller: _name,
-                              labelText: 'Full Name',
-                              hintText: 'Enter your full name',
+                              labelText: context.l10n.editProfileFullName,
+                              hintText: context.l10n.editProfileFullNameHint,
                               prefixIcon: Icons.person_outline_rounded,
                               validator: AppValidators.validateName,
                               textInputAction: TextInputAction.next,
@@ -631,8 +632,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             AbsorbPointer(
                               child: CustomFormTextField(
                                 controller: _email,
-                                labelText: 'Email',
-                                hintText: 'Your email',
+                                labelText: context.l10n.editProfileEmail,
+                                hintText: context.l10n.editProfileEmailHint,
                                 keyboardType: TextInputType.emailAddress,
                                 prefixIcon: Icons.email_outlined,
                                 textInputAction: TextInputAction.next,
@@ -649,8 +650,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                     child: AbsorbPointer(
                                       child: CustomFormTextField(
                                         controller: _dobController,
-                                        labelText: 'Birth Date',
-                                        hintText: 'Select date',
+                                        labelText: context.l10n.editProfileBirthDate,
+                                        hintText: context.l10n.editProfileBirthDateHint,
                                         prefixIcon: Icons.cake_outlined,
                                         validator: (v) => null,
                                       ),
@@ -664,8 +665,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                     child: AbsorbPointer(
                                       child: CustomFormTextField(
                                         controller: _genderController,
-                                        labelText: 'Gender',
-                                        hintText: 'Select',
+                                        labelText: context.l10n.editProfileGender,
+                                        hintText: context.l10n.editProfileGenderHint,
                                         prefixIcon: Icons.transgender_outlined,
                                         validator: (v) => null,
                                       ),
@@ -677,13 +678,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                             SizedBox(height: 32.h),
 
-                            _buildSectionTitle(context, 'Contact Information'),
+                            _buildSectionTitle(context, context.l10n.editProfileContactInfo),
                             SizedBox(height: 18.h),
 
                             CustomFormTextField(
                               controller: _phone,
-                              labelText: 'Phone Number',
-                              hintText: 'Enter your phone number',
+                              labelText: context.l10n.editProfilePhone,
+                              hintText: context.l10n.editProfilePhoneHint,
                               keyboardType: TextInputType.phone,
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly
@@ -709,7 +710,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       topRight: Radius.circular(22.r),
                                     ),
                                     inputDecoration: InputDecoration(
-                                      hintText: 'Search country',
+                                      hintText: context.l10n.editProfileSearchCountry,
                                       prefixIcon: const Icon(Icons.search),
                                       border: OutlineInputBorder(
                                         borderRadius:
@@ -727,8 +728,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               child: AbsorbPointer(
                                 child: CustomFormTextField(
                                   controller: _countryController,
-                                  labelText: 'Country',
-                                  hintText: 'Select your country',
+                                  labelText: context.l10n.editProfileCountry,
+                                  hintText: context.l10n.editProfileCountryHint,
                                   prefixIcon: Icons.public_rounded,
                                   validator: (v) =>
                                       AppValidators.validateDropdown(
@@ -770,7 +771,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         HapticFeedback.selectionClick();
                                       }
                                     },
-                              text: isLoading ? 'Saving...' : 'Save Changes',
+                              text: isLoading ? context.l10n.editProfileSaving : context.l10n.editProfileSaveChanges,
                             ),
 
                             SizedBox(height: 24.h),

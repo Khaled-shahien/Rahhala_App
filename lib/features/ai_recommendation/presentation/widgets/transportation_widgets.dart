@@ -118,7 +118,7 @@ class TransportationPill extends StatelessWidget {
         maxWidth: 160.w,
       ),
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-      margin: EdgeInsets.only(right: 6.w),
+      margin: EdgeInsetsDirectional.only(end: 6.w),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(20.r),
