@@ -55,11 +55,13 @@ class GeminiRepositoryImpl implements GeminiRepository {
             for (int i = 0; i < cleanResponse.length; i++) {
               if (cleanResponse[i] == '{') {
                 openBraces++;
-              } else if (cleanResponse[i] == '}')
+              } else if (cleanResponse[i] == '}') {
                 openBraces--;
-              else if (cleanResponse[i] == '[')
+              } else if (cleanResponse[i] == '[') {
                 openBrackets++;
-              else if (cleanResponse[i] == ']') openBrackets--;
+              } else if (cleanResponse[i] == ']') {
+                openBrackets--;
+              }
             }
 
             // Close any unclosed structures

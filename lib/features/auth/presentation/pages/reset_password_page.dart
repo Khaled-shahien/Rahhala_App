@@ -183,7 +183,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                         Text(
                                           context.l10n.authResetPasswordTitle,
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 28,
                                             fontWeight: FontWeight.bold,
                                             color: ThemeColor.primaryColor,

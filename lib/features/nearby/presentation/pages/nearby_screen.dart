@@ -27,7 +27,6 @@ class _NearbyBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final colorScheme = Theme.of(context).colorScheme;
 
     return BlocBuilder<NearbyCubit, NearbyState>(

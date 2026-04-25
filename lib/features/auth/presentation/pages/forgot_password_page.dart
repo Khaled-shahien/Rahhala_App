@@ -158,7 +158,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                         Text(
                                           context.l10n.authForgotPasswordTitle,
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 28,
                                             fontWeight: FontWeight.bold,
                                             color: ThemeColor.primaryColor,
@@ -264,7 +264,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                               Navigator.pop(context),
                                           child: Text(
                                             context.l10n.authBackToLogin,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               color: ThemeColor.primaryColor,
                                               fontWeight: FontWeight.w600,
                                             ),

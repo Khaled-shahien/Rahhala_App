@@ -8,7 +8,7 @@ import 'package:rahhala_app/features/home/data/models/home_model.dart';
 import 'package:rahhala_app/features/home/presentation/details_cubit/place_details_cubit.dart';
 import 'package:rahhala_app/features/home/presentation/details_cubit/place_details_state.dart';
 import 'package:rahhala_app/features/home/presentation/details_cubit/review_cubit.dart';
-import 'package:rahhala_app/features/home/presentation/widgets/RatingSummaryCharts.dart';
+import 'package:rahhala_app/features/home/presentation/widgets/rating_summary_charts.dart';
 import '../widgets/horizontal_section.dart';
 import '../widgets/review_card.dart';
 import '../widgets/submit_review.dart';

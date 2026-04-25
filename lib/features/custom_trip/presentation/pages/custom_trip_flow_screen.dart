@@ -36,7 +36,7 @@ class _CustomTripFlowScreenState extends State<CustomTripFlowScreen> {
 
           return PopScope(
             canPop: true,
-            onPopInvoked: (didPop) {
+            onPopInvokedWithResult: (didPop, result) {
               if (didPop) innerContext.read<CustomTripCubit>().reset();
             },
             child: Theme(

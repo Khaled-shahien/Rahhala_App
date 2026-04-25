@@ -125,8 +125,6 @@ class ChatBotRepositoryImpl implements ChatBotRepository {
       if (response['success'] == true || response['success'] == 'true') {
         final result = response['result'];
         if (result != null) {
-          // Parse context data from response
-          final contextData = result['items'] ?? result;
           final context = ChatContext(
             contextId: contextId,
             title: null, // Title may not be provided by API

@@ -38,28 +38,9 @@ class _HomePageState extends State<HomePage> {
     _currentIndex = widget.initialIndex;
   }
 
-  void _notifyComingSoon(String text) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(text),
-        duration: const Duration(seconds: 1),
-        backgroundColor: ThemeColor.primaryColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
-        margin: EdgeInsetsDirectional.only(
-          bottom: 90.h,
-          end: 20.w,
-          start: 20.w,
-        ),
-      ),
-    );
-  }
+
 
   void _onTabTapped(int index) {
-    final l10n = context.l10n;
 
     setState(() => _currentIndex = index);
 
@@ -69,7 +50,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -281,21 +262,3 @@ class _HomeMainSection extends StatelessWidget {
   }
 }
 
-class _SoonPage extends StatelessWidget {
-  final String title;
-  const _SoonPage({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    return Center(
-      child: Text(
-        l10n.homeComingSoonShort(title),
-        style: TextStyle(
-          fontSize: 17.sp,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-      ),
-    );
-  }
-}

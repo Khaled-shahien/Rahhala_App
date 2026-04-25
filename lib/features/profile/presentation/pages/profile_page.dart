@@ -441,21 +441,9 @@ class _ProfilePageState extends State<ProfilePage> {
               SizedBox(height: 12.h),
               _sectionCard(context, [
                 ProfileListTile(
-                  icon: Icons.notifications_outlined,
-                  title: l10n.profileNotification,
-                  onTap: () => _showComingSoon(l10n.profileNotification),
-                ),
-                _divider(themeController),
-                ProfileListTile(
                   icon: Icons.language_outlined,
                   title: l10n.profileLanguage,
                   onTap: _showLanguagePicker,
-                ),
-                _divider(themeController),
-                ProfileListTile(
-                  icon: Icons.card_membership_outlined,
-                  title: l10n.profilePlans,
-                  onTap: () => _showComingSoon(l10n.profilePlans),
                 ),
                 _divider(themeController),
                 ListenableBuilder(
@@ -492,16 +480,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ]),
               SizedBox(height: 22.h),
-              _sectionTitle(l10n.profileSupport),
-              SizedBox(height: 12.h),
-              _sectionCard(context, [
-                ProfileListTile(
-                  icon: Icons.help_outline_rounded,
-                  title: l10n.profileHelpSupport,
-                  onTap: () => _showComingSoon(l10n.profileHelpSupport),
-                ),
-              ]),
-              SizedBox(height: 22.h),
               _sectionTitle(l10n.profileDangerZone),
               SizedBox(height: 12.h),
               _sectionCard(context, [
@@ -519,7 +497,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   onTap: deleteAccount,
                 ),
               ]),
-              SizedBox(height: 36.h),
+              SizedBox(height: 120.h),
             ]),
           ),
         ),

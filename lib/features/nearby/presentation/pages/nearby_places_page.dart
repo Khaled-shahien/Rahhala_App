@@ -176,7 +176,7 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 250),
                                   transform: Matrix4.identity()
-                                    ..scale(isFocused ? 1.02 : 1.0),
+                                    ..scaleByDouble(isFocused ? 1.02 : 1.0, isFocused ? 1.02 : 1.0, 1.0, 1.0),
                                   transformAlignment: Alignment.center,
                                   child: NearbyPlaceCard(place: place),
                                 ),

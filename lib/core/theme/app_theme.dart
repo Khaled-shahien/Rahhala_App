@@ -144,8 +144,8 @@ class AppTheme {
       onSecondary: ThemeColor.onSecondary,
       surface: ThemeColor.surface,
       onSurface: ThemeColor.onSurface,
-      background: ThemeColor.background,
-      onBackground: ThemeColor.onBackground,
+      // surface already set above
+      // onSurface already set above
       error: ThemeColor.error,
       onError: ThemeColor.onError,
     ),
@@ -197,8 +197,8 @@ class AppTheme {
       onSecondary: ThemeColor.onSecondary,
       surface: const Color(0xFF1E1E1E),
       onSurface: Colors.white,
-      background: const Color(0xFF121212),
-      onBackground: Colors.white,
+      // surface already set above
+      // onSurface already set above
       error: ThemeColor.error,
       onError: ThemeColor.onError,
       brightness: Brightness.dark,

@@ -59,11 +59,13 @@ class _CustomTripSplashScreenState extends State<CustomTripSplashScreen> {
 
     return BlocProvider.value(
       value: widget.cubit,
-      child: WillPopScope(
-        onWillPop: () async {
-          // Reset cubit when user presses back button
-          widget.cubit.reset();
-          return true;
+      child: PopScope(
+        canPop: true,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) {
+            // Reset cubit when user presses back button
+            widget.cubit.reset();
+          }
         },
         child: BlocListener<CustomTripCubit, CustomTripState>(
           listener: (context, state) {

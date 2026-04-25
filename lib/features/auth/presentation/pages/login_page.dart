@@ -398,7 +398,7 @@ class _LoginPageState extends State<LoginPage> {
                                                       _navigateToForgotPassword,
                                                   child: Text(
                                                     context.l10n.authForgotPassword,
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       color: ThemeColor
                                                           .primaryColor,
                                                       fontWeight:

@@ -253,7 +253,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                       Text(
                                         context.l10n.authVerifyCodeTitle,
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize:
                                               26, // Slightly reduced font size
                                           fontWeight: FontWeight.bold,

@@ -234,7 +234,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                         Text(
                                           context.l10n.authCreateAccountTitle,
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 28,
                                             fontWeight: FontWeight.bold,
                                             color: ThemeColor.primaryColor,
@@ -502,7 +502,7 @@ class _SignUpPageState extends State<SignUpPage> {
               onPressed: _navigateToLogin,
               child: Text(
                 context.l10n.authLogIn,
-                style: TextStyle(
+                style: const TextStyle(
                   color: ThemeColor.primaryColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
