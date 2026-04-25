@@ -96,8 +96,8 @@ class NearbyPermissionPage extends StatelessWidget {
             const Spacer(),
             // Map icon circle
             Container(
-              width: 180.w,
-              height: 180.w,
+              width: 280.w,
+              height: 280.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isDark
@@ -114,10 +114,20 @@ class NearbyPermissionPage extends StatelessWidget {
                   ),
                 ],
               ),
-              child: ClipOval(
+              child: Padding(
+                padding: EdgeInsets.all(4.w),
                 child: Image.asset(
-                  AppAssets.location,
-                  fit: BoxFit.cover,
+                  AppAssets.nearby,
+                  width: 212.w,
+                  height: 212.w,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.explore,
+                      size: 80.w,
+                      color: AppColors.primary,
+                    );
+                  },
                 ),
               ),
             ),
