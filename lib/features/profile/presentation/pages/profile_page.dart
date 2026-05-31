@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:rahhala_app/core/auth/auth_session_service.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/localization/app_locale_controller.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
+import 'package:rahhala_app/core/routing/app_router.dart';
 
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/theme/theme_controller.dart';
 import 'package:rahhala_app/core/utils/app_notifications.dart';
-import 'package:rahhala_app/core/utils/token_storage.dart';
 
-import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
-import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/reset_password_logged_in_page.dart';
-import 'package:rahhala_app/features/auth/presentation/pages/welcome_page.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/profile_list_tile.dart';
 
 import 'package:rahhala_app/features/profile/domain/profile/profile_cubit.dart';
@@ -175,14 +175,10 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     if (confirm != true) return;
 
-    await sl<TokenStorage>().clearAll();
+    await sl<AuthSessionService>().logout();
     if (!mounted) return;
 
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const WelcomePage()),
-      (_) => false,
-    );
+    context.go(AppRoutes.welcome);
   }
 
   Future<void> _showLanguagePicker() async {
@@ -192,17 +188,19 @@ class _ProfilePageState extends State<ProfilePage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (_) => const LanguagePickerBottomSheet(),
+      builder: (_) => LanguagePickerBottomSheet(
+        localeController: sl<AppLocaleController>(),
+      ),
     );
   }
 
   Widget buildContent(ProfileState state) {
     final l10n = context.l10n;
-    final storage = sl<TokenStorage>();
+    final session = sl<AuthSessionService>();
     final themeController = sl<AppThemeController>();
-    String displayName = storage.displayName;
-    String displayEmail = storage.email ?? l10n.profileNoEmail;
-    String? profileImageUrl = storage.profileImageUrl;
+    String displayName = session.displayName;
+    String displayEmail = session.email ?? l10n.profileNoEmail;
+    String? profileImageUrl = session.profileImageUrl;
 
     if (state is ProfileLoaded) {
       if (state.details.fullName.trim().isNotEmpty) {
@@ -230,13 +228,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       IconButton(
                         onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const HomePage(isGuest: false),
-                            ),
-                            (route) => false,
-                          );
+                          context.go(AppRoutes.home);
                         },
                         icon: Icon(
                           Icons.arrow_back_ios_new_rounded,
@@ -267,7 +259,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 // Profile Header Original
                 Container(
-                  padding: EdgeInsetsDirectional.fromSTEB(20.w, 22.h, 20.w, 24.h),
+                  padding:
+                      EdgeInsetsDirectional.fromSTEB(20.w, 22.h, 20.w, 24.h),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: AlignmentDirectional.topStart,
@@ -580,13 +573,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
             final msg = state.model.message.toLowerCase();
             if (msg.contains('delete')) {
-              await sl<TokenStorage>().clearAll();
+              await sl<AuthSessionService>().clearSession();
               if (!context.mounted) return;
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-                (_) => false,
-              );
+              context.go(AppRoutes.login);
             } else {
               if (mounted) setState(() {});
             }

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_text_styles.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_cubit.dart';
+import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_options.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_state.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/button.dart';
 import 'package:country_picker/country_picker.dart';
@@ -31,6 +32,12 @@ class TripInfoScreen extends StatelessWidget {
         if (state is! AiTripData) {
           return const Center(child: CircularProgressIndicator());
         }
+        final hasDestination = (state.destination?.trim().isNotEmpty ?? false);
+        final hasValidSeason = state.selectedMonth != null &&
+            seasons.any((season) => season['value'] == state.selectedMonth);
+        final hasValidDays = state.totalDays >= state.tripOptions.minDays &&
+            state.totalDays <= state.tripOptions.maxDays;
+        final canGoNext = hasDestination && hasValidSeason && hasValidDays;
 
         return SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -59,7 +66,7 @@ class TripInfoScreen extends StatelessWidget {
                   context, seasons, state.selectedMonth, cubit),
               SizedBox(height: 76.h),
               NextButton(
-                onPressed: onNext,
+                onPressed: canGoNext ? onNext : null,
                 text: l10n.commonNext,
               ),
               SizedBox(height: 44.h),
@@ -140,7 +147,7 @@ class TripInfoScreen extends StatelessWidget {
           children: [
             _buildDayButton(context, Icons.remove, () {
               if (days > 1) cubit.updateDays(days - 1);
-            }),
+            }, enabled: days > AiTripOptions.minDays),
             SizedBox(width: 14.w),
             Text('$days',
                 style: TextStyle(
@@ -149,7 +156,11 @@ class TripInfoScreen extends StatelessWidget {
                     color: colorScheme.onSurface)),
             SizedBox(width: 14.w),
             _buildDayButton(
-                context, Icons.add, () => cubit.updateDays(days + 1)),
+              context,
+              Icons.add,
+              () => cubit.updateDays(days + 1),
+              enabled: days < AiTripOptions.maxDays,
+            ),
           ],
         ),
       ],
@@ -157,18 +168,30 @@ class TripInfoScreen extends StatelessWidget {
   }
 
   Widget _buildDayButton(
-      BuildContext context, IconData icon, VoidCallback onPressed) {
+    BuildContext context,
+    IconData icon,
+    VoidCallback onPressed, {
+    bool enabled = true,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return InkWell(
-      onTap: onPressed,
+      onTap: enabled ? onPressed : null,
       child: Container(
         padding: EdgeInsets.all(10.r),
         decoration: BoxDecoration(
-          color: colorScheme.primary,
+          color: enabled
+              ? colorScheme.primary
+              : colorScheme.onSurface.withValues(alpha: 0.18),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, size: 22, color: colorScheme.onPrimary),
+        child: Icon(
+          icon,
+          size: 22,
+          color: enabled
+              ? colorScheme.onPrimary
+              : colorScheme.onSurface.withValues(alpha: 0.45),
+        ),
       ),
     );
   }

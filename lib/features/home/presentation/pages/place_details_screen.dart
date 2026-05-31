@@ -1,9 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/core/auth/auth_session_service.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
-import 'package:rahhala_app/core/utils/token_storage.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/home/data/models/home_model.dart';
 import 'package:rahhala_app/features/home/presentation/details_cubit/place_details_cubit.dart';
 import 'package:rahhala_app/features/home/presentation/details_cubit/place_details_state.dart';
@@ -57,6 +59,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   ) async {
     final reviewCubit = context.read<ReviewCubit>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = context.l10n;
 
     final approved = await showDialog<bool>(
       context: context,
@@ -66,14 +69,14 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
           title: Text(
-            'Delete Review',
+            l10n.reviewDeleteTitle,
             style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold),
           ),
           content: Text(
-            'Are you sure you want to delete this review?',
+            l10n.reviewDeleteMessage,
             style: TextStyle(
                 color: Theme.of(context)
                     .colorScheme
@@ -84,7 +87,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text('Cancel',
+              child: Text(l10n.commonCancel,
                   style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
             ),
             ElevatedButton(
@@ -94,7 +97,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                     borderRadius: BorderRadius.circular(10.r)),
               ),
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text('Delete',
+              child: Text(l10n.commonDelete,
                   style: TextStyle(color: Colors.white, fontSize: 14.sp)),
             ),
           ],
@@ -108,15 +111,18 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   }
 
   bool _isMyReview(ReviewModel review) {
-    final storage = sl<TokenStorage>();
+    final session = sl<AuthSessionService>();
+    // TODO: Prefer a stable backend user id when review payloads expose one.
+    // The current API only gives reviewer display data, so ownership falls
+    // back to normalized profile identifiers stored in the auth session.
     final currentValues = <String>{
-      if ((storage.email ?? '').trim().isNotEmpty)
-        storage.email!.trim().toLowerCase(),
-      if ((storage.username ?? '').trim().isNotEmpty)
-        storage.username!.trim().toLowerCase(),
-      if ((storage.fullName ?? '').trim().isNotEmpty)
-        storage.fullName!.trim().toLowerCase(),
-      storage.displayName.trim().toLowerCase(),
+      if ((session.email ?? '').trim().isNotEmpty)
+        session.email!.trim().toLowerCase(),
+      if ((session.username ?? '').trim().isNotEmpty)
+        session.username!.trim().toLowerCase(),
+      if ((session.fullName ?? '').trim().isNotEmpty)
+        session.fullName!.trim().toLowerCase(),
+      session.displayName.trim().toLowerCase(),
     };
     return currentValues.contains(review.userName.trim().toLowerCase());
   }
@@ -192,10 +198,13 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                         background: Stack(
                           fit: StackFit.expand,
                           children: [
-                            Image.network(
-                              place.imageUrl,
+                            CachedNetworkImage(
+                              imageUrl: place.imageUrl,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
+                              placeholder: (_, __) => Container(
+                                color: const Color(0xFFF2E7D5),
+                              ),
+                              errorWidget: (_, __, ___) => Container(
                                 color: const Color(0xFFF2E7D5),
                                 child: Icon(Icons.landscape_outlined,
                                     color: AppColors.lightBrown, size: 50.sp),
@@ -366,6 +375,7 @@ class _EditReviewSheetState extends State<_EditReviewSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = context.l10n;
 
     return Padding(
       padding: EdgeInsetsDirectional.only(
@@ -392,7 +402,7 @@ class _EditReviewSheetState extends State<_EditReviewSheet> {
           SizedBox(height: 16.h),
 
           Text(
-            'Edit Review',
+            l10n.reviewEditTitle,
             style: TextStyle(
               fontSize: 20.sp,
               fontWeight: FontWeight.bold,
@@ -402,7 +412,7 @@ class _EditReviewSheetState extends State<_EditReviewSheet> {
           SizedBox(height: 16.h),
 
           // Stars
-          Text('Your Rating',
+          Text(l10n.reviewYourRating,
               style: TextStyle(
                   fontSize: 14.sp,
                   color: Theme.of(context)
@@ -431,7 +441,7 @@ class _EditReviewSheetState extends State<_EditReviewSheet> {
             maxLines: 4,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             decoration: InputDecoration(
-              hintText: 'Update your review...',
+              hintText: l10n.reviewUpdateHint,
               hintStyle: TextStyle(
                   color: Theme.of(context)
                       .colorScheme
@@ -465,7 +475,7 @@ class _EditReviewSheetState extends State<_EditReviewSheet> {
                     borderRadius: BorderRadius.circular(12.r)),
               ),
               child: Text(
-                'Update Review',
+                l10n.reviewUpdate,
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 15.sp,

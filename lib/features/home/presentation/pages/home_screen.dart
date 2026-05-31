@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
-import 'package:rahhala_app/core/utils/token_storage.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/home/domain/repositories/home_repository.dart';
 import 'package:rahhala_app/features/home/presentation/cubit/home_cubit.dart';
 import 'package:rahhala_app/features/home/presentation/pages/place_details_screen.dart';
@@ -19,16 +19,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
+  late final HomeCubit _homeCubit;
 
   @override
   void initState() {
     super.initState();
+    _homeCubit = HomeCubit(sl<HomeRepository>())..getHomeData();
     _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _homeCubit.close();
     super.dispose();
   }
 
@@ -36,60 +40,57 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!_scrollController.hasClients) return;
     final threshold = _scrollController.position.maxScrollExtent * 0.85;
     if (_scrollController.offset >= threshold) {
-      context.read<HomeCubit>().loadMore();
+      _homeCubit.loadMore();
     }
-  }
-
-  void _showLoginRequiredMessage(BuildContext context) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Please log in to manage favourites.'),
-        behavior: SnackBarBehavior.floating,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        backgroundColor: AppColors.primary,
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => HomeCubit(sl<HomeRepository>())..getHomeData(),
-      child: Builder(
-        builder: (context) {
-          _scrollController.removeListener(_onScroll);
-          _scrollController.addListener(() {
-            if (!_scrollController.hasClients) return;
-            final threshold = _scrollController.position.maxScrollExtent * 0.85;
-            if (_scrollController.offset >= threshold) {
-              context.read<HomeCubit>().loadMore();
+    return BlocProvider.value(
+      value: _homeCubit,
+      child: RefreshIndicator(
+        color: AppColors.primary,
+        onRefresh: _homeCubit.getHomeData,
+        child: BlocConsumer<HomeCubit, HomeState>(
+          listener: _handleHomeMessage,
+          builder: (context, state) {
+            if (state is HomeLoading) {
+              return _buildShimmer(context);
+            } else if (state is HomeError) {
+              return _buildError(context, state.message);
+            } else if (state is HomeSuccess) {
+              return _buildList(context, state);
             }
-          });
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+  }
 
-          return RefreshIndicator(
-            color: AppColors.primary,
-            onRefresh: () => context.read<HomeCubit>().getHomeData(),
-            child: BlocBuilder<HomeCubit, HomeState>(
-              builder: (context, state) {
-                if (state is HomeLoading) {
-                  return _buildShimmer(context);
-                } else if (state is HomeError) {
-                  return _buildError(context, state.message);
-                } else if (state is HomeSuccess) {
-                  return _buildList(context, state);
-                }
-                return const SizedBox.shrink();
-              },
-            ),
-          );
-        },
+  void _handleHomeMessage(BuildContext context, HomeState state) {
+    if (state is! HomeSuccess || state.userMessage == null) return;
+    final message = switch (state.userMessage!) {
+      HomeUserMessage.paginationFailed => context.l10n.homeLoadMoreError,
+      HomeUserMessage.favouriteFailed => context.l10n.homeFavouriteError,
+    };
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.primary,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       ),
     );
   }
 
   Widget _buildList(BuildContext context, HomeSuccess state) {
+    if (state.places.isEmpty && !state.isLoadingMore) {
+      return _buildEmpty(context);
+    }
+
     return ListView.builder(
       controller: _scrollController,
       physics:
@@ -120,10 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           onFavTap: () {
-            if (!sl<TokenStorage>().hasToken) {
-              _showLoginRequiredMessage(context);
-              return;
-            }
             context
                 .read<HomeCubit>()
                 .toggleFavourite(place.id, place.isFavourite);
@@ -143,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _DotsLoadingIndicator(),
           SizedBox(height: 8.h),
           Text(
-            'Loading more places...',
+            context.l10n.homeLoadingMorePlaces,
             style: TextStyle(
               fontSize: 12.sp,
               color: isDark ? Colors.grey[400] : Colors.grey[500],
@@ -175,8 +172,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20.r),
-                    border:
-                        Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                    border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -185,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           size: 14.sp, color: AppColors.primary),
                       SizedBox(width: 4.w),
                       Text(
-                        "You've seen it all!",
+                        context.l10n.homeEndOfList,
                         style: TextStyle(
                           fontSize: 12.sp,
                           color: AppColors.primary,
@@ -268,6 +265,37 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmpty(BuildContext context) {
+    return ListView(
+      physics:
+          const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      children: [
+        SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+        Icon(
+          Icons.travel_explore_rounded,
+          size: 58.sp,
+          color: AppColors.primary.withValues(alpha: 0.55),
+        ),
+        SizedBox(height: 14.h),
+        Text(
+          context.l10n.homeNoPlaces,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        SizedBox(height: 6.h),
+        Text(
+          context.l10n.commonTryAgain,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 13.sp, color: Colors.grey.shade500),
         ),
       ],
     );

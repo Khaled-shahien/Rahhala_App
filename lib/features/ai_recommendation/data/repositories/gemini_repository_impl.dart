@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
+import 'package:rahhala_app/core/crash/app_error_reporter.dart';
 import 'package:rahhala_app/core/errors/exceptions.dart';
 import 'package:rahhala_app/core/errors/failures.dart';
-import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/core/network/api_consumer.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_model.dart';
@@ -77,7 +77,7 @@ class GeminiRepositoryImpl implements GeminiRepository {
             try {
               jsonResponse = jsonDecode(cleanResponse);
             } catch (parseError) {
-              AppLogger.instance.e(
+              AppErrorReporter.record(
                 'GeminiRepository.getTripPlan failed to parse cleaned JSON',
                 error: parseError,
               );
@@ -195,10 +195,8 @@ class GeminiRepositoryImpl implements GeminiRepository {
     Map<String, dynamic> requestBody,
   ) async {
     try {
-      const String regenerateEndpoint = '/api/gemini/Regenerate_Trip';
-
       final response = await apiConsumer.post(
-        regenerateEndpoint,
+        EndPoints.regenerateTrip,
         data: requestBody,
       );
 

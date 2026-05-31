@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class SoftArcNotchedShape extends NotchedShape {
-  final double arcWidth; 
-  final double arcHeight; 
+  final double arcWidth;
+  final double arcHeight;
 
   const SoftArcNotchedShape({
-    this.arcWidth = 120, 
+    this.arcWidth = 120,
     this.arcHeight = 22,
   });
 
@@ -37,8 +37,10 @@ class SoftArcNotchedShape extends NotchedShape {
       ..lineTo(notchLeft, top);
 
     path.quadraticBezierTo(
-      midX, top - arcHeight, 
-      notchRight, top,
+      midX,
+      top - arcHeight,
+      notchRight,
+      top,
     );
 
     path

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_cubit.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_state.dart';
@@ -49,7 +49,7 @@ class ImageSearchResultsScreen extends StatelessWidget {
         backgroundColor: colorScheme.primary,
         elevation: 0,
         title: Text(
-          'Searching...',
+          context.l10n.imageSearchSearching,
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
@@ -104,7 +104,7 @@ class ImageSearchResultsScreen extends StatelessWidget {
             Icon(Icons.location_on_outlined, color: Colors.white, size: 20.sp),
             SizedBox(width: 6.w),
             Text(
-              'Matching Places',
+              context.l10n.imageSearchMatchingPlaces,
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
@@ -165,7 +165,7 @@ class ImageSearchResultsScreen extends StatelessWidget {
                   color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
               SizedBox(height: 16.h),
               Text(
-                'Join us! Log in to unlock more features and search by image',
+                message,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 16.sp, color: colorScheme.onSurfaceVariant),
@@ -174,10 +174,7 @@ class ImageSearchResultsScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   context.read<ImageSearchCubit>().reset();
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const LoginPage()),
-                    (route) => false,
-                  );
+                  _openCamera(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: ThemeColor.primaryColor,
@@ -186,7 +183,7 @@ class ImageSearchResultsScreen extends StatelessWidget {
                   padding:
                       EdgeInsets.symmetric(horizontal: 32.w, vertical: 14.h),
                 ),
-                child: Text('Login Now',
+                child: Text(context.l10n.imageSearchTryAnotherImage,
                     style: TextStyle(color: Colors.white, fontSize: 16.sp)),
               ),
             ],
@@ -207,7 +204,7 @@ class ImageSearchResultsScreen extends StatelessWidget {
               color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
           SizedBox(height: 16.h),
           Text(
-            'No matching places found',
+            context.l10n.imageSearchNoMatches,
             style:
                 TextStyle(fontSize: 16.sp, color: colorScheme.onSurfaceVariant),
           ),
@@ -219,7 +216,7 @@ class ImageSearchResultsScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.r)),
             ),
-            child: Text('Try Another Image',
+            child: Text(context.l10n.imageSearchTryAnotherImage,
                 style: TextStyle(color: Colors.white, fontSize: 16.sp)),
           ),
         ],

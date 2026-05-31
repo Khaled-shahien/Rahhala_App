@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rahhala_app/core/logging/app_logger.dart';
+import 'package:rahhala_app/features/home/domain/repositories/home_repository.dart';
 import '../../data/models/home_model.dart';
-import '../../domain/repositories/home_repository.dart';
 
 abstract class HomeState {}
 
@@ -8,15 +9,19 @@ class HomeInitial extends HomeState {}
 
 class HomeLoading extends HomeState {}
 
+enum HomeUserMessage { paginationFailed, favouriteFailed }
+
 class HomeSuccess extends HomeState {
   final List<PlaceModel> places;
   final bool hasMore;
   final bool isLoadingMore;
+  final HomeUserMessage? userMessage;
 
   HomeSuccess({
     required this.places,
     this.hasMore = true,
     this.isLoadingMore = false,
+    this.userMessage,
   });
 }
 
@@ -53,6 +58,7 @@ class HomeCubit extends Cubit<HomeState> {
 
       emit(HomeSuccess(places: List.from(_places), hasMore: _hasMore));
     } catch (e) {
+      AppLogger.instance.w('HomeCubit: Failed to load home data', error: e);
       emit(HomeError(e.toString()));
     }
   }
@@ -67,8 +73,6 @@ class HomeCubit extends Cubit<HomeState> {
       hasMore: _hasMore,
       isLoadingMore: true,
     ));
-
-    await Future.delayed(const Duration(milliseconds: 1000));
 
     try {
       _currentPage++;
@@ -92,6 +96,7 @@ class HomeCubit extends Cubit<HomeState> {
       emit(HomeSuccess(
         places: List.from(_places),
         hasMore: _hasMore,
+        userMessage: HomeUserMessage.paginationFailed,
       ));
     }
   }
@@ -112,14 +117,18 @@ class HomeCubit extends Cubit<HomeState> {
       } else {
         await repository.addFavourite(placeId);
       }
-    } catch (_) {
-      // rollback
+    } catch (e) {
+      AppLogger.instance.w('HomeCubit: Failed to toggle favourite', error: e);
       _places = _places
           .map((place) => place.id == placeId
               ? place.copyWith(isFavourite: isCurrentlyFavourite)
               : place)
           .toList();
-      emit(HomeSuccess(places: List.from(_places), hasMore: _hasMore));
+      emit(HomeSuccess(
+        places: List.from(_places),
+        hasMore: _hasMore,
+        userMessage: HomeUserMessage.favouriteFailed,
+      ));
     }
   }
 }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/core/auth/auth_session_service.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
-import 'package:rahhala_app/core/utils/token_storage.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/home/presentation/details_cubit/place_details_cubit.dart';
 import 'package:rahhala_app/features/home/presentation/details_cubit/review_cubit.dart';
 
@@ -28,7 +29,8 @@ class _SubmitReviewState extends State<SubmitReview> {
 
   @override
   Widget build(BuildContext context) {
-    final canSubmit = sl<TokenStorage>().hasToken;
+    final canSubmit = sl<AuthSessionService>().hasToken;
+    final l10n = context.l10n;
 
     if (!canSubmit) {
       return Container(
@@ -40,7 +42,7 @@ class _SubmitReviewState extends State<SubmitReview> {
           border: Border.all(color: Colors.orange.shade200),
         ),
         child: Text(
-          'Login is required to add a rating and review.',
+          l10n.reviewLoginRequired,
           style: TextStyle(fontSize: 14.sp, color: Colors.brown.shade600),
         ),
       );
@@ -68,12 +70,12 @@ class _SubmitReviewState extends State<SubmitReview> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Submit your review",
+            l10n.reviewSubmitTitle,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24.sp),
           ),
           SizedBox(height: 10.h),
           Text(
-            "Your Rate",
+            l10n.reviewYourRate,
             style: TextStyle(fontSize: 16.sp, color: Colors.grey),
           ),
           SizedBox(height: 6.h),
@@ -105,7 +107,7 @@ class _SubmitReviewState extends State<SubmitReview> {
             maxLines: 3,
             style: TextStyle(fontSize: 20.sp),
             decoration: InputDecoration(
-              hintText: "Your review...",
+              hintText: l10n.reviewHint,
               hintStyle: TextStyle(fontSize: 14.sp),
               contentPadding:
                   EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
@@ -140,16 +142,13 @@ class _SubmitReviewState extends State<SubmitReview> {
                   onPressed: () {
                     if (selectedRating == 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(
-                                "please select a rating before submitting your review!")),
+                        SnackBar(content: Text(l10n.reviewSelectRating)),
                       );
                       return;
                     }
                     if (_commentController.text.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text("please enter your comment!")),
+                        SnackBar(content: Text(l10n.reviewEnterComment)),
                       );
                       return;
                     }
@@ -161,7 +160,7 @@ class _SubmitReviewState extends State<SubmitReview> {
                         );
                   },
                   child: Text(
-                    "Submit",
+                    l10n.reviewSubmit,
                     style:
                         TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                   ),

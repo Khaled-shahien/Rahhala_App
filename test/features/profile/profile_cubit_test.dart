@@ -2,9 +2,11 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:rahhala_app/core/auth/auth_session_service.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/errors/failures.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
+import 'package:rahhala_app/core/utils/user_session.dart';
 import 'package:rahhala_app/features/profile/data/models/user_model_details.dart';
 import 'package:rahhala_app/features/profile/data/repositories/user_repository.dart';
 import 'package:rahhala_app/features/profile/domain/profile/profile_cubit.dart';
@@ -24,6 +26,13 @@ void main() {
 
     await sl.reset();
     sl.registerSingleton<TokenStorage>(tokenStorage);
+    sl.registerLazySingleton<UserSession>(() => UserSession());
+    sl.registerLazySingleton<AuthSessionService>(
+      () => AuthSessionService(
+        tokenStorage: sl<TokenStorage>(),
+        userSession: sl<UserSession>(),
+      ),
+    );
 
     when(() => tokenStorage.setFullName(any())).thenAnswer((_) async {});
     when(() => tokenStorage.setEmail(any())).thenAnswer((_) async {});

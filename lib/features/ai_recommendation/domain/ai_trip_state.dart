@@ -1,7 +1,6 @@
-
-
 import 'package:equatable/equatable.dart';
 import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_model.dart';
+import 'package:rahhala_app/features/ai_recommendation/domain/trip_option.dart';
 
 abstract class AiTripState extends Equatable {
   const AiTripState();
@@ -15,6 +14,7 @@ class AiTripData extends AiTripState {
   final String? selectedMonth;
   final String? selectedRange;
   final List<String> selectedInterests;
+  final TripOptionsConfig tripOptions;
 
   const AiTripData({
     this.destination,
@@ -22,6 +22,7 @@ class AiTripData extends AiTripState {
     this.selectedMonth,
     this.selectedRange,
     this.selectedInterests = const [],
+    this.tripOptions = const TripOptionsConfig.empty(),
   });
 
   AiTripData copyWith({
@@ -30,6 +31,7 @@ class AiTripData extends AiTripState {
     String? selectedMonth,
     String? selectedRange,
     List<String>? selectedInterests,
+    TripOptionsConfig? tripOptions,
   }) {
     return AiTripData(
       destination: destination ?? this.destination,
@@ -37,12 +39,19 @@ class AiTripData extends AiTripState {
       selectedMonth: selectedMonth ?? this.selectedMonth,
       selectedRange: selectedRange ?? this.selectedRange,
       selectedInterests: selectedInterests ?? this.selectedInterests,
+      tripOptions: tripOptions ?? this.tripOptions,
     );
   }
 
   @override
-  List<Object?> get props =>
-      [destination, totalDays, selectedMonth, selectedRange, selectedInterests];
+  List<Object?> get props => [
+        destination,
+        totalDays,
+        selectedMonth,
+        selectedRange,
+        selectedInterests,
+        tripOptions,
+      ];
 }
 
 class AiTripInitial extends AiTripData {
@@ -53,11 +62,11 @@ class AiTripInitial extends AiTripData {
           selectedMonth: null,
           selectedRange: null,
           selectedInterests: const [],
+          tripOptions: const TripOptionsConfig.empty(),
         );
 }
 
 class AiTripLoading extends AiTripData {
-  
   AiTripLoading(AiTripData oldState)
       : super(
           destination: oldState.destination,
@@ -65,6 +74,7 @@ class AiTripLoading extends AiTripData {
           selectedMonth: oldState.selectedMonth,
           selectedRange: oldState.selectedRange,
           selectedInterests: oldState.selectedInterests,
+          tripOptions: oldState.tripOptions,
         );
 }
 
@@ -80,6 +90,7 @@ class AiTripSuccess extends AiTripData {
           selectedMonth: oldState.selectedMonth,
           selectedRange: oldState.selectedRange,
           selectedInterests: oldState.selectedInterests,
+          tripOptions: oldState.tripOptions,
         );
 
   @override
@@ -96,6 +107,7 @@ class AiTripFailure extends AiTripData {
           selectedMonth: oldState.selectedMonth,
           selectedRange: oldState.selectedRange,
           selectedInterests: oldState.selectedInterests,
+          tripOptions: oldState.tripOptions,
         );
 
   @override

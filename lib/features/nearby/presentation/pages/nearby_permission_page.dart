@@ -4,9 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_assets.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/core/constants/app_text_styles.dart';
-import 'package:rahhala_app/core/di/service_locator.dart';
-import 'package:rahhala_app/core/utils/token_storage.dart';
-import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
 import 'package:rahhala_app/features/nearby/domain/cubit/nearby_cubit.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
@@ -14,72 +11,6 @@ class NearbyPermissionPage extends StatelessWidget {
   const NearbyPermissionPage({super.key});
 
   void _handleAllowAccess(BuildContext context) {
-    final token = sl<TokenStorage>().token;
-
-    if (token == null || token.isEmpty) {
-      final isDark = Theme.of(context).brightness == Brightness.dark;
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.r),
-          ),
-          title: Text(
-            context.l10n.nearbyLoginRequired,
-            style: AppTextStyles.cairoBold(
-              fontSize: 18,
-              color: isDark ? Colors.white : AppColors.textPrimary,
-            ),
-          ),
-          content: Text(
-            context.l10n.nearbyLoginMessage,
-            style: AppTextStyles.cairoRegular(
-              fontSize: 14,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                context.l10n.commonCancel,
-                style: AppTextStyles.cairoMedium(
-                  fontSize: 14,
-                  color: AppColors.neutralGray,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                  (route) => false,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                context.l10n.commonLogin,
-                style: AppTextStyles.cairoBold(
-                  fontSize: 14,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-      return;
-    }
-
     context.read<NearbyCubit>().requestLocationAndLoad();
   }
 

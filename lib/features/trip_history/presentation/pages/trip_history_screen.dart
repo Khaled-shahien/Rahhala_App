@@ -8,6 +8,7 @@ import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/features/trip_history/data/models/trip_history_model.dart';
 import 'package:rahhala_app/features/trip_history/domain/cubits/trip_history_cubit.dart';
 import 'package:rahhala_app/features/trip_history/domain/cubits/trip_history_state.dart';
@@ -294,11 +295,16 @@ class _TripHistoryCard extends StatelessWidget {
     try {
       final date = DateTime.parse(createdAt);
       final diff = DateTime.now().difference(date);
-      if (diff.inDays >= 30) return context.l10n.tripHistoryMonthsAgo((diff.inDays / 30).floor());
-      if (diff.inDays >= 7) return context.l10n.tripHistoryWeeksAgo((diff.inDays / 7).floor());
+      if (diff.inDays >= 30) {
+        return context.l10n.tripHistoryMonthsAgo((diff.inDays / 30).floor());
+      }
+      if (diff.inDays >= 7) {
+        return context.l10n.tripHistoryWeeksAgo((diff.inDays / 7).floor());
+      }
       if (diff.inDays > 0) return context.l10n.tripHistoryDaysAgo(diff.inDays);
       return context.l10n.tripHistoryToday;
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.w('TripHistoryCard: Failed to parse date', error: e);
       return '';
     }
   }
@@ -408,7 +414,8 @@ class _TripHistoryCard extends StatelessWidget {
                     ),
                     SizedBox(height: 6.h),
                     Text(
-                      context.l10n.tripHistoryCreated(_timeAgo(context, trip.createdAt)),
+                      context.l10n.tripHistoryCreated(
+                          _timeAgo(context, trip.createdAt)),
                       style: TextStyle(
                           fontSize: 11.sp,
                           color: isDark

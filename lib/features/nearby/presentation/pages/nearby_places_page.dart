@@ -87,9 +87,11 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
         _focusedPlaceId = place.id;
         _mapController.move(LatLng(place.latitude, place.longitude), 17);
         final index = places.indexOf(place);
-        if (index != -1) {
+        if (index != -1 && _scrollController.hasClients) {
+          final targetOffset = (index * NearbyPlaceCard.estimatedHeight.h)
+              .clamp(0.0, _scrollController.position.maxScrollExtent);
           _scrollController.animateTo(
-            index * 135.h,
+            targetOffset,
             duration: const Duration(milliseconds: 400),
             curve: Curves.easeInOut,
           );
@@ -111,8 +113,14 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
       'https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}',
     );
     if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
+      final launched =
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+      if (launched || !mounted) return;
     }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.l10n.commonError)),
+    );
   }
 
   @override
@@ -147,7 +155,8 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
                   child: Row(
                     children: [
                       Text(
-                        context.l10n.nearbyPlacesFound(loaded.filteredPlaces.length),
+                        context.l10n
+                            .nearbyPlacesFound(loaded.filteredPlaces.length),
                         style: AppTextStyles.cairoMedium(
                             fontSize: 13, color: AppColors.textSecondary),
                       ),
@@ -176,7 +185,8 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 250),
                                   transform: Matrix4.identity()
-                                    ..scaleByDouble(isFocused ? 1.02 : 1.0, isFocused ? 1.02 : 1.0, 1.0, 1.0),
+                                    ..scaleByDouble(isFocused ? 1.02 : 1.0,
+                                        isFocused ? 1.02 : 1.0, 1.0, 1.0),
                                   transformAlignment: Alignment.center,
                                   child: NearbyPlaceCard(place: place),
                                 ),
@@ -287,6 +297,8 @@ class _NearbyPlacesPageState extends State<NearbyPlacesPage> {
             ),
             children: [
               TileLayer(
+                // TODO: Add provider-compliant tile caching before offering
+                // offline maps; OpenStreetMap tiles should not be bulk cached.
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.rahhala.app',
               ),

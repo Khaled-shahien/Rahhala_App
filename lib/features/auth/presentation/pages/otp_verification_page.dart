@@ -263,8 +263,10 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                       SizedBox(height: 8.h), // Reduced height
                                       Text(
                                         widget.flow == VerifyFlow.signUp
-                                            ? context.l10n.authVerifyCodeSignUpDesc
-                                            : context.l10n.authVerifyCodeResetDesc,
+                                            ? context
+                                                .l10n.authVerifyCodeSignUpDesc
+                                            : context
+                                                .l10n.authVerifyCodeResetDesc,
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                           fontSize:

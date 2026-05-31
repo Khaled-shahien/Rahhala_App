@@ -66,8 +66,7 @@ class TripTypeSelectionScreen extends StatelessWidget {
                 context,
                 icon: Icons.edit_document,
                 title: context.l10n.tripTypeCustom,
-                description:
-                    context.l10n.tripTypeCustomDesc,
+                description: context.l10n.tripTypeCustomDesc,
                 onTap: () {
                   HapticFeedback.mediumImpact();
                   Navigator.push(

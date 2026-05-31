@@ -33,9 +33,11 @@ class TripBudgetRangeScreen extends StatelessWidget {
 
     return BlocBuilder<AiTripCubit, AiTripState>(
       builder: (context, state) {
-        if (state is! AiTripData) {
+        if (state is! AiTripData || cubit.budgetRanges.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
+        final canGoNext = state.selectedRange != null &&
+            cubit.budgetRanges.contains(state.selectedRange);
 
         return SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -60,7 +62,7 @@ class TripBudgetRangeScreen extends StatelessWidget {
                   )),
               SizedBox(height: 44.h),
               NextButton(
-                onPressed: onNext,
+                onPressed: canGoNext ? onNext : null,
                 text: l10n.commonNext,
               ),
               SizedBox(height: 44.h),

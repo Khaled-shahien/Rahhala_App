@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rahhala_app/features/auth/data/repositories/auth_repository.dart';
+import 'package:rahhala_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:rahhala_app/features/auth/domain/reset_password/reset_password_state.dart';
 
 class ResetPasswordCubit extends Cubit<ResetPasswordState> {

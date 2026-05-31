@@ -9,8 +9,6 @@ import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/utils/app_notifications.dart';
 import 'package:rahhala_app/core/utils/app_validators.dart';
-import 'package:rahhala_app/core/utils/user_session.dart';
-import 'package:rahhala_app/core/utils/token_storage.dart';
 
 import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/otp_verification_page.dart';
@@ -75,16 +73,7 @@ class _SignUpPageState extends State<SignUpPage> {
     BuildContext listenerContext,
     RegisterSuccess state,
   ) async {
-    final fullName = _nameController.text.trim();
     final email = _emailController.text.trim().toLowerCase();
-
-    await sl<TokenStorage>().setFullName(fullName);
-    await sl<TokenStorage>().setEmail(email);
-
-    sl<UserSession>().setFromRegister(
-      fullName: fullName,
-      email: email,
-    );
 
     if (!mounted || !listenerContext.mounted) return;
 
@@ -242,7 +231,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 6.h),
                                         Text(
-                                          context.l10n.authCreateAccountSubtitle,
+                                          context
+                                              .l10n.authCreateAccountSubtitle,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 16,
@@ -251,8 +241,10 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 24.h),
                                         CustomFormTextField(
-                                          labelText: context.l10n.authFullNameLabel,
-                                          hintText: context.l10n.authFullNameHint,
+                                          labelText:
+                                              context.l10n.authFullNameLabel,
+                                          hintText:
+                                              context.l10n.authFullNameHint,
                                           controller: _nameController,
                                           prefixIcon: Icons.person_outline,
                                           validator: AppValidators.validateName,
@@ -260,7 +252,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
-                                          labelText: context.l10n.authEmailLabel,
+                                          labelText:
+                                              context.l10n.authEmailLabel,
                                           hintText: context.l10n.authEmailHint,
                                           controller: _emailController,
                                           keyboardType:
@@ -294,8 +287,10 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
-                                          labelText: context.l10n.authPasswordLabel,
-                                          hintText: context.l10n.authPasswordHint,
+                                          labelText:
+                                              context.l10n.authPasswordLabel,
+                                          hintText:
+                                              context.l10n.authPasswordHint,
                                           controller: _passwordController,
                                           obscureText: _obscurePassword,
                                           prefixIcon: Icons.lock_outline,
@@ -320,10 +315,10 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
-                                          labelText:
-                                              context.l10n.authConfirmPasswordLabel,
-                                          hintText:
-                                              context.l10n.authConfirmPasswordHint,
+                                          labelText: context
+                                              .l10n.authConfirmPasswordLabel,
+                                          hintText: context
+                                              .l10n.authConfirmPasswordHint,
                                           controller:
                                               _confirmPasswordController,
                                           obscureText: _obscureConfirmPassword,
@@ -367,7 +362,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                             child: CustomFormTextField(
                                               labelText:
                                                   context.l10n.authCountryLabel,
-                                              hintText: context.l10n.authCountryHint,
+                                              hintText:
+                                                  context.l10n.authCountryHint,
                                               controller:
                                                   _countryController, // 5. . "ŝ^" "S
                                               prefixIcon: Icons.public,
@@ -450,8 +446,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     ),
                                     child: Column(
                                       children: [
-                                        OrDivider(
-                                            text: context.l10n.commonOr),
+                                        OrDivider(text: context.l10n.commonOr),
                                         SizedBox(height: 18.h),
                                         _buildSocialLoginSection(),
                                       ],

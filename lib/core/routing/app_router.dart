@@ -1,7 +1,13 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:rahhala_app/core/auth/auth_session_service.dart';
+import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
+import 'package:rahhala_app/core/startup/app_bootstrap_cubit.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
+import 'package:rahhala_app/features/onboarding/presentation/cubit/onboarding_cubit.dart';
 import 'package:rahhala_app/features/splash/presentation/pages/splash_screen.dart';
 import 'package:rahhala_app/features/onboarding/presentation/pages/onboarding_screen.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/welcome_page.dart';
@@ -18,17 +24,24 @@ import 'package:rahhala_app/features/profile/presentation/pages/edit_profile_pag
 class AppRouter {
   static final router = GoRouter(
     initialLocation: AppRoutes.splash,
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: kDebugMode,
+    redirect: _redirect,
     routes: [
       GoRoute(
         path: AppRoutes.splash,
         name: AppRouteNames.splash,
-        builder: (context, state) => const SplashScreen(),
+        builder: (context, state) => BlocProvider(
+          create: (_) => sl<AppBootstrapCubit>()..initialize(),
+          child: const SplashScreen(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.onboarding,
         name: AppRouteNames.onboarding,
-        builder: (context, state) => const OnboardingScreen(),
+        builder: (context, state) => BlocProvider(
+          create: (_) => sl<OnboardingCubit>(),
+          child: const OnboardingScreen(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.welcome,
@@ -166,6 +179,43 @@ class AppRouter {
     },
   );
 
+  static String? _redirect(BuildContext context, GoRouterState state) {
+    final path = state.uri.path;
+    final publicRoutes = <String>{
+      AppRoutes.splash,
+      AppRoutes.onboarding,
+      AppRoutes.welcome,
+      AppRoutes.login,
+      AppRoutes.signup,
+      AppRoutes.forgotPassword,
+      AppRoutes.otpVerification,
+      AppRoutes.resetPassword,
+    };
+
+    if (publicRoutes.contains(path)) return null;
+
+    final authSession = sl<AuthSessionService>();
+    final isGuestHome =
+        path == AppRoutes.home && state.uri.queryParameters['guest'] == 'true';
+    if (path == AppRoutes.home && (authSession.hasToken || isGuestHome)) {
+      return null;
+    }
+
+    final protectedRoutes = <String>{
+      AppRoutes.home,
+      AppRoutes.profile,
+      AppRoutes.editProfile,
+      AppRoutes.resetPasswordLoggedIn,
+      AppRoutes.wishlist,
+      AppRoutes.tripPlanner,
+    };
+
+    if (!authSession.hasToken && protectedRoutes.contains(path)) {
+      return AppRoutes.welcome;
+    }
+    return null;
+  }
+
   static Widget _comingSoonPage(BuildContext context, String featureName) {
     final l10n = context.l10n;
     return Scaffold(
@@ -181,7 +231,7 @@ class AppRouter {
             const Icon(
               Icons.construction,
               size: 80,
-              color: Color(0xFFCDAE8A),
+              color: ThemeColor.primary,
             ),
             const SizedBox(height: 16),
             Text(

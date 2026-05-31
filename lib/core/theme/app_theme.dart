@@ -1,51 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:rahhala_app/core/constants/app_colors.dart';
 
 /// Color palette for the Rahhala travel application
 class ThemeColor {
   // Primary brand colors
-  static const Color primary = Color(0xFFCDAE8A); // Gold/Bronze accent
-  static const Color onPrimary = Color(0xFFFFFFFF); // Text on primary
+  static const Color primary = AppColors.primary; // Gold/Bronze accent
+  static const Color onPrimary = AppColors.textOnPrimary; // Text on primary
 
   // Secondary colors
-  static const Color secondary = Color(0xFF36454F); // Charcoal
-  static const Color onSecondary = Color(0xFFFFFFFF); // Text on secondary
+  static const Color secondary = AppColors.charcoal; // Charcoal
+  static const Color onSecondary = AppColors.textOnPrimary; // Text on secondary
 
   // Surface and background
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color onSurface = Color(0xFF1F1F1F);
-  static const Color background = Color(0xFFF8F9FA);
-  static const Color onBackground = Color(0xFF1F1F1F);
+  static const Color surface = AppColors.backgroundWhite;
+  static const Color onSurface = AppColors.textPrimaryDark;
+  static const Color background = AppColors.backgroundLight;
+  static const Color onBackground = AppColors.textPrimaryDark;
 
   // Error colors
-  static const Color error = Color(0xFFB00020);
-  static const Color onError = Color(0xFFFFFFFF);
+  static const Color error = AppColors.materialError;
+  static const Color onError = AppColors.textOnPrimary;
 
   // Additional semantic colors
-  static const Color success = Color(0xFF4CAF50);
-  static const Color warning = Color(0xFFFF9800);
-  static const Color info = Color(0xFF2196F3);
+  static const Color success = AppColors.success;
+  static const Color warning = AppColors.orange;
+  static const Color info = AppColors.info;
 
   // Neutral colors
-  static const Color neutral50 = Color(0xFFFAFAFA);
-  static const Color neutral100 = Color(0xFFF5F5F5);
-  static const Color neutral200 = Color(0xFFEEEEEE);
-  static const Color neutral300 = Color(0xFFE0E0E0);
-  static const Color neutral400 = Color(0xFFBDBDBD);
-  static const Color neutral500 = Color(0xFF9E9E9E);
-  static const Color neutral600 = Color(0xFF757575);
-  static const Color neutral700 = Color(0xFF616161);
-  static const Color neutral800 = Color(0xFF424242);
-  static const Color neutral900 = Color(0xFF212121);
+  static const Color neutral50 = AppColors.cardBackground;
+  static const Color neutral100 = AppColors.backgroundGray;
+  static const Color neutral200 = AppColors.borderExtraLight;
+  static const Color neutral300 = AppColors.borderLight;
+  static const Color neutral400 = AppColors.borderMedium;
+  static const Color neutral500 = AppColors.inputPlaceholder;
+  static const Color neutral600 = AppColors.textSecondary;
+  static const Color neutral700 = AppColors.neutral700;
+  static const Color neutral800 = AppColors.neutral800;
+  static const Color neutral900 = AppColors.textPrimary;
 
   // Deprecated colors - for backward compatibility
   static const Color primaryColor = primary;
-  static const Color darkGreenColor = Color(0xFF006400);
+  static const Color darkGreenColor = AppColors.darkGreen;
   static const Color charcoalColor = secondary;
   static const Color neutralGrayColor = neutral500;
   static const Color bgColor = background;
   static const Color errorColor = error;
-  static const Color amber = Color(0xFFFFC107);
-  static const Color orange = Color(0xFFFF9800);
+  static const Color amber = AppColors.amber;
+  static const Color orange = AppColors.orange;
 }
 
 class AppTypography {
@@ -188,14 +189,14 @@ class AppTheme {
   static final ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    scaffoldBackgroundColor: const Color(0xFF121212),
+    scaffoldBackgroundColor: AppColors.backgroundDark,
     colorScheme: ColorScheme.fromSeed(
       seedColor: ThemeColor.primary,
       primary: ThemeColor.primary,
       onPrimary: ThemeColor.onPrimary,
       secondary: ThemeColor.secondary,
       onSecondary: ThemeColor.onSecondary,
-      surface: const Color(0xFF1E1E1E),
+      surface: AppColors.surfaceDark,
       onSurface: Colors.white,
       // surface already set above
       // onSurface already set above
@@ -218,17 +219,17 @@ class AppTheme {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: const Color(0xFF2C2C2C),
+      fillColor: AppColors.surfaceDarkHigh,
       hintStyle: const TextStyle(color: ThemeColor.neutral500),
       enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF3D3D3D))),
+          borderSide: const BorderSide(color: AppColors.outlineDark)),
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: ThemeColor.primary, width: 2)),
     ),
     cardTheme: const CardThemeData(
-      color: Color(0xFF1E1E1E),
+      color: AppColors.surfaceDark,
       elevation: 0,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(16))),

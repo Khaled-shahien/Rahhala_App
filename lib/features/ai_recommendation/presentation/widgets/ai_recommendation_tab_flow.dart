@@ -105,7 +105,7 @@ class _AIRecommendationTabFlowState extends State<AIRecommendationTabFlow> {
     final theme = Theme.of(context);
 
     return BlocProvider(
-      create: (context) => sl<AiTripCubit>(),
+      create: (context) => sl<AiTripCubit>()..init(),
       child: Container(
         color: theme.scaffoldBackgroundColor,
         child: Column(

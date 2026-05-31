@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_cubit.dart';
 import 'package:rahhala_app/features/image_search/presentation/pages/pinterest_camera_screen.dart';
 
@@ -35,7 +36,7 @@ class _ImageSearchBarState extends State<ImageSearchBar> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ImageSearchCubit(repository: sl()),
+      create: (_) => sl<ImageSearchCubit>(),
       child: Builder(
         builder: (context) {
           return Container(
@@ -68,7 +69,7 @@ class _ImageSearchBarState extends State<ImageSearchBar> {
                   controller: _controller,
                   cursorColor: Colors.black,
                   decoration: InputDecoration(
-                    hintText: 'Search',
+                    hintText: context.l10n.homeSearch,
                     filled: true,
                     fillColor: Colors.transparent,
                     hintStyle: TextStyle(

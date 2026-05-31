@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
+import 'package:rahhala_app/core/widgets/anis_avatar.dart';
 
 class TypingIndicator extends StatelessWidget {
   const TypingIndicator({super.key});
@@ -10,26 +11,13 @@ class TypingIndicator extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final bubbleColor = isDark ? const Color(0xFF2C2C2C) : Colors.white;
-    final dotColor = ThemeColor.primaryColor.withValues(alpha: isDark ? 0.8 : 0.6);
-    final iconBgColor = ThemeColor.primaryColor.withValues(alpha: isDark ? 0.2 : 0.1);
+    final dotColor =
+        ThemeColor.primaryColor.withValues(alpha: isDark ? 0.8 : 0.6);
 
     return Row(
       children: [
-        // أيقونة الروبوت (ANIS)
-        Container(
-          padding: EdgeInsets.all(8.r),
-          decoration: BoxDecoration(
-            color: iconBgColor,
-            borderRadius: BorderRadius.circular(20.r),
-          ),
-          child: Icon(
-            Icons.smart_toy_outlined,
-            size: 20.sp,
-            color: ThemeColor.primaryColor,
-          ),
-        ),
-        SizedBox(width: 8.w),
-
+        const AnisAvatar(size: 50),
+        SizedBox(width: 10.w),
         Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           decoration: BoxDecoration(

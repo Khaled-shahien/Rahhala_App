@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
@@ -11,12 +12,14 @@ class TripDetailsHeader extends StatelessWidget {
     required this.isRegenerating,
     required this.onBack,
     required this.onRegenerate,
+    this.showRegenerate = true,
   });
 
   final TripPlan plan;
   final bool isRegenerating;
   final VoidCallback onBack;
   final VoidCallback onRegenerate;
+  final bool showRegenerate;
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +40,24 @@ class TripDetailsHeader extends StatelessWidget {
                   bottomLeft: Radius.circular(35.r),
                   bottomRight: Radius.circular(35.r),
                 ),
-                child: Image.network(
-                  plan.countryImage!,
+                child: CachedNetworkImage(
+                  imageUrl: plan.countryImage!,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: 380.h,
-                  errorBuilder: (context, error, stackTrace) {
+                  placeholder: (context, _) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        color:
+                            isDark ? Colors.grey[900] : headerBackgroundColor,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(35.r),
+                          bottomRight: Radius.circular(35.r),
+                        ),
+                      ),
+                    );
+                  },
+                  errorWidget: (context, error, stackTrace) {
                     return Container(
                       decoration: BoxDecoration(
                         color:
@@ -134,7 +149,7 @@ class TripDetailsHeader extends StatelessWidget {
                     ),
                   ),
                 ),
-                _buildRegenerateControl(isDark),
+                if (showRegenerate) _buildRegenerateControl(isDark),
               ],
             ),
           ),

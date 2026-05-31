@@ -1,38 +1,21 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:rahhala_app/features/nearby/domain/cubit/nearby_state.dart';
 import 'package:rahhala_app/features/nearby/domain/repositories/nearby_repository.dart';
+import 'package:rahhala_app/features/nearby/domain/services/location_service.dart';
 
 class NearbyCubit extends Cubit<NearbyState> {
   final NearbyRepository repository;
-  NearbyCubit({required this.repository}) : super(NearbyInitial());
+  final LocationService locationService;
+
+  NearbyCubit({
+    required this.repository,
+    required this.locationService,
+  }) : super(NearbyInitial());
 
   Future<void> requestLocationAndLoad() async {
     emit(NearbyLocationLoading());
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        emit(NearbyError(message: 'Location services are disabled.'));
-        return;
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          emit(NearbyLocationDenied());
-          return;
-        }
-      }
-      if (permission == LocationPermission.deniedForever) {
-        emit(NearbyLocationPermanentlyDenied());
-        return;
-      }
-
-      final position = await Geolocator.getCurrentPosition(
-        locationSettings:
-            const LocationSettings(accuracy: LocationAccuracy.high),
-      );
+      final position = await locationService.getCurrentLocation();
 
       emit(NearbyPlacesLoading(
         latitude: position.latitude,
@@ -49,6 +32,19 @@ class NearbyCubit extends Cubit<NearbyState> {
         latitude: position.latitude,
         longitude: position.longitude,
       ));
+    } on LocationServiceException catch (e) {
+      switch (e.reason) {
+        case LocationFailureReason.permissionDenied:
+          emit(NearbyLocationDenied());
+          break;
+        case LocationFailureReason.permissionDeniedForever:
+          emit(NearbyLocationPermanentlyDenied());
+          break;
+        case LocationFailureReason.serviceDisabled:
+        case LocationFailureReason.unavailable:
+          emit(NearbyError(message: e.message));
+          break;
+      }
     } catch (e) {
       emit(NearbyError(message: e.toString()));
     }

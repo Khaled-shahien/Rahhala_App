@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/core/utils/app_notifications.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
 import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_model.dart';
@@ -21,10 +22,12 @@ class TripDetailsScreen extends StatefulWidget {
     super.key,
     required this.tripPlan,
     required this.geminiRequest,
+    this.showActions = true,
   });
 
   final TripPlanResponse tripPlan;
   final Map<String, dynamic> geminiRequest;
+  final bool showActions;
 
   @override
   State<TripDetailsScreen> createState() => _TripDetailsScreenState();
@@ -92,7 +95,8 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
           );
         },
       );
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.w('TripDetailsScreen: Save trip failed', error: e);
       if (mounted) {
         HapticFeedback.mediumImpact();
         showAppNotification(
@@ -135,7 +139,15 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                               'description': activity.description,
                               'estimatedCost': activity.estimatedCost,
                               'image': activity.image,
-                              'transportation': [],
+                              'transportation':
+                                  activity.transportation.map((transport) {
+                                return {
+                                  'from': transport.from,
+                                  'to': transport.to,
+                                  'method': transport.method,
+                                  'estimatedCost': transport.estimatedCost,
+                                };
+                              }).toList(),
                             })
                         .toList(),
                   })
@@ -198,7 +210,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
           );
         },
       );
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance
+          .w('TripDetailsScreen: Regenerate trip failed', error: e);
       if (mounted) {
         HapticFeedback.mediumImpact();
         showAppNotification(
@@ -223,7 +237,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
         final isDark = theme.brightness == Brightness.dark;
 
         return AlertDialog(
-          backgroundColor: Theme.of(dialogContext).dialogTheme.backgroundColor ?? theme.colorScheme.surface,
+          backgroundColor:
+              Theme.of(dialogContext).dialogTheme.backgroundColor ??
+                  theme.colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.r),
           ),
@@ -289,10 +305,12 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     return Scaffold(
       backgroundColor: customBgColor,
       extendBodyBehindAppBar: true,
-      bottomNavigationBar: TripSaveButton(
-        isSaving: _isSaving,
-        onSave: _saveTrip,
-      ),
+      bottomNavigationBar: widget.showActions
+          ? TripSaveButton(
+              isSaving: _isSaving,
+              onSave: _saveTrip,
+            )
+          : null,
       body: SafeArea(
         top: false,
         child: BackgroundDecorator(
@@ -304,6 +322,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                 isRegenerating: _isRegenerating,
                 onBack: () => Navigator.pop(context),
                 onRegenerate: _showRegenerateDialog,
+                showRegenerate: widget.showActions,
               ),
               Expanded(
                 child: SingleChildScrollView(
@@ -333,7 +352,6 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       ),
     );
   }
-
 
   Widget _buildEmergencyContactSection({required String emergencyContact}) {
     if (emergencyContact.isEmpty) return const SizedBox.shrink();
@@ -436,7 +454,6 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       ),
     );
   }
-
 }
 
 class TimelineWrapper extends StatelessWidget {

@@ -8,6 +8,7 @@ class AppAssets {
   static const String noplans = "assets/images/no_saved_plans.png";
   static const String location = "assets/images/location.png";
   static const String nearby = "assets/images/nearby.png";
+  static const String anis = "assets/images/ANIS.png";
 
   static const String imagesOnboarding1 = "assets/images/1.png";
 
@@ -41,16 +42,6 @@ class AppAssets {
   static const String imagesRectangle120Png = "assets/images/Rectangle 120.png";
 
   static const String imagesRectangle121 = "assets/images/Rectangle 121.png";
-
-  static const String iconsHome = "assets/icons/home.svg";
-
-  static const String iconsFavorite = "assets/icons/favorite.svg";
-
-  static const String iconsSearch = "assets/icons/search.svg";
-
-  static const String iconsProfile = "assets/icons/profile.svg";
-
-  static const String iconsTripPlanner = "assets/icons/trip_planner.svg";
 
   static const String fontsCairoBold = "assets/fonts/Cairo-Bold.ttf";
 

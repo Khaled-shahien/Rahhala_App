@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:rahhala_app/core/crash/app_error_reporter.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_cubit.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_state.dart';
@@ -24,6 +26,8 @@ class _PinterestCameraScreenState extends State<PinterestCameraScreen>
   List<AssetEntity> _galleryAssets = [];
   bool _isCameraReady = false;
   bool _isFlashOn = false;
+  String? _cameraError;
+  String? _galleryError;
   final DraggableScrollableController _sheetController =
       DraggableScrollableController();
 
@@ -50,48 +54,111 @@ class _PinterestCameraScreenState extends State<PinterestCameraScreen>
     }
     if (state == AppLifecycleState.inactive) {
       _cameraController?.dispose();
+      _cameraController = null;
+      if (mounted) setState(() => _isCameraReady = false);
     } else if (state == AppLifecycleState.resumed) {
       _initCamera();
     }
   }
 
   Future<void> _initCamera() async {
-    _cameras = await availableCameras();
-    if (_cameras.isEmpty) return;
+    final noCameraMessage = context.l10n.imageSearchNoCamera;
+    final cameraUnavailableMessage = context.l10n.imageSearchCameraUnavailable;
+    try {
+      if (mounted) {
+        setState(() {
+          _cameraError = null;
+          _isCameraReady = false;
+        });
+      }
 
-    _cameraController = CameraController(
-      _cameras.first,
-      ResolutionPreset.high,
-      enableAudio: false,
-    );
+      final cameras = await availableCameras();
+      if (cameras.isEmpty) {
+        if (mounted) setState(() => _cameraError = noCameraMessage);
+        return;
+      }
 
-    await _cameraController!.initialize();
-    if (mounted) setState(() => _isCameraReady = true);
+      final controller = CameraController(
+        cameras.first,
+        ResolutionPreset.high,
+        enableAudio: false,
+      );
+
+      await controller.initialize();
+      if (!mounted) {
+        await controller.dispose();
+        return;
+      }
+
+      await _cameraController?.dispose();
+      setState(() {
+        _cameras = cameras;
+        _cameraController = controller;
+        _isCameraReady = true;
+      });
+    } catch (e) {
+      AppLogger.instance
+          .e('PinterestCameraScreen failed camera init', error: e);
+      if (mounted) {
+        setState(() {
+          _cameraError = cameraUnavailableMessage;
+          _isCameraReady = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadGallery() async {
-    final permission = await PhotoManager.requestPermissionExtend();
-    if (!permission.hasAccess) return;
+    final photoAccessRequiredMessage =
+        context.l10n.imageSearchPhotoAccessRequired;
+    final noPhotosMessage = context.l10n.imageSearchNoPhotos;
+    try {
+      final permission = await PhotoManager.requestPermissionExtend();
+      if (!permission.hasAccess) {
+        if (mounted) {
+          setState(() => _galleryError = photoAccessRequiredMessage);
+        }
+        return;
+      }
 
-    final albums = await PhotoManager.getAssetPathList(
-      type: RequestType.image,
-      filterOption: FilterOptionGroup(
-        orders: [const OrderOption(type: OrderOptionType.createDate)],
-      ),
-    );
+      final albums = await PhotoManager.getAssetPathList(
+        type: RequestType.image,
+        filterOption: FilterOptionGroup(
+          orders: [const OrderOption(type: OrderOptionType.createDate)],
+        ),
+      );
 
-    if (albums.isEmpty) return;
+      if (albums.isEmpty) {
+        if (mounted) setState(() => _galleryError = noPhotosMessage);
+        return;
+      }
 
-    final assets = await albums.first.getAssetListRange(start: 0, end: 30);
-    if (mounted) setState(() => _galleryAssets = assets);
+      final assets = await albums.first.getAssetListRange(start: 0, end: 30);
+      if (mounted) {
+        setState(() {
+          _galleryError = null;
+          _galleryAssets = assets;
+        });
+      }
+    } catch (e) {
+      AppLogger.instance
+          .e('PinterestCameraScreen failed gallery load', error: e);
+      if (mounted) setState(() => _galleryError = noPhotosMessage);
+    }
   }
 
   Future<void> _toggleFlash() async {
     if (_cameraController == null) return;
-    setState(() => _isFlashOn = !_isFlashOn);
-    await _cameraController!.setFlashMode(
-      _isFlashOn ? FlashMode.torch : FlashMode.off,
-    );
+    final nextFlashState = !_isFlashOn;
+    try {
+      await _cameraController!.setFlashMode(
+        nextFlashState ? FlashMode.torch : FlashMode.off,
+      );
+      if (mounted) setState(() => _isFlashOn = nextFlashState);
+    } catch (e) {
+      AppLogger.instance
+          .e('PinterestCameraScreen failed flash toggle', error: e);
+    }
   }
 
   Future<void> _takePicture() async {
@@ -109,9 +176,20 @@ class _PinterestCameraScreenState extends State<PinterestCameraScreen>
   }
 
   Future<void> _pickFromGallery(AssetEntity asset) async {
-    final file = await asset.file;
-    if (file == null || !mounted) return;
-    _searchWithFile(file.path);
+    final photoOpenErrorMessage = context.l10n.imageSearchPhotoOpenError;
+    try {
+      final file = await asset.file;
+      if (file == null || !mounted) return;
+      _searchWithFile(file.path);
+    } catch (e) {
+      AppLogger.instance
+          .e('PinterestCameraScreen failed gallery pick', error: e);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(photoOpenErrorMessage)),
+        );
+      }
+    }
   }
 
   void _searchWithFile(String path) {
@@ -144,7 +222,34 @@ class _PinterestCameraScreenState extends State<PinterestCameraScreen>
           value: SystemUiOverlayStyle.light,
           child: Stack(
             children: [
-              if (_isCameraReady && _cameraController != null)
+              if (_cameraError != null)
+                Positioned.fill(
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 32.w),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.no_photography_outlined,
+                              color: Colors.white70, size: 44.sp),
+                          SizedBox(height: 12.h),
+                          Text(
+                            _cameraError!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white70, fontSize: 14.sp),
+                          ),
+                          SizedBox(height: 16.h),
+                          TextButton(
+                            onPressed: _initCamera,
+                            child: const Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              else if (_isCameraReady && _cameraController != null)
                 Positioned.fill(
                   child: CameraPreview(_cameraController!),
                 )
@@ -195,7 +300,8 @@ class _PinterestCameraScreenState extends State<PinterestCameraScreen>
                           height: 4.h,
                           decoration: BoxDecoration(
                             color: isDark
-                                ? colorScheme.onSurfaceVariant.withValues(alpha: 0.4)
+                                ? colorScheme.onSurfaceVariant
+                                    .withValues(alpha: 0.4)
                                 : Colors.white38,
                             borderRadius: BorderRadius.circular(2.r),
                           ),
@@ -250,14 +356,28 @@ class _PinterestCameraScreenState extends State<PinterestCameraScreen>
                                     (c) => c != current,
                                     orElse: () => _cameras.first,
                                   );
-                                  await _cameraController?.dispose();
-                                  _cameraController = CameraController(
-                                    next,
-                                    ResolutionPreset.high,
-                                    enableAudio: false,
-                                  );
-                                  await _cameraController!.initialize();
-                                  if (mounted) setState(() {});
+                                  try {
+                                    final controller = CameraController(
+                                      next,
+                                      ResolutionPreset.high,
+                                      enableAudio: false,
+                                    );
+                                    await controller.initialize();
+                                    await _cameraController?.dispose();
+                                    if (!mounted) {
+                                      await controller.dispose();
+                                      return;
+                                    }
+                                    setState(() {
+                                      _cameraController = controller;
+                                      _isCameraReady = true;
+                                    });
+                                  } catch (e) {
+                                    AppErrorReporter.record(
+                                      'PinterestCameraScreen failed camera flip',
+                                      error: e,
+                                    );
+                                  }
                                 },
                               ),
                             ],
@@ -267,7 +387,7 @@ class _PinterestCameraScreenState extends State<PinterestCameraScreen>
                         Expanded(
                           child: _galleryAssets.isEmpty
                               ? Center(
-                                  child: Text('No photos',
+                                  child: Text(_galleryError ?? 'No photos',
                                       style: TextStyle(
                                           color: isDark
                                               ? colorScheme.onSurfaceVariant

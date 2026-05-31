@@ -4,9 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/localization/app_locale_controller.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
+import 'package:rahhala_app/core/routing/app_router.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/theme/theme_controller.dart';
-import 'package:rahhala_app/features/splash/presentation/pages/splash_screen.dart';
 import 'package:rahhala_app/l10n/generated/app_localizations.dart';
 
 /// Entry point of the Rahhala travel application
@@ -39,9 +39,10 @@ class RahhalaApp extends StatelessWidget {
         return ListenableBuilder(
           listenable: Listenable.merge([localeController, themeController]),
           builder: (context, child) {
-            return MaterialApp(
+            return MaterialApp.router(
               debugShowCheckedModeBanner: false,
               onGenerateTitle: (context) => context.l10n.appTitle,
+              routerConfig: AppRouter.router,
               locale: localeController.locale,
               supportedLocales: AppLocaleController.supportedLocales,
               localizationsDelegates: const [
@@ -66,7 +67,6 @@ class RahhalaApp extends StatelessWidget {
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
               themeMode: themeController.themeMode,
-              home: const SplashScreen(),
             );
           },
         );

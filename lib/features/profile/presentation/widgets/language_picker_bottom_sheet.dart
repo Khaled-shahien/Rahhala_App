@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/localization/app_locale_controller.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 
 class LanguagePickerBottomSheet extends StatelessWidget {
-  const LanguagePickerBottomSheet({super.key});
+  const LanguagePickerBottomSheet({
+    super.key,
+    required this.localeController,
+  });
+
+  final AppLocaleController localeController;
 
   @override
   Widget build(BuildContext context) {
-    final localeController = sl<AppLocaleController>();
     final currentLocale = localeController.locale;
 
     return SafeArea(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/core/auth/auth_session_service.dart';
 import 'package:rahhala_app/core/constants/app_assets.dart';
+import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
@@ -29,7 +31,9 @@ class WelcomePage extends StatelessWidget {
       ));
     }
 
-    void continueAsGuest() {
+    Future<void> continueAsGuest() async {
+      await sl<AuthSessionService>().clearSession();
+      if (!context.mounted) return;
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const HomePage(isGuest: true)),

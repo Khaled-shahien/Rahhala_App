@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
@@ -16,87 +16,9 @@ import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_mod
 import 'package:rahhala_app/features/ai_recommendation/presentation/cubit/navigation_voice_cubit.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/expansion_tile_components.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_details_theme.dart';
-
-List<LatLng> _decodePolylinePoints(String encoded) {
-  final points = <LatLng>[];
-  int index = 0;
-  int lat = 0;
-  int lng = 0;
-
-  while (index < encoded.length) {
-    int result = 0;
-    int shift = 0;
-    int byte;
-    do {
-      byte = encoded.codeUnitAt(index++) - 63;
-      result |= (byte & 0x1f) << shift;
-      shift += 5;
-    } while (byte >= 0x20);
-    final deltaLat = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
-    lat += deltaLat;
-
-    result = 0;
-    shift = 0;
-    do {
-      byte = encoded.codeUnitAt(index++) - 63;
-      result |= (byte & 0x1f) << shift;
-      shift += 5;
-    } while (byte >= 0x20);
-    final deltaLng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
-    lng += deltaLng;
-
-    points.add(LatLng(lat / 1e5, lng / 1e5));
-  }
-
-  return points;
-}
-
-LatLng? _extractStepPoint(dynamic value) {
-  if (value is Map<String, dynamic>) {
-    final lat = (value['lat'] as num?)?.toDouble() ??
-        (value['latitude'] as num?)?.toDouble();
-    final lng = (value['lng'] as num?)?.toDouble() ??
-        (value['longitude'] as num?)?.toDouble();
-    if (lat != null && lng != null) {
-      return LatLng(lat, lng);
-    }
-  }
-  return null;
-}
-
-List<_RouteStepData> _extractRouteSteps(dynamic rawSteps) {
-  if (rawSteps is! List) {
-    return const [];
-  }
-
-  final steps = <_RouteStepData>[];
-  for (final step in rawSteps) {
-    if (step is! Map<String, dynamic>) {
-      continue;
-    }
-
-    final instruction = step['instruction']?.toString().trim() ?? '';
-    if (instruction.isEmpty) {
-      continue;
-    }
-
-    steps.add(
-      _RouteStepData(
-        instruction: instruction,
-        duration: step['duration']?.toString().trim().isNotEmpty == true
-            ? step['duration'].toString().trim()
-            : '--',
-        distance: step['distance']?.toString().trim().isNotEmpty == true
-            ? step['distance'].toString().trim()
-            : '--',
-        startLocation: _extractStepPoint(step['startLocation']),
-        endLocation: _extractStepPoint(step['endLocation']),
-      ),
-    );
-  }
-
-  return steps;
-}
+import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_location_tracking_service.dart';
+import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_navigation_voice_service.dart';
+import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_route_helpers.dart';
 
 class TripDaySection extends StatelessWidget {
   const TripDaySection({
@@ -233,12 +155,14 @@ class _DayDetailsContent extends StatelessWidget {
                       padding: EdgeInsets.only(bottom: 12.h),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12.r),
-                        child: Image.network(
-                          act.image!,
+                        child: CachedNetworkImage(
+                          imageUrl: act.image!,
                           width: double.infinity,
                           height: 180.h,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
+                          placeholder: (context, url) =>
+                              const SizedBox.shrink(),
+                          errorWidget: (context, url, error) {
                             AppLogger.instance.w('Image load failed');
                             return const SizedBox.shrink();
                           },
@@ -246,8 +170,8 @@ class _DayDetailsContent extends StatelessWidget {
                       ),
                     ),
                   Padding(
-                    padding:
-                        EdgeInsetsDirectional.only(start: 45.w, end: 12.w, bottom: 12.h),
+                    padding: EdgeInsetsDirectional.only(
+                        start: 45.w, end: 12.w, bottom: 12.h),
                     child: Text(
                       act.description,
                       style: TextStyle(
@@ -283,7 +207,7 @@ class _DayRouteMapSectionState extends State<_DayRouteMapSection> {
   );
 
   late final List<LatLng> _waypoints;
-  Future<_RouteResponseData?>? _routeFuture;
+  Future<TripRouteResponseData?>? _routeFuture;
 
   @override
   void initState() {
@@ -317,7 +241,7 @@ class _DayRouteMapSectionState extends State<_DayRouteMapSection> {
     return LatLng(lat, lng);
   }
 
-  Future<_RouteResponseData?> _fetchRouteData(List<LatLng> waypoints) async {
+  Future<TripRouteResponseData?> _fetchRouteData(List<LatLng> waypoints) async {
     try {
       final api = sl<ApiConsumer>();
       final response = await api.post(
@@ -346,7 +270,7 @@ class _DayRouteMapSectionState extends State<_DayRouteMapSection> {
       String instruction = 'Follow the route';
       String instructionDuration = totalDuration;
       final steps = response['steps'];
-      final extractedSteps = _extractRouteSteps(steps);
+      final extractedSteps = extractTripRouteSteps(steps);
       if (steps is List &&
           steps.isNotEmpty &&
           steps.first is Map<String, dynamic>) {
@@ -362,7 +286,7 @@ class _DayRouteMapSectionState extends State<_DayRouteMapSection> {
       }
 
       if (!canDrawRoute || encoded == null || encoded.isEmpty) {
-        return _RouteResponseData(
+        return TripRouteResponseData(
           polylinePoints: waypoints,
           totalDistance: totalDistance,
           totalDuration: totalDuration,
@@ -372,9 +296,9 @@ class _DayRouteMapSectionState extends State<_DayRouteMapSection> {
         );
       }
 
-      final decoded = _decodePolylinePoints(encoded);
+      final decoded = decodeTripPolylinePoints(encoded);
       final points = decoded.length >= 2 ? decoded : waypoints;
-      return _RouteResponseData(
+      return TripRouteResponseData(
         polylinePoints: points,
         totalDistance: totalDistance,
         totalDuration: totalDuration,
@@ -384,7 +308,7 @@ class _DayRouteMapSectionState extends State<_DayRouteMapSection> {
       );
     } catch (error) {
       AppLogger.instance.w('Trip route API failed, using fallback polyline');
-      return _RouteResponseData(
+      return TripRouteResponseData(
         polylinePoints: waypoints,
         totalDistance: '--',
         totalDuration: '--',
@@ -422,7 +346,7 @@ class _DayRouteMapSectionState extends State<_DayRouteMapSection> {
           child: SizedBox(
             width: double.infinity,
             height: 200.h,
-            child: FutureBuilder<_RouteResponseData?>(
+            child: FutureBuilder<TripRouteResponseData?>(
               future: _routeFuture,
               builder: (context, snapshot) {
                 final routeData = snapshot.data;
@@ -527,49 +451,7 @@ class _DayRouteMapSectionState extends State<_DayRouteMapSection> {
     );
   }
 
-  LatLng _calculateCenter(List<LatLng> points) {
-    var sumLat = 0.0;
-    var sumLng = 0.0;
-    for (final point in points) {
-      sumLat += point.latitude;
-      sumLng += point.longitude;
-    }
-    return LatLng(sumLat / points.length, sumLng / points.length);
-  }
-}
-
-class _RouteResponseData {
-  const _RouteResponseData({
-    required this.polylinePoints,
-    required this.totalDistance,
-    required this.totalDuration,
-    required this.nextInstruction,
-    required this.nextInstructionDuration,
-    required this.steps,
-  });
-
-  final List<LatLng> polylinePoints;
-  final String totalDistance;
-  final String totalDuration;
-  final String nextInstruction;
-  final String nextInstructionDuration;
-  final List<_RouteStepData> steps;
-}
-
-class _RouteStepData {
-  const _RouteStepData({
-    required this.instruction,
-    required this.duration,
-    required this.distance,
-    this.startLocation,
-    this.endLocation,
-  });
-
-  final String instruction;
-  final String duration;
-  final String distance;
-  final LatLng? startLocation;
-  final LatLng? endLocation;
+  LatLng _calculateCenter(List<LatLng> points) => calculateMapCenter(points);
 }
 
 class _FullScreenDayRouteMap extends StatefulWidget {
@@ -579,7 +461,7 @@ class _FullScreenDayRouteMap extends StatefulWidget {
   });
 
   final List<LatLng> waypoints;
-  final _RouteResponseData? routeData;
+  final TripRouteResponseData? routeData;
 
   @override
   State<_FullScreenDayRouteMap> createState() => _FullScreenDayRouteMapState();
@@ -592,9 +474,12 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
 
   final Distance _distance = const Distance();
   final MapController _mapController = MapController();
-  final FlutterTts _tts = FlutterTts();
 
-  StreamSubscription<Position>? _positionSub;
+  // TODO: Consider injecting these services via constructor or GetIt
+  // for deeper testability improvements in a future refactor.
+  final TripNavigationVoiceService _voiceService = TripNavigationVoiceService();
+  final TripLocationTrackingService _locationService =
+      TripLocationTrackingService();
 
   late List<LatLng> _routePoints;
   late List<LatLng> _plannedRoutePoints;
@@ -604,7 +489,7 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
   late String _nextInstruction;
   late String _nextInstructionDuration;
 
-  List<_RouteStepData> _steps = const [];
+  List<TripRouteStepData> _steps = const [];
   Position? _currentPosition;
 
   bool _isNavigating = false;
@@ -620,13 +505,13 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
   void initState() {
     super.initState();
     _hydrateFromInitialRoute();
-    _configureTts();
+    _voiceService.configure();
   }
 
   @override
   void dispose() {
-    _positionSub?.cancel();
-    _tts.stop();
+    _locationService.dispose();
+    _voiceService.dispose();
     super.dispose();
   }
 
@@ -642,12 +527,7 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
     _steps = routeData?.steps ?? const [];
   }
 
-  Future<void> _configureTts() async {
-    await _tts.setSpeechRate(0.46);
-    await _tts.setVolume(1.0);
-    await _tts.setPitch(1.0);
-    await _tts.setLanguage('en-US');
-  }
+  LatLng _calculateCenter(List<LatLng> points) => calculateMapCenter(points);
 
   LatLng _centerFromCurrentRoute() {
     if (_routePoints.isEmpty) {
@@ -658,73 +538,41 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
     return _calculateCenter(_routePoints);
   }
 
-  LatLng _calculateCenter(List<LatLng> points) {
-    var sumLat = 0.0;
-    var sumLng = 0.0;
-    for (final point in points) {
-      sumLat += point.latitude;
-      sumLng += point.longitude;
-    }
-    return LatLng(sumLat / points.length, sumLng / points.length);
-  }
-
   Future<Position?> _requestCurrentPosition() async {
-    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('GPS is disabled. Please enable it.')),
-        );
-      }
-      return null;
-    }
-
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    if (permission == LocationPermission.denied) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location permission denied.')),
-        );
-      }
-      return null;
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Location permission denied permanently.'),
-          ),
-        );
-      }
-      return null;
-    }
-
-    return Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.best),
+    return _locationService.getCurrentLocation(
+      onServiceDisabled: () {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('GPS is disabled. Please enable it.')),
+          );
+        }
+      },
+      onPermissionDenied: () {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permission denied.')),
+          );
+        }
+      },
+      onPermissionDeniedForever: () {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Location permission denied permanently.'),
+            ),
+          );
+        }
+      },
     );
   }
 
   void _ensureLocationStream() {
-    if (_positionSub != null) {
-      return;
-    }
+    if (_locationService.isTracking) return;
 
-    _positionSub = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.bestForNavigation,
-        distanceFilter: 5,
-      ),
-    ).listen(
-      _onLocationUpdate,
+    _locationService.startTracking(
+      onUpdate: _onLocationUpdate,
       onError: (_) {
-        if (!mounted) {
-          return;
-        }
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text('Unable to read live location updates.')),
@@ -851,7 +699,8 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
   }
 
   void _stopNavigation() {
-    _tts.stop();
+    _voiceService.stop();
+    _locationService.stopTracking();
     setState(() {
       _isNavigating = false;
       _isFollowingUser = false;
@@ -864,7 +713,7 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
     });
   }
 
-  String _pointLabel(int index) => String.fromCharCode(65 + index);
+  String _pointLabel(int index) => waypointLabel(index);
 
   Future<void> _advanceToNextLeg() async {
     if (!_isNavigating || _isAdvancingLeg) {
@@ -929,7 +778,7 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
     }
   }
 
-  Future<_RouteResponseData?> _fetchRouteForNavigation(
+  Future<TripRouteResponseData?> _fetchRouteForNavigation(
     LatLng from,
     LatLng to,
   ) async {
@@ -954,14 +803,14 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
       final encoded = response['polyline']?.toString();
       final totalDistance = response['totalDistance']?.toString() ?? '--';
       final totalDuration = response['totalDuration']?.toString() ?? '--';
-      final steps = _extractRouteSteps(response['steps']);
+      final steps = extractTripRouteSteps(response['steps']);
 
       final firstStep = steps.isNotEmpty ? steps.first : null;
       final nextInstruction = firstStep?.instruction ?? 'Follow the route';
       final nextInstructionDuration = firstStep?.duration ?? totalDuration;
 
       if (!canDrawRoute || encoded == null || encoded.isEmpty) {
-        return _RouteResponseData(
+        return TripRouteResponseData(
           polylinePoints: [from, to],
           totalDistance: totalDistance,
           totalDuration: totalDuration,
@@ -971,8 +820,8 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
         );
       }
 
-      final decoded = _decodePolylinePoints(encoded);
-      return _RouteResponseData(
+      final decoded = decodeTripPolylinePoints(encoded);
+      return TripRouteResponseData(
         polylinePoints: decoded.length >= 2 ? decoded : [from, to],
         totalDistance: totalDistance,
         totalDuration: totalDuration,
@@ -980,7 +829,8 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
         nextInstructionDuration: nextInstructionDuration,
         steps: steps,
       );
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.w('Navigation route fetch failed', error: e);
       return null;
     }
   }
@@ -1007,7 +857,8 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
       unawaited(_animateCameraTo(current, zoom: 16));
     }
 
-    final distanceFromRoute = _distanceToPolylineMeters(current, _routePoints);
+    final distanceFromRoute = distanceToPolylineMeters(current, _routePoints,
+        distanceCalculator: _distance);
     if (!_lockRouteToWaypoints &&
         distanceFromRoute > _offRouteThresholdMeters &&
         !_isRerouting) {
@@ -1053,16 +904,20 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
       return;
     }
 
-    final nearestIndex = _nearestRouteIndex(current, _routePoints);
-    final remainingMeters = _polylineLength(_routePoints.sublist(nearestIndex));
-    final totalMeters = _polylineLength(_routePoints);
+    final nearestIndex = nearestRoutePointIndex(current, _routePoints,
+        distanceCalculator: _distance);
+    final remainingMeters = polylineLengthMeters(
+        _routePoints.sublist(nearestIndex),
+        distanceCalculator: _distance);
+    final totalMeters =
+        polylineLengthMeters(_routePoints, distanceCalculator: _distance);
 
     final safeSpeed = speedMps > 1.2 ? speedMps : 13.9;
     final etaSeconds = (remainingMeters / safeSpeed).round();
 
-    _remainingDistance = _formatMeters(remainingMeters);
-    _totalDistance = _formatMeters(totalMeters);
-    _eta = _formatDuration(Duration(seconds: etaSeconds));
+    _remainingDistance = formatMetersDisplay(remainingMeters);
+    _totalDistance = formatMetersDisplay(totalMeters);
+    _eta = formatDurationDisplay(Duration(seconds: etaSeconds));
 
     if (_steps.isNotEmpty) {
       final nextStepIndex = _resolveStepIndex(current);
@@ -1101,69 +956,13 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
     return _distance.as(LengthUnit.Meter, a, b);
   }
 
-  int _nearestRouteIndex(LatLng current, List<LatLng> points) {
-    var nearestIndex = 0;
-    var minDistance = double.infinity;
-    for (var i = 0; i < points.length; i++) {
-      final d = _distanceInMeters(current, points[i]);
-      if (d < minDistance) {
-        minDistance = d;
-        nearestIndex = i;
-      }
-    }
-    return nearestIndex;
-  }
-
-  double _polylineLength(List<LatLng> points) {
-    if (points.length < 2) {
-      return 0;
-    }
-
-    var total = 0.0;
-    for (var i = 0; i < points.length - 1; i++) {
-      total += _distanceInMeters(points[i], points[i + 1]);
-    }
-    return total;
-  }
-
-  double _distanceToPolylineMeters(LatLng current, List<LatLng> points) {
-    if (points.isEmpty) {
-      return double.infinity;
-    }
-
-    var min = double.infinity;
-    for (final point in points) {
-      final d = _distanceInMeters(current, point);
-      if (d < min) {
-        min = d;
-      }
-    }
-    return min;
-  }
-
-  String _formatMeters(double meters) {
-    if (meters >= 1000) {
-      return '${(meters / 1000).toStringAsFixed(1)} km';
-    }
-    return '${meters.round()} m';
-  }
-
-  String _formatDuration(Duration d) {
-    if (d.inHours >= 1) {
-      final minutes = d.inMinutes % 60;
-      return '${d.inHours}h ${minutes}m';
-    }
-    return '${d.inMinutes.clamp(1, 59)} mins';
-  }
-
   Future<void> _maybeSpeakCurrentInstruction() async {
     final isMuted = context.read<NavigationVoiceCubit>().isMuted;
     if (isMuted || !_isNavigating || _nextInstruction.trim().isEmpty) {
       return;
     }
 
-    await _tts.stop();
-    await _tts.speak(_nextInstruction);
+    await _voiceService.speak(_nextInstruction);
   }
 
   @override
@@ -1173,7 +972,8 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
         ? LatLng(current.latitude, current.longitude)
         : _centerFromCurrentRoute();
     final remainingRoute = _routePoints.length >= 2 && current != null
-        ? _routePoints.sublist(_nearestRouteIndex(center, _routePoints))
+        ? _routePoints.sublist(nearestRoutePointIndex(center, _routePoints,
+            distanceCalculator: _distance))
         : _routePoints;
     final routeColor =
         _activeLegStartIndex < 0 ? _currentLegColor : _plannedRouteColor;
@@ -1363,7 +1163,7 @@ class _FullScreenDayRouteMapState extends State<_FullScreenDayRouteMap> {
                         final mutedNow = voiceCubit.isMuted;
 
                         if (mutedNow) {
-                          await _tts.stop();
+                          await _voiceService.stop();
                         } else {
                           await _maybeSpeakCurrentInstruction();
                         }

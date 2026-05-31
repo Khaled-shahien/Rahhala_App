@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rahhala_app/core/auth/auth_session_service.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
-import 'package:rahhala_app/core/utils/token_storage.dart';
-import 'package:rahhala_app/features/profile/data/repositories/user_repository.dart';
+import 'package:rahhala_app/features/profile/domain/repositories/user_repository.dart';
 import 'package:rahhala_app/features/profile/domain/profile/profile_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
@@ -14,16 +14,11 @@ class ProfileCubit extends Cubit<ProfileState> {
     await res.fold(
       (failure) async => emit(ProfileFailure(failure.message)),
       (details) async {
-        if (details.fullName.trim().isNotEmpty) {
-          await sl<TokenStorage>().setFullName(details.fullName.trim());
-        }
-        if (details.email.trim().isNotEmpty) {
-          await sl<TokenStorage>().setEmail(details.email.trim().toLowerCase());
-        }
-        if (details.profileImageUrl != null &&
-            details.profileImageUrl!.isNotEmpty) {
-          await sl<TokenStorage>().setProfileImageUrl(details.profileImageUrl!);
-        }
+        await sl<AuthSessionService>().saveSession(
+          fullName: details.fullName.trim(),
+          email: details.email.trim().toLowerCase(),
+          profileImageUrl: details.profileImageUrl,
+        );
         emit(ProfileLoaded(details));
       },
     );
@@ -54,14 +49,13 @@ class ProfileCubit extends Cubit<ProfileState> {
           (details) async {
             if (details.profileImageUrl != null &&
                 details.profileImageUrl!.isNotEmpty) {
-              await sl<TokenStorage>().setProfileImageUrl(
-                details.profileImageUrl!,
+              await sl<AuthSessionService>().saveSession(
+                profileImageUrl: details.profileImageUrl!,
               );
             }
-
-            if (details.fullName.trim().isNotEmpty) {
-              await sl<TokenStorage>().setFullName(details.fullName.trim());
-            }
+            await sl<AuthSessionService>().saveSession(
+              fullName: details.fullName.trim(),
+            );
 
             emit(ProfileActionSuccess(success));
             emit(ProfileLoaded(details));
@@ -89,7 +83,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     await res.fold(
       (failure) async => emit(ProfileFailure(failure.message)),
       (success) async {
-        await sl<TokenStorage>().setFullName(fullName);
+        await sl<AuthSessionService>().saveSession(fullName: fullName);
         emit(ProfileActionSuccess(success));
         await fetch();
       },

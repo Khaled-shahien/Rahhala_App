@@ -201,8 +201,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                         SizedBox(height: 24.h),
                                         CustomFormTextField(
                                           controller: _passwordController,
-                                          labelText: context.l10n.authNewPassword,
-                                          hintText: context.l10n.authNewPasswordHint,
+                                          labelText:
+                                              context.l10n.authNewPassword,
+                                          hintText:
+                                              context.l10n.authNewPasswordHint,
                                           obscureText: _obscurePassword,
                                           prefixIcon: Icons.lock_outline,
                                           suffixIcon: IconButton(
@@ -273,7 +275,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                               SizedBox(height: 12.h),
                                               _rule(
                                                   ok: pw.length >= 8,
-                                                  text: context.l10n.passwordRule8Chars,
+                                                  text: context
+                                                      .l10n.passwordRule8Chars,
                                                   textColor: colorScheme
                                                       .onSurfaceVariant,
                                                   inactiveIconColor: colorScheme
@@ -281,8 +284,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                               _rule(
                                                   ok: RegExp(r'[A-Z]')
                                                       .hasMatch(pw),
-                                                  text:
-                                                      context.l10n.passwordRuleUppercase,
+                                                  text: context.l10n
+                                                      .passwordRuleUppercase,
                                                   textColor: colorScheme
                                                       .onSurfaceVariant,
                                                   inactiveIconColor: colorScheme
@@ -290,8 +293,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                               _rule(
                                                   ok: RegExp(r'[a-z]')
                                                       .hasMatch(pw),
-                                                  text:
-                                                      context.l10n.passwordRuleLowercase,
+                                                  text: context.l10n
+                                                      .passwordRuleLowercase,
                                                   textColor: colorScheme
                                                       .onSurfaceVariant,
                                                   inactiveIconColor: colorScheme
@@ -299,7 +302,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                               _rule(
                                                   ok: RegExp(r'\d')
                                                       .hasMatch(pw),
-                                                  text: context.l10n.passwordRuleNumber,
+                                                  text: context
+                                                      .l10n.passwordRuleNumber,
                                                   textColor: colorScheme
                                                       .onSurfaceVariant,
                                                   inactiveIconColor: colorScheme
@@ -307,8 +311,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                               _rule(
                                                   ok: RegExp(r'[^A-Za-z0-9]')
                                                       .hasMatch(pw),
-                                                  text:
-                                                      context.l10n.passwordRuleSpecial,
+                                                  text: context
+                                                      .l10n.passwordRuleSpecial,
                                                   textColor: colorScheme
                                                       .onSurfaceVariant,
                                                   inactiveIconColor: colorScheme
@@ -320,8 +324,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                         CustomFormTextField(
                                           controller:
                                               _confirmPasswordController,
-                                          labelText: context.l10n.authConfirmNewPassword,
-                                          hintText: context.l10n.authConfirmNewPasswordHint,
+                                          labelText: context
+                                              .l10n.authConfirmNewPassword,
+                                          hintText: context
+                                              .l10n.authConfirmNewPasswordHint,
                                           obscureText: _obscureConfirmPassword,
                                           prefixIcon: Icons.lock_reset_outlined,
                                           suffixIcon: IconButton(

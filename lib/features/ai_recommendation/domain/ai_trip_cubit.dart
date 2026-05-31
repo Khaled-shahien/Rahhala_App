@@ -1,32 +1,40 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rahhala_app/features/ai_recommendation/data/repositories/gemini_repository.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_state.dart';
+import 'package:rahhala_app/features/ai_recommendation/domain/repositories/trip_options_repository.dart';
+import 'package:rahhala_app/features/ai_recommendation/domain/trip_option.dart';
 
 class AiTripCubit extends Cubit<AiTripState> {
   final GeminiRepository geminiRepository;
+  final TripOptionsRepository tripOptionsRepository;
 
-  final List<String> budgetRanges = [
-    'Less 5000',
-    'From 5000 to 10000',
-    'From 10000 to 15000',
-    'From 15000 to 20000',
-    'More than 20000',
-  ];
-  final List<String> availableInterests = [
-    'Nature',
-    'Adventure',
-    'Relaxation',
-    'Historical sites',
-    'Morning activity',
-    'Night activity',
-    'Shopping',
-    'Hidden gems'
-  ];
+  List<String> get budgetRanges => _currentOptions.budgetRanges
+      .map((option) => option.label)
+      .toList(growable: false);
+  List<String> get availableInterests => _currentOptions.interests
+      .map((option) => option.label)
+      .toList(growable: false);
 
-  AiTripCubit({required this.geminiRepository}) : super(const AiTripInitial());
+  TripOptionsConfig get _currentOptions {
+    final currentState = state;
+    if (currentState is AiTripData) {
+      return currentState.tripOptions;
+    }
+    return const TripOptionsConfig.empty();
+  }
 
-  void init() {
+  AiTripCubit({
+    required this.geminiRepository,
+    required this.tripOptionsRepository,
+  }) : super(const AiTripInitial());
+
+  Future<void> init() async {
     emit(const AiTripData());
+    final options = await tripOptionsRepository.getTripOptions();
+    final currentState = state;
+    if (currentState is AiTripData) {
+      emit(currentState.copyWith(tripOptions: options));
+    }
   }
 
   void updateDestination(String dest) {
@@ -37,7 +45,11 @@ class AiTripCubit extends Cubit<AiTripState> {
 
   void updateDays(int days) {
     if (state is AiTripData) {
-      emit((state as AiTripData).copyWith(totalDays: days));
+      final options = (state as AiTripData).tripOptions;
+      final minDays = options.minDays;
+      final maxDays = options.maxDays;
+      final safeDays = days.clamp(minDays, maxDays);
+      emit((state as AiTripData).copyWith(totalDays: safeDays));
     }
   }
 
@@ -67,6 +79,11 @@ class AiTripCubit extends Cubit<AiTripState> {
 
   String _parseBudget(String? range) {
     if (range == null) return "5000";
+    final option = _currentOptions.budgetRanges.where(
+      (option) => option.label == range,
+    );
+    if (option.isNotEmpty) return option.first.value;
+
     if (range.startsWith('Less')) return "5000";
     if (range.startsWith('More')) return "25000";
 
@@ -128,6 +145,13 @@ class AiTripCubit extends Cubit<AiTripState> {
     if (currentState.selectedInterests.isEmpty) {
       emit(AiTripFailure(currentState,
           message: "Please select at least one interest."));
+      return;
+    }
+    final minDays = currentState.tripOptions.minDays;
+    final maxDays = currentState.tripOptions.maxDays;
+    if (currentState.totalDays < minDays || currentState.totalDays > maxDays) {
+      emit(AiTripFailure(currentState,
+          message: "Trip length must be between $minDays and $maxDays days."));
       return;
     }
 

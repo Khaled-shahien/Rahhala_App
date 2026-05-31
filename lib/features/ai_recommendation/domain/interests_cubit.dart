@@ -1,5 +1,3 @@
-
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class InterestsState {
@@ -17,13 +15,11 @@ class InterestsState {
 }
 
 class InterestsCubit extends Cubit<InterestsState> {
+  InterestsCubit({
+    required this.availableInterests,
+  }) : super(InterestsState());
 
-  final List<String> availableInterests = [
-    'Nature', 'Adventure', 'Relaxation', 'Historical sites',
-    'Morning activity', 'Night activity', 'Shopping', 'Hidden gems'
-  ];
-
-  InterestsCubit() : super(InterestsState());
+  final List<String> availableInterests;
 
   void toggleInterest(String interest) {
     final current = List<String>.from(state.selectedInterests);

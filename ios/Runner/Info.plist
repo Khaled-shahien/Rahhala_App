@@ -6,6 +6,8 @@
     <string>We need camera access to search places by photo</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>We need photo library access to search places by photo</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Rahhala uses your location to show nearby places and travel recommendations around you.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

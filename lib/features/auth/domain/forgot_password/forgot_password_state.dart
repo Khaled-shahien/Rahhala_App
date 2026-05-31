@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:rahhala_app/features/auth/data/models/success_message_model.dart';
+import 'package:rahhala_app/features/auth/domain/entities/success_message.dart';
 
 abstract class ForgotPasswordState extends Equatable {
   const ForgotPasswordState();

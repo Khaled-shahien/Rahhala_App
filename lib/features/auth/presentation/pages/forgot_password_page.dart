@@ -177,7 +177,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                         SizedBox(height: 26.h),
                                         CustomFormTextField(
                                           controller: _emailController,
-                                          labelText: context.l10n.authEmailAddress,
+                                          labelText:
+                                              context.l10n.authEmailAddress,
                                           hintText: context.l10n.authEmailHint,
                                           keyboardType:
                                               TextInputType.emailAddress,

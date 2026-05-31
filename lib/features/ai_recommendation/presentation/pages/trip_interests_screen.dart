@@ -34,9 +34,10 @@ class TripInterestsScreen extends StatelessWidget {
 
     return BlocBuilder<AiTripCubit, AiTripState>(
       builder: (context, state) {
-        if (state is! AiTripData) {
+        if (state is! AiTripData || cubit.availableInterests.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
+        final canGoNext = state.selectedInterests.isNotEmpty;
 
         return SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -80,19 +81,21 @@ class TripInterestsScreen extends StatelessWidget {
               ),
               SizedBox(height: 44.h),
               NextButton(
-                onPressed: () {
-                  cubit.generateTripPlan();
+                onPressed: canGoNext
+                    ? () {
+                        cubit.generateTripPlan();
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BlocProvider.value(
-                        value: cubit,
-                        child: const TripSplashScreen(),
-                      ),
-                    ),
-                  );
-                },
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider.value(
+                              value: cubit,
+                              child: const TripSplashScreen(),
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
                 text: l10n.commonNext,
               ),
               SizedBox(height: 44.h),

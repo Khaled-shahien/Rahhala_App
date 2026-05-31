@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:rahhala_app/features/profile/data/models/user_model_details.dart';
-import 'package:rahhala_app/features/auth/data/models/success_message_model.dart';
+import 'package:rahhala_app/features/profile/domain/entities/user_details.dart';
+import 'package:rahhala_app/features/auth/domain/entities/success_message.dart';
 
 abstract class ProfileState extends Equatable {
   const ProfileState();
@@ -26,10 +26,9 @@ class ProfileFailure extends ProfileState {
   List<Object?> get props => [message];
 }
 
-class ProfileActionLoading extends ProfileState {} 
+class ProfileActionLoading extends ProfileState {}
 
 class ProfileActionSuccess extends ProfileState {
-  
   final SuccessMessageModel model;
   const ProfileActionSuccess(this.model);
   @override

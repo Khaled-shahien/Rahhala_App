@@ -17,6 +17,20 @@ class AppConstants {
   /// App version
   static const String appVersion = '1.0.0';
 
+  /// Available build flavors.
+  static const String developmentFlavor = 'development';
+  static const String stagingFlavor = 'staging';
+  static const String productionFlavor = 'production';
+
+  /// Current build flavor.
+  ///
+  /// Set at build time with:
+  ///   `--dart-define=APP_FLAVOR=development|staging|production`
+  static const String appFlavor = String.fromEnvironment(
+    'APP_FLAVOR',
+    defaultValue: productionFlavor,
+  );
+
   // ==================== API ====================
 
   /// API Base URL
@@ -135,17 +149,41 @@ class AppConstants {
 
   // ==================== Features ====================
 
-  /// Enable debug mode
-  static const bool debugMode = true; // Change to false in production
+  /// Enable debug mode.
+  ///
+  /// Defaults to `false`. Enable at build time with:
+  ///   `flutter run --dart-define=DEBUG_MODE=true`
+  static const bool debugMode = bool.fromEnvironment(
+    'DEBUG_MODE',
+    defaultValue: false,
+  );
 
-  /// Enable logging
-  static const bool enableLogging = true;
+  /// Enable logging.
+  ///
+  /// Defaults to `true`. Logging is generally safe in production
+  /// when sensitive data is not included.
+  static const bool enableLogging = bool.fromEnvironment(
+    'ENABLE_LOGGING',
+    defaultValue: true,
+  );
 
-  /// Enable analytics
-  static const bool enableAnalytics = false;
+  /// Enable analytics tracking.
+  ///
+  /// Defaults to `false`. Enable at build time with:
+  ///   `flutter run --dart-define=ENABLE_ANALYTICS=true`
+  static const bool enableAnalytics = bool.fromEnvironment(
+    'ENABLE_ANALYTICS',
+    defaultValue: false,
+  );
 
-  /// Enable crash reporting
-  static const bool enableCrashReporting = false;
+  /// Enable crash reporting.
+  ///
+  /// Defaults to `false`. Enable at build time with:
+  ///   `flutter run --dart-define=ENABLE_CRASH_REPORTING=true`
+  static const bool enableCrashReporting = bool.fromEnvironment(
+    'ENABLE_CRASH_REPORTING',
+    defaultValue: false,
+  );
 
   // ==================== Social Media ====================
 
@@ -286,12 +324,16 @@ class SuccessMessages {
   static const String emailVerified = 'Email verified successfully';
 }
 
-/// Debug information
+/// Debug information.
+///
+/// All flags default to the value of [AppConstants.debugMode], so in
+/// production builds they are automatically `false` unless explicitly
+/// overridden with `--dart-define`.
 class DebugInfo {
   DebugInfo._();
 
-  static const bool enableDebugPrint = true;
-  static const bool enableNetworkLogs = true;
-  static const bool enableBlocLogs = true;
-  static const bool enableNavigationLogs = true;
+  static const bool enableDebugPrint = AppConstants.debugMode;
+  static const bool enableNetworkLogs = AppConstants.debugMode;
+  static const bool enableBlocLogs = AppConstants.debugMode;
+  static const bool enableNavigationLogs = AppConstants.debugMode;
 }

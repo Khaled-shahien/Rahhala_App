@@ -6,6 +6,8 @@ import 'package:rahhala_app/core/constants/app_text_styles.dart';
 import 'package:rahhala_app/features/nearby/data/models/nearby_place_model.dart';
 
 class NearbyPlaceCard extends StatelessWidget {
+  static const double estimatedHeight = 134;
+
   final NearbyPlaceModel place;
   const NearbyPlaceCard({super.key, required this.place});
 

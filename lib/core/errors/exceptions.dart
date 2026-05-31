@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:rahhala_app/core/errors/error_model.dart';
+import 'package:rahhala_app/core/logging/app_logger.dart';
 
 class ServerException implements Exception {
   final ErrorModel errorModel;
@@ -33,7 +34,12 @@ Never handleDioException(DioException e) {
         try {
           final d = jsonDecode(data);
           if (d is Map<String, dynamic>) map = d;
-        } catch (_) {}
+        } catch (e) {
+          AppLogger.instance.w(
+            'handleDioException: Failed to decode response body as JSON',
+            error: e,
+          );
+        }
       }
 
       if (map.isEmpty) {

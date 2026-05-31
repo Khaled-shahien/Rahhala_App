@@ -793,4 +793,123 @@ class AppLocalizationsEn extends AppLocalizations {
   String favouritesSavedOn(Object date) {
     return 'Saved on $date';
   }
+
+  @override
+  String get homeLoadingMorePlaces => 'Loading more places...';
+
+  @override
+  String get homeEndOfList => 'You\'ve seen it all!';
+
+  @override
+  String get homeNoPlaces => 'No places available right now.';
+
+  @override
+  String get homeLoadMoreError =>
+      'Could not load more places. Please try again.';
+
+  @override
+  String get homeFavouriteError =>
+      'Could not update your favourites. Please try again.';
+
+  @override
+  String get reviewLoginRequired =>
+      'Login is required to add a rating and review.';
+
+  @override
+  String get reviewSubmitTitle => 'Submit your review';
+
+  @override
+  String get reviewYourRate => 'Your Rate';
+
+  @override
+  String get reviewYourRating => 'Your Rating';
+
+  @override
+  String get reviewHint => 'Your review...';
+
+  @override
+  String get reviewUpdateHint => 'Update your review...';
+
+  @override
+  String get reviewEditTitle => 'Edit Review';
+
+  @override
+  String get reviewUpdate => 'Update Review';
+
+  @override
+  String get reviewSelectRating =>
+      'Please select a rating before submitting your review.';
+
+  @override
+  String get reviewEnterComment => 'Please enter your comment.';
+
+  @override
+  String get reviewSubmit => 'Submit';
+
+  @override
+  String get reviewDeleteTitle => 'Delete Review';
+
+  @override
+  String get reviewDeleteMessage =>
+      'Are you sure you want to delete this review?';
+
+  @override
+  String get reviewEditTooltip => 'Edit review';
+
+  @override
+  String get reviewDeleteTooltip => 'Delete review';
+
+  @override
+  String get imageSearchHint => 'Search by image';
+
+  @override
+  String get imageSearchSearching => 'Searching...';
+
+  @override
+  String get imageSearchMatchingPlaces => 'Matching Places';
+
+  @override
+  String get imageSearchNoMatches => 'No matching places found';
+
+  @override
+  String get imageSearchTryAnotherImage => 'Try Another Image';
+
+  @override
+  String get imageSearchNoCamera => 'No camera is available.';
+
+  @override
+  String get imageSearchCameraUnavailable =>
+      'Camera is unavailable. Check permission and try again.';
+
+  @override
+  String get imageSearchPhotoAccessRequired => 'Photo access is required.';
+
+  @override
+  String get imageSearchNoPhotos => 'No photos found.';
+
+  @override
+  String get imageSearchPhotoOpenError => 'Could not open this photo.';
+
+  @override
+  String get tripLoadingBrand => 'Rahhala AI';
+
+  @override
+  String get tripLoadingSubtitle => 'Crafting your unique travel experience...';
+
+  @override
+  String get tripLoadingPreference => 'Analyzing your travel preferences...';
+
+  @override
+  String get tripLoadingHiddenGems =>
+      'Discovering hidden gems for your trip...';
+
+  @override
+  String get tripLoadingItinerary => 'Designing your personalized itinerary...';
+
+  @override
+  String get tripLoadingExperiences => 'Finding exclusive experiences...';
+
+  @override
+  String get tripLoadingAlmostReady =>
+      'Your AI-powered adventure is almost ready!';
 }

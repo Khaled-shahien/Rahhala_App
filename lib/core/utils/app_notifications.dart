@@ -4,7 +4,7 @@ void showAppNotification({
   required BuildContext context,
   required String title,
   required String message,
-  bool isError = false, 
+  bool isError = false,
 }) {
   final color = isError ? Colors.redAccent : Colors.green;
 
@@ -21,11 +21,8 @@ void showAppNotification({
           const SizedBox(width: 12),
           Expanded(
             child: Column(
-
               crossAxisAlignment: CrossAxisAlignment.start,
-
               mainAxisSize: MainAxisSize.min,
-
               children: [
                 Text(title,
                     style: const TextStyle(

@@ -1,4 +1,4 @@
-import 'package:rahhala_app/features/nearby/data/models/nearby_response_model.dart';
+import 'package:rahhala_app/features/nearby/domain/entities/nearby_entities.dart';
 
 abstract class NearbyRepository {
   Future<NearbyResponseModel> getNearbyPlaces({

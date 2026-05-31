@@ -59,7 +59,7 @@ class _AIRecommendationFlowScreenState
     final colorScheme = Theme.of(context).colorScheme;
 
     return BlocProvider(
-      create: (context) => AiTripCubit(geminiRepository: sl()),
+      create: (context) => sl<AiTripCubit>()..init(),
       child: Scaffold(
         backgroundColor: colorScheme.surface,
         appBar: AppBar(

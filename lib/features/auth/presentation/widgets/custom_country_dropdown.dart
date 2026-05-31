@@ -58,11 +58,11 @@ class _CustomCountryDropdownState extends State<CustomCountryDropdown> {
     setState(() {
       _errorText = error;
       if (error != null && error.isNotEmpty) {
-        _borderColor = Colors.red; 
+        _borderColor = Colors.red;
       } else if (value != null && value.isNotEmpty) {
-        _borderColor = Colors.green; 
+        _borderColor = Colors.green;
       } else {
-        _borderColor = const Color(0xFFCDCDCD); 
+        _borderColor = const Color(0xFFCDCDCD);
       }
     });
   }

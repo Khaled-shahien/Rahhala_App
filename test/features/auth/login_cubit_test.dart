@@ -7,16 +7,29 @@ import 'package:rahhala_app/features/auth/data/models/login_model.dart';
 import 'package:rahhala_app/features/auth/data/repositories/auth_repository.dart';
 import 'package:rahhala_app/features/auth/domain/login/login_cubit.dart';
 import 'package:rahhala_app/features/auth/domain/login/login_state.dart';
+import 'package:rahhala_app/features/auth/domain/usecases/post_login_session_use_case.dart';
 
 class _MockAuthRepo extends Mock implements AuthRepo {}
 
+class _MockPostLoginSessionUseCase extends Mock
+    implements PostLoginSessionUseCase {}
+
 void main() {
   late _MockAuthRepo authRepo;
+  late _MockPostLoginSessionUseCase postLoginSessionUseCase;
   late LoginCubit cubit;
+
+  setUpAll(() {
+    registerFallbackValue(const Login());
+  });
 
   setUp(() {
     authRepo = _MockAuthRepo();
-    cubit = LoginCubit(authRepo: authRepo);
+    postLoginSessionUseCase = _MockPostLoginSessionUseCase();
+    cubit = LoginCubit(
+      authRepo: authRepo,
+      postLoginSessionUseCase: postLoginSessionUseCase,
+    );
   });
 
   tearDown(() async {
@@ -32,6 +45,17 @@ void main() {
           password: any(named: 'password'),
         ),
       ).thenAnswer((_) async => const Right(Login(token: 'token-123')));
+      when(
+        () => postLoginSessionUseCase(
+          login: any(named: 'login'),
+          email: any(named: 'email'),
+        ),
+      ).thenAnswer(
+        (_) async => const PostLoginSessionResult(
+          email: 'user@rahhala.com',
+          displayName: 'User',
+        ),
+      );
       return cubit;
     },
     act: (cubit) => cubit.loginUser(

@@ -30,8 +30,11 @@ class ImageSearchRepositoryImpl implements ImageSearchRepository {
         '${response.data.runtimeType}',
       );
 
-      final data =
+      final decoded =
           response.data is String ? jsonDecode(response.data) : response.data;
+      final data = decoded is Map<String, dynamic>
+          ? decoded
+          : Map<String, dynamic>.from(decoded as Map);
 
       if (data['success'] == true) {
         return Right(ImageSearchResponse.fromJson(data));
@@ -40,8 +43,16 @@ class ImageSearchRepositoryImpl implements ImageSearchRepository {
       return Left(ServerFailure(
         message: data['message'] ?? 'Something went wrong',
       ));
+    } on DioException catch (e) {
+      final responseData = e.response?.data;
+      final message = responseData is Map && responseData['message'] != null
+          ? responseData['message'].toString()
+          : 'Image search is unavailable right now. Please try again later.';
+      return Left(ServerFailure(message: message));
     } catch (e) {
-      return Left(ServerFailure(message: 'Failed to search by image'));
+      return Left(ServerFailure(
+        message: 'Could not search with this image. Please try another photo.',
+      ));
     }
   }
 }

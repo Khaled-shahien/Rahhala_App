@@ -8,6 +8,7 @@ import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
+import 'package:rahhala_app/core/widgets/anis_avatar.dart';
 import 'package:rahhala_app/features/image_search/presentation/widgets/image_search_bar.dart';
 import 'package:rahhala_app/features/nearby/presentation/pages/nearby_screen.dart';
 import 'package:rahhala_app/features/profile/presentation/pages/profile_page.dart';
@@ -38,10 +39,7 @@ class _HomePageState extends State<HomePage> {
     _currentIndex = widget.initialIndex;
   }
 
-
-
   void _onTabTapped(int index) {
-
     setState(() => _currentIndex = index);
 
     ////////
@@ -50,7 +48,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -62,12 +59,12 @@ class _HomePageState extends State<HomePage> {
     final List<Widget> pages = [
       _HomeMainSection(
         isGuest: widget.isGuest,
-        displayName: displayName,
-        email: email,
-        profileImageUrl: profileImageUrl,
+        displayName: widget.isGuest ? null : displayName,
+        email: widget.isGuest ? '' : email,
+        profileImageUrl: widget.isGuest ? null : profileImageUrl,
       ),
       const FavouritesScreen(),
-      const NearbyScreen(),
+      NearbyScreen(isGuest: widget.isGuest),
       const TripTypeSelectionScreen(),
       const ProfilePage(embedded: true),
     ];
@@ -119,8 +116,9 @@ class _HomePageState extends State<HomePage> {
               Positioned(
                 right: 20.w,
                 bottom: 100.h,
-                child: FloatingActionButton(
-                  onPressed: () {
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
                     HapticFeedback.mediumImpact();
                     Navigator.push(
                       context,
@@ -128,23 +126,9 @@ class _HomePageState extends State<HomePage> {
                           builder: (context) => const ChatBotScreen()),
                     );
                   },
-                  backgroundColor: ThemeColor.primaryColor,
-                  elevation: 8,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.r)),
-                  child: Container(
-                    padding: EdgeInsets.all(12.r),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          ThemeColor.primaryColor,
-                          ThemeColor.primaryColor.withValues(alpha: 0.8)
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    child: const Icon(Icons.smart_toy_outlined,
-                        color: Colors.white, size: 28),
+                  child: const Padding(
+                    padding: EdgeInsets.all(4),
+                    child: AnisAvatar(size: 76),
                   ),
                 ),
               ),
@@ -261,4 +245,3 @@ class _HomeMainSection extends StatelessWidget {
     );
   }
 }
-

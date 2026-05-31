@@ -1,10 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
-import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/home/data/models/home_model.dart';
 import 'package:rahhala_app/features/home/presentation/cubit/favourites_cubit.dart';
 import 'package:rahhala_app/features/home/presentation/pages/place_details_screen.dart';
@@ -24,9 +24,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
   void initState() {
     super.initState();
     _favouritesCubit = sl<FavouritesCubit>();
-    if (sl<TokenStorage>().hasToken) {
-      _favouritesCubit.getFavourites();
-    }
+    _favouritesCubit.getFavourites();
   }
 
   @override
@@ -37,7 +35,6 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final hasToken = sl<TokenStorage>().hasToken;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return BlocProvider.value(
@@ -54,19 +51,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
         builder: (context, state) {
           Widget content;
 
-          if (!hasToken) {
-            content = Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: Text(
-                  context.l10n.favouritesLoginPrompt,
-                  textAlign: TextAlign.center,
-                  style:
-                      TextStyle(fontSize: 16.sp, color: Colors.grey.shade700),
-                ),
-              ),
-            );
-          } else if (state is FavouritesLoading) {
+          if (state is FavouritesLoading) {
             content = const Center(child: CircularProgressIndicator());
           } else if (state is FavouritesError) {
             content = Center(
@@ -209,20 +194,39 @@ class _FavouritePlaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? const Color(0xFF1A1816) : Colors.white;
+    final cardBorderColor =
+        isDark ? AppColors.primary.withValues(alpha: 0.16) : Colors.transparent;
+    final titleColor = isDark ? const Color(0xFFF4EEE6) : AppColors.charcoal;
+    final subtitleColor =
+        isDark ? const Color(0xFFBEB4A8) : Colors.grey.shade600;
+    final imagePlaceholderColor =
+        isDark ? const Color(0xFF2A2622) : Colors.grey.shade300;
+    final favouriteButtonColor =
+        isDark ? const Color(0xFF29231E) : Colors.white;
+    final ratingBadgeColor =
+        isDark ? const Color(0xFF27221D) : Colors.grey.shade100;
+    final ratingTextColor =
+        isDark ? const Color(0xFFE5C59B) : const Color(0xFF6F563D);
+    final ratingIconColor =
+        isDark ? const Color(0xFFD7B98D) : const Color(0xFF9A7B56);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: EdgeInsets.only(bottom: 14.h),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardColor,
           borderRadius: BorderRadius.circular(18.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
+              color: Colors.black.withValues(alpha: isDark ? 0.32 : 0.12),
+              blurRadius: isDark ? 18 : 10,
+              offset: Offset(0, isDark ? 8 : 3),
             ),
           ],
+          border: Border.all(color: cardBorderColor),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,17 +235,37 @@ class _FavouritePlaceCard extends StatelessWidget {
               borderRadius: BorderRadius.vertical(top: Radius.circular(18.r)),
               child: Stack(
                 children: [
-                  Image.network(
-                    item.imageUrl,
+                  CachedNetworkImage(
+                    imageUrl: item.imageUrl,
                     width: double.infinity,
                     height: 140.h,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
+                    placeholder: (_, __) => Container(
                       width: double.infinity,
                       height: 140.h,
-                      color: Colors.grey.shade300,
+                      color: imagePlaceholderColor,
+                    ),
+                    errorWidget: (_, __, ___) => Container(
+                      width: double.infinity,
+                      height: 140.h,
+                      color: imagePlaceholderColor,
                     ),
                   ),
+                  if (isDark)
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withValues(alpha: 0.03),
+                              Colors.black.withValues(alpha: 0.18),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   Positioned(
                     top: 10.h,
                     right: 10.w,
@@ -250,9 +274,17 @@ class _FavouritePlaceCard extends StatelessWidget {
                       child: Container(
                         width: 34.w,
                         height: 34.w,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
+                        decoration: BoxDecoration(
+                          color: favouriteButtonColor,
                           shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black
+                                  .withValues(alpha: isDark ? 0.28 : 0.08),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: const Icon(
                           Icons.favorite,
@@ -279,15 +311,18 @@ class _FavouritePlaceCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 20.sp,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.charcoal,
+                            color: titleColor,
                           ),
                         ),
                         SizedBox(height: 4.h),
                         Text(
-                          context.l10n.favouritesSavedOn(item.createdAt.length >= 10 ? item.createdAt.substring(0, 10) : item.createdAt),
+                          context.l10n.favouritesSavedOn(
+                              item.createdAt.length >= 10
+                                  ? item.createdAt.substring(0, 10)
+                                  : item.createdAt),
                           style: TextStyle(
                             fontSize: 13.sp,
-                            color: Colors.grey.shade600,
+                            color: subtitleColor,
                           ),
                         ),
                       ],
@@ -297,28 +332,33 @@ class _FavouritePlaceCard extends StatelessWidget {
                     padding:
                         EdgeInsets.symmetric(horizontal: 9.w, vertical: 5.h),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: ratingBadgeColor,
                       borderRadius: BorderRadius.circular(12.r),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
-                          blurRadius: 6,
-                          offset: const Offset(0, 1),
+                          color: Colors.black
+                              .withValues(alpha: isDark ? 0.2 : 0.08),
+                          blurRadius: isDark ? 10 : 6,
+                          offset: const Offset(0, 2),
                         ),
                       ],
+                      border: Border.all(
+                        color: isDark
+                            ? AppColors.primary.withValues(alpha: 0.14)
+                            : Colors.transparent,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.star,
-                            color: Color(0xFF9A7B56), size: 14),
+                        Icon(Icons.star, color: ratingIconColor, size: 14),
                         SizedBox(width: 4.w),
                         Text(
                           item.rating.toStringAsFixed(2),
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFF6F563D),
+                            color: ratingTextColor,
                           ),
                         ),
                       ],

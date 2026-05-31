@@ -1561,6 +1561,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saved on {date}'**
   String favouritesSavedOn(Object date);
+
+  /// No description provided for @homeLoadingMorePlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading more places...'**
+  String get homeLoadingMorePlaces;
+
+  /// No description provided for @homeEndOfList.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve seen it all!'**
+  String get homeEndOfList;
+
+  /// No description provided for @homeNoPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'No places available right now.'**
+  String get homeNoPlaces;
+
+  /// No description provided for @homeLoadMoreError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load more places. Please try again.'**
+  String get homeLoadMoreError;
+
+  /// No description provided for @homeFavouriteError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update your favourites. Please try again.'**
+  String get homeFavouriteError;
+
+  /// No description provided for @reviewLoginRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Login is required to add a rating and review.'**
+  String get reviewLoginRequired;
+
+  /// No description provided for @reviewSubmitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit your review'**
+  String get reviewSubmitTitle;
+
+  /// No description provided for @reviewYourRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Rate'**
+  String get reviewYourRate;
+
+  /// No description provided for @reviewYourRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Rating'**
+  String get reviewYourRating;
+
+  /// No description provided for @reviewHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review...'**
+  String get reviewHint;
+
+  /// No description provided for @reviewUpdateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Update your review...'**
+  String get reviewUpdateHint;
+
+  /// No description provided for @reviewEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Review'**
+  String get reviewEditTitle;
+
+  /// No description provided for @reviewUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Review'**
+  String get reviewUpdate;
+
+  /// No description provided for @reviewSelectRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a rating before submitting your review.'**
+  String get reviewSelectRating;
+
+  /// No description provided for @reviewEnterComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your comment.'**
+  String get reviewEnterComment;
+
+  /// No description provided for @reviewSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get reviewSubmit;
+
+  /// No description provided for @reviewDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Review'**
+  String get reviewDeleteTitle;
+
+  /// No description provided for @reviewDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this review?'**
+  String get reviewDeleteMessage;
+
+  /// No description provided for @reviewEditTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit review'**
+  String get reviewEditTooltip;
+
+  /// No description provided for @reviewDeleteTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete review'**
+  String get reviewDeleteTooltip;
+
+  /// No description provided for @imageSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by image'**
+  String get imageSearchHint;
+
+  /// No description provided for @imageSearchSearching.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching...'**
+  String get imageSearchSearching;
+
+  /// No description provided for @imageSearchMatchingPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Matching Places'**
+  String get imageSearchMatchingPlaces;
+
+  /// No description provided for @imageSearchNoMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching places found'**
+  String get imageSearchNoMatches;
+
+  /// No description provided for @imageSearchTryAnotherImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Another Image'**
+  String get imageSearchTryAnotherImage;
+
+  /// No description provided for @imageSearchNoCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'No camera is available.'**
+  String get imageSearchNoCamera;
+
+  /// No description provided for @imageSearchCameraUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera is unavailable. Check permission and try again.'**
+  String get imageSearchCameraUnavailable;
+
+  /// No description provided for @imageSearchPhotoAccessRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo access is required.'**
+  String get imageSearchPhotoAccessRequired;
+
+  /// No description provided for @imageSearchNoPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'No photos found.'**
+  String get imageSearchNoPhotos;
+
+  /// No description provided for @imageSearchPhotoOpenError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open this photo.'**
+  String get imageSearchPhotoOpenError;
+
+  /// No description provided for @tripLoadingBrand.
+  ///
+  /// In en, this message translates to:
+  /// **'Rahhala AI'**
+  String get tripLoadingBrand;
+
+  /// No description provided for @tripLoadingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Crafting your unique travel experience...'**
+  String get tripLoadingSubtitle;
+
+  /// No description provided for @tripLoadingPreference.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing your travel preferences...'**
+  String get tripLoadingPreference;
+
+  /// No description provided for @tripLoadingHiddenGems.
+  ///
+  /// In en, this message translates to:
+  /// **'Discovering hidden gems for your trip...'**
+  String get tripLoadingHiddenGems;
+
+  /// No description provided for @tripLoadingItinerary.
+  ///
+  /// In en, this message translates to:
+  /// **'Designing your personalized itinerary...'**
+  String get tripLoadingItinerary;
+
+  /// No description provided for @tripLoadingExperiences.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding exclusive experiences...'**
+  String get tripLoadingExperiences;
+
+  /// No description provided for @tripLoadingAlmostReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Your AI-powered adventure is almost ready!'**
+  String get tripLoadingAlmostReady;
 }
 
 class _AppLocalizationsDelegate

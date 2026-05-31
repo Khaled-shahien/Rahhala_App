@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/widgets/anis_avatar.dart';
 import 'package:rahhala_app/features/chatbot/presentation/cubit/chat_bot_cubit.dart';
 import 'package:rahhala_app/features/chatbot/presentation/cubit/chat_bot_state.dart';
 import 'package:rahhala_app/features/chatbot/presentation/widgets/chat_bubble.dart';
@@ -16,8 +19,8 @@ class ChatBotScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<ChatBotCubit>(),
+    return BlocProvider.value(
+      value: sl<ChatBotCubit>(),
       child: const _ChatBotScreenContent(),
     );
   }
@@ -33,6 +36,8 @@ class _ChatBotScreenContent extends StatefulWidget {
 class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();
+  List<_ChatSuggestion> _emptyStateSuggestions = const [];
+  Locale? _suggestionLocale;
 
   @override
   void initState() {
@@ -42,6 +47,16 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
         context.read<ChatBotCubit>().initializeContext();
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final locale = Localizations.localeOf(context);
+    if (_suggestionLocale != locale || _emptyStateSuggestions.isEmpty) {
+      _suggestionLocale = locale;
+      _emptyStateSuggestions = _pickRandomSuggestions(context);
+    }
   }
 
   @override
@@ -223,31 +238,16 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
 
   Widget _buildEmptyState(BuildContext context, ChatBotCubit cubit) {
     final isDark = _isDark(context);
-    final l10n = context.l10n;
-    final suggestions = [
-      l10n.chatbotSuggestion1,
-      l10n.chatbotSuggestion2,
-      l10n.chatbotSuggestion3
-    ];
+    final suggestions = _emptyStateSuggestions.isEmpty
+        ? _pickRandomSuggestions(context)
+        : _emptyStateSuggestions;
 
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 60.h, horizontal: 30.w),
         child: Column(
           children: [
-            Container(
-              padding: EdgeInsets.all(25.r),
-              decoration: BoxDecoration(
-                color: ThemeColor.primaryColor
-                    .withValues(alpha: isDark ? 0.15 : 0.05),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.smart_toy_outlined,
-                size: 70.sp,
-                color: ThemeColor.primaryColor,
-              ),
-            ),
+            const AnisAvatar(size: 170),
             SizedBox(height: 24.h),
             Text(
               context.l10n.chatbotWelcome,
@@ -267,27 +267,17 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
               ),
             ),
             SizedBox(height: 30.h),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              alignment: WrapAlignment.center,
-              children: suggestions
-                  .map((text) => ActionChip(
-                        label: Text(text,
-                            style: TextStyle(
-                                color:
-                                    isDark ? Colors.white70 : Colors.black87)),
-                        backgroundColor:
-                            isDark ? const Color(0xFF2C2C2C) : Colors.white,
-                        shape: StadiumBorder(
-                          side: BorderSide(
-                              color: isDark
-                                  ? Colors.white12
-                                  : Colors.grey.shade300),
-                        ),
-                        onPressed: () => cubit.sendMessage(text),
-                      ))
-                  .toList(),
+            Column(
+              children: [
+                for (final suggestion in suggestions) ...[
+                  _SuggestionPromptCard(
+                    suggestion: suggestion,
+                    isDark: isDark,
+                    onTap: () => cubit.sendMessage(suggestion.text),
+                  ),
+                  SizedBox(height: 10.h),
+                ],
+              ],
             ),
           ],
         ),
@@ -295,8 +285,154 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
     );
   }
 
+  List<_ChatSuggestion> _pickRandomSuggestions(BuildContext context) {
+    final suggestions = _buildSuggestionPool(context).toList()
+      ..shuffle(Random());
+    return List.unmodifiable(suggestions.take(3));
+  }
+
+  List<_ChatSuggestion> _buildSuggestionPool(BuildContext context) {
+    final l10n = context.l10n;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+
+    if (isArabic) {
+      return [
+        _ChatSuggestion(Icons.flight_takeoff_rounded, l10n.chatbotSuggestion1),
+        _ChatSuggestion(Icons.hotel_rounded, l10n.chatbotSuggestion2),
+        _ChatSuggestion(Icons.family_restroom_rounded, l10n.chatbotSuggestion3),
+        const _ChatSuggestion(
+          Icons.map_rounded,
+          'خطط لي برنامج 5 أيام في القاهرة',
+        ),
+        const _ChatSuggestion(
+          Icons.beach_access_rounded,
+          'اقترح أفضل شواطئ قريبة من الغردقة',
+        ),
+        const _ChatSuggestion(
+          Icons.museum_rounded,
+          'اصنع لي جولة ثقافية في الأقصر',
+        ),
+        const _ChatSuggestion(
+          Icons.restaurant_rounded,
+          'رتب لي جولة أكل محلي في الإسكندرية',
+        ),
+        const _ChatSuggestion(
+          Icons.savings_rounded,
+          'خطط رحلة اقتصادية مناسبة لميزانية محدودة',
+        ),
+        const _ChatSuggestion(
+          Icons.hiking_rounded,
+          'ما أفضل أنشطة المغامرة في دهب؟',
+        ),
+        const _ChatSuggestion(
+          Icons.wb_sunny_rounded,
+          'ما أفضل وقت لزيارة سيوة؟',
+        ),
+        const _ChatSuggestion(
+          Icons.shopping_bag_rounded,
+          'خطط لي يوم تسوق في دبي',
+        ),
+        const _ChatSuggestion(
+          Icons.child_care_rounded,
+          'اقترح برنامج رحلة مناسب للأطفال',
+        ),
+        const _ChatSuggestion(
+          Icons.favorite_rounded,
+          'اصنع برنامج شهر عسل هادئ ومميز',
+        ),
+        const _ChatSuggestion(
+          Icons.backpack_rounded,
+          'ماذا أحزم لرحلة صحراوية؟',
+        ),
+        const _ChatSuggestion(
+          Icons.route_rounded,
+          'قارن لي بين دبي وأبوظبي للعائلات',
+        ),
+        const _ChatSuggestion(
+          Icons.explore_rounded,
+          'اقترح أماكن مخفية وغير مزدحمة',
+        ),
+        const _ChatSuggestion(
+          Icons.account_balance_rounded,
+          'اصنع مسار مشي في القاهرة التاريخية',
+        ),
+        const _ChatSuggestion(
+          Icons.public_rounded,
+          'ساعدني أختار وجهة مناسبة لعطلة قصيرة',
+        ),
+      ];
+    }
+
+    return [
+      _ChatSuggestion(Icons.flight_takeoff_rounded, l10n.chatbotSuggestion1),
+      _ChatSuggestion(Icons.hotel_rounded, l10n.chatbotSuggestion2),
+      _ChatSuggestion(Icons.family_restroom_rounded, l10n.chatbotSuggestion3),
+      const _ChatSuggestion(
+        Icons.map_rounded,
+        'Build a 5-day Cairo itinerary',
+      ),
+      const _ChatSuggestion(
+        Icons.beach_access_rounded,
+        'Suggest the best beaches near Hurghada',
+      ),
+      const _ChatSuggestion(
+        Icons.museum_rounded,
+        'Create a cultural tour in Luxor',
+      ),
+      const _ChatSuggestion(
+        Icons.restaurant_rounded,
+        'Plan a local food tour in Alexandria',
+      ),
+      const _ChatSuggestion(
+        Icons.savings_rounded,
+        'Plan a budget-friendly weekend trip',
+      ),
+      const _ChatSuggestion(
+        Icons.hiking_rounded,
+        'What are the best adventure activities in Dahab?',
+      ),
+      const _ChatSuggestion(
+        Icons.wb_sunny_rounded,
+        'What is the best season to visit Siwa?',
+      ),
+      const _ChatSuggestion(
+        Icons.shopping_bag_rounded,
+        'Plan a shopping day in Dubai',
+      ),
+      const _ChatSuggestion(
+        Icons.child_care_rounded,
+        'Create a kid-friendly travel plan',
+      ),
+      const _ChatSuggestion(
+        Icons.favorite_rounded,
+        'Design a calm honeymoon itinerary',
+      ),
+      const _ChatSuggestion(
+        Icons.backpack_rounded,
+        'What should I pack for a desert trip?',
+      ),
+      const _ChatSuggestion(
+        Icons.route_rounded,
+        'Compare Dubai and Abu Dhabi for families',
+      ),
+      const _ChatSuggestion(
+        Icons.explore_rounded,
+        'Suggest hidden gems away from crowds',
+      ),
+      const _ChatSuggestion(
+        Icons.account_balance_rounded,
+        'Make a walking tour for Old Cairo',
+      ),
+      const _ChatSuggestion(
+        Icons.public_rounded,
+        'Help me choose a short-break destination',
+      ),
+    ];
+  }
+
   void _showClearConfirmation() {
     final isDark = _isDark(context);
+    final cubit = context.read<ChatBotCubit>();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -322,13 +458,107 @@ class _ChatBotScreenContentState extends State<_ChatBotScreenContent> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.r)),
             ),
-            onPressed: () {
-              context.read<ChatBotCubit>().clearConversation();
+            onPressed: () async {
               Navigator.pop(context);
+              await cubit.discardContext();
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(context.l10n.commonDelete,
+                style: const TextStyle(color: Colors.white)),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ChatSuggestion {
+  const _ChatSuggestion(this.icon, this.text);
+
+  final IconData icon;
+  final String text;
+}
+
+class _SuggestionPromptCard extends StatelessWidget {
+  const _SuggestionPromptCard({
+    required this.suggestion,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  final _ChatSuggestion suggestion;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final backgroundColor =
+        isDark ? const Color(0xFF242424) : const Color(0xFFFFFFFF);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.12)
+        : Colors.grey.withValues(alpha: 0.22);
+    final textColor =
+        isDark ? Colors.white.withValues(alpha: 0.9) : ThemeColor.charcoalColor;
+    final iconBackgroundColor =
+        ThemeColor.primaryColor.withValues(alpha: isDark ? 0.2 : 0.14);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18.r),
+        child: Ink(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 13.h),
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(18.r),
+            border: Border.all(color: borderColor),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.18 : 0.05),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 38.r,
+                height: 38.r,
+                decoration: BoxDecoration(
+                  color: iconBackgroundColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  suggestion.icon,
+                  color: ThemeColor.primaryColor,
+                  size: 20.sp,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  suggestion.text,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 13.5.sp,
+                    fontWeight: FontWeight.w600,
+                    height: 1.25,
+                  ),
+                ),
+              ),
+              SizedBox(width: 10.w),
+              Icon(
+                Icons.arrow_forward_rounded,
+                color: ThemeColor.primaryColor,
+                size: 19.sp,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

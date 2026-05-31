@@ -15,8 +15,16 @@ class AppValidators {
     if (value == null || value.trim().isEmpty) {
       return 'Email is required';
     }
-    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (!emailRegex.hasMatch(value.trim())) {
+    final email = value.trim();
+    final emailRegex = RegExp(
+      r'^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$',
+      caseSensitive: false,
+    );
+    final hasInvalidDots = email.contains('..') ||
+        email
+            .split('@')
+            .any((part) => part.startsWith('.') || part.endsWith('.'));
+    if (!emailRegex.hasMatch(email) || hasInvalidDots) {
       return 'Invalid email format';
     }
     return null;
@@ -49,7 +57,7 @@ class AppValidators {
     if (!RegExp(r'\d').hasMatch(v)) {
       return 'Password must include at least one number';
     }
-    
+
     if (!RegExp(r'[^A-Za-z0-9\s]').hasMatch(v)) {
       return 'Password must include at least one special character';
     }

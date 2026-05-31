@@ -1,11 +1,18 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/logging/app_logger.dart';
+import 'package:rahhala_app/core/network/api_consumer.dart';
+import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/expansion_tile_components.dart';
+import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/trip_details/trip_route_helpers.dart';
 import 'package:rahhala_app/features/trip_history/data/models/trip_history_model.dart';
 import 'package:rahhala_app/features/trip_history/domain/cubits/trip_history_cubit.dart';
 import 'package:rahhala_app/features/trip_history/domain/cubits/trip_history_state.dart';
@@ -64,45 +71,13 @@ class _TripHistoryDetailView extends StatelessWidget {
       builder: (context, state) {
         if (state is TripHistoryDetailLoading) {
           return _buildLoading(context);
-        } else if (state is TripRegenerateLoading) {
-          return _buildRegenerateLoading(context);
         } else if (state is TripHistoryDetailLoaded) {
           return _buildContent(context, state.response.trip);
-        } else if (state is TripRegenerateSuccess) {
-          return _buildContent(context, state.response.trip);
         } else if (state is TripHistoryDetailFailure) {
-          return _buildError(context, state.message);
-        } else if (state is TripRegenerateFailure) {
           return _buildError(context, state.message);
         }
         return const SizedBox.shrink();
       },
-    );
-  }
-
-  Widget _buildRegenerateLoading(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _screenBg(context),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(
-              color: AppColors.primary,
-              strokeWidth: 3,
-            ),
-            SizedBox(height: 24.h),
-            Text(
-              'Regenerating your trip plan...',
-              style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: _primaryText(context),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -233,10 +208,13 @@ class _TripHistoryDetailView extends StatelessWidget {
                   bottomLeft: Radius.circular(35.r),
                   bottomRight: Radius.circular(35.r),
                 ),
-                child: Image.network(
-                  trip.countryImage!,
+                child: CachedNetworkImage(
+                  imageUrl: trip.countryImage!,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                  placeholder: (_, __) => Container(
+                    color: const Color(0xFFF2E7D5),
+                  ),
+                  errorWidget: (_, __, ___) => Container(
                     color: const Color(0xFFF2E7D5),
                   ),
                 ),
@@ -292,7 +270,7 @@ class _TripHistoryDetailView extends StatelessWidget {
             left: 16.w,
             right: 16.w,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
@@ -303,19 +281,6 @@ class _TripHistoryDetailView extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white, size: 20.sp),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => _showRegenerateDialog(context, trip),
-                  child: Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.r),
-                    decoration: const BoxDecoration(
-                      color: AppColors.primary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.refresh_rounded,
                         color: Colors.white, size: 20.sp),
                   ),
                 ),
@@ -483,57 +448,62 @@ class _TripHistoryDetailView extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: activities.asMap().entries.map((entry) {
-          final i = entry.key;
-          final act = entry.value;
-          return TimelineWrapperHistory(
-            isFirst: i == 0,
-            isLast: i == activities.length - 1,
-            timelineColor: _lightBorder(context),
-            child: CustomExpansionTile(
-              tilePadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-              leading: NumberCircle(
-                number: i + 1,
-                backgroundColor: _lightBorder(context),
-                textColor: Colors.white,
-              ),
-              title: Text(
-                act.place,
-                style: TextStyle(
-                  color: _primaryText(context),
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.bold,
+        children: [
+          _HistoryDayRouteMap(activities: activities),
+          ...activities.asMap().entries.map((entry) {
+            final i = entry.key;
+            final act = entry.value;
+            return TimelineWrapperHistory(
+              isFirst: i == 0,
+              isLast: i == activities.length - 1,
+              timelineColor: _lightBorder(context),
+              child: CustomExpansionTile(
+                tilePadding:
+                    EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+                leading: NumberCircle(
+                  number: i + 1,
+                  backgroundColor: _lightBorder(context),
+                  textColor: Colors.white,
                 ),
-              ),
-              iconColor: _primaryText(context),
-              collapsedIconColor: _primaryText(context),
-              children: [
-                if (act.image != null && act.image!.isNotEmpty)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12.r),
-                    child: Image.network(
-                      act.image!,
-                      width: double.infinity,
-                      height: 180.h,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                title: Text(
+                  act.place,
+                  style: TextStyle(
+                    color: _primaryText(context),
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                iconColor: _primaryText(context),
+                collapsedIconColor: _primaryText(context),
+                children: [
+                  if (act.image != null && act.image!.isNotEmpty)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12.r),
+                      child: CachedNetworkImage(
+                        imageUrl: act.image!,
+                        width: double.infinity,
+                        height: 180.h,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => const SizedBox.shrink(),
+                        errorWidget: (_, __, ___) => const SizedBox.shrink(),
+                      ),
+                    ),
+                  if (act.image != null && act.image!.isNotEmpty)
+                    SizedBox(height: 12.h),
+                  Padding(
+                    padding: EdgeInsetsDirectional.only(
+                        start: 45.w, end: 12.w, bottom: 12.h),
+                    child: Text(
+                      act.description,
+                      style: TextStyle(
+                          color: _primaryText(context), fontSize: 13.sp),
                     ),
                   ),
-                if (act.image != null && act.image!.isNotEmpty)
-                  SizedBox(height: 12.h),
-                Padding(
-                  padding:
-                      EdgeInsetsDirectional.only(start: 45.w, end: 12.w, bottom: 12.h),
-                  child: Text(
-                    act.description,
-                    style: TextStyle(
-                        color: _primaryText(context), fontSize: 13.sp),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
+                ],
+              ),
+            );
+          }),
+        ],
       ),
     );
   }
@@ -707,67 +677,413 @@ class _TripHistoryDetailView extends StatelessWidget {
       ),
     );
   }
+}
 
-  void _showRegenerateDialog(BuildContext context, TripHistoryDetail trip) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          backgroundColor: Theme.of(context).cardColor,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-          title: Text(
-            'Regenerate Trip Plan',
-            style: TextStyle(
-              color: _primaryText(context),
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Text(
-            'Would you like to regenerate the entire trip plan with new suggestions for all days and activities?',
-            style: TextStyle(
-              color: _primaryText(context),
-              fontSize: 14.sp,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text('Cancel',
-                  style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                _regenerateTrip(context, trip);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r)),
-              ),
-              child: Text('Regenerate',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600)),
-            ),
-          ],
-        );
-      },
-    );
+class _HistoryDayRouteMap extends StatefulWidget {
+  const _HistoryDayRouteMap({required this.activities});
+
+  final List<TripHistoryActivity> activities;
+
+  @override
+  State<_HistoryDayRouteMap> createState() => _HistoryDayRouteMapState();
+}
+
+class _HistoryDayRouteMapState extends State<_HistoryDayRouteMap> {
+  static final RegExp _namedCoordinatesPattern = RegExp(
+    r'lat\s*:\s*([-+]?\d+(?:\.\d+)?)\s*,\s*lng\s*:\s*([-+]?\d+(?:\.\d+)?)',
+    caseSensitive: false,
+  );
+  static final RegExp _numberPattern = RegExp(r'[-+]?\d+(?:\.\d+)?');
+
+  late final List<LatLng> _waypoints;
+  Future<TripRouteResponseData?>? _routeFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _waypoints = widget.activities
+        .map((activity) => _parseCoordinates(activity.coordinates))
+        .whereType<LatLng>()
+        .toList();
+
+    if (_waypoints.length >= 2) {
+      _routeFuture = _fetchRouteData(_waypoints);
+    }
   }
 
-  void _regenerateTrip(BuildContext context, TripHistoryDetail trip) {
-    context.read<TripHistoryCubit>().regenerateTripPlan(
-          trip.tripId,
-          trip.country,
-          trip.numberOfDays,
-          trip.budgetRange,
-          trip.interests,
-          trip.season,
-        );
+  LatLng? _parseCoordinates(String? rawCoordinates) {
+    if (rawCoordinates == null || rawCoordinates.trim().isEmpty) {
+      return null;
+    }
+
+    final namedMatch = _namedCoordinatesPattern.firstMatch(rawCoordinates);
+    if (namedMatch != null) {
+      return _latLngFromStrings(namedMatch.group(1), namedMatch.group(2));
+    }
+
+    final numbers = _numberPattern
+        .allMatches(rawCoordinates)
+        .map((match) => match.group(0))
+        .whereType<String>()
+        .toList();
+    if (numbers.length < 2) {
+      return null;
+    }
+
+    return _latLngFromStrings(numbers[0], numbers[1]);
+  }
+
+  LatLng? _latLngFromStrings(String? latitude, String? longitude) {
+    final lat = double.tryParse(latitude ?? '');
+    final lng = double.tryParse(longitude ?? '');
+    if (lat == null || lng == null) {
+      return null;
+    }
+    return LatLng(lat, lng);
+  }
+
+  Future<TripRouteResponseData?> _fetchRouteData(List<LatLng> waypoints) async {
+    try {
+      final api = sl<ApiConsumer>();
+      final response = await api.post(
+        EndPoints.getActivityRoute,
+        data: {
+          'travelMode': 'driving',
+          'waypoints': waypoints.asMap().entries.map((entry) {
+            return {
+              'lat': entry.value.latitude,
+              'lng': entry.value.longitude,
+              'order': entry.key + 1,
+            };
+          }).toList(),
+        },
+      );
+
+      if (response is! Map<String, dynamic>) {
+        return null;
+      }
+
+      final encoded = response['polyline']?.toString();
+      final canDrawRoute = response['canDrawRoute'] == true;
+      final decoded = canDrawRoute && encoded != null && encoded.isNotEmpty
+          ? decodeTripPolylinePoints(encoded)
+          : const <LatLng>[];
+      final points = decoded.length >= 2 ? decoded : waypoints;
+
+      return TripRouteResponseData(
+        polylinePoints: points,
+        totalDistance: response['totalDistance']?.toString() ?? '--',
+        totalDuration: response['totalDuration']?.toString() ?? '--',
+        nextInstruction: 'Follow the route',
+        nextInstructionDuration: response['totalDuration']?.toString() ?? '--',
+        steps: extractTripRouteSteps(response['steps']),
+      );
+    } catch (error, stackTrace) {
+      AppLogger.instance.w(
+        'Trip history route API failed, using waypoint route',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return TripRouteResponseData(
+        polylinePoints: waypoints,
+        totalDistance: '--',
+        totalDuration: '--',
+        nextInstruction: 'Follow the route',
+        nextInstructionDuration: '--',
+        steps: const [],
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_waypoints.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : AppColors.darkBrown;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "day's Route",
+            style: TextStyle(
+              color: textColor,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12.r),
+            child: SizedBox(
+              width: double.infinity,
+              height: 200.h,
+              child: FutureBuilder<TripRouteResponseData?>(
+                future: _routeFuture,
+                builder: (context, snapshot) {
+                  final routeData = snapshot.data;
+                  return _HistoryRouteMapView(
+                    waypoints: _waypoints,
+                    routeData: routeData,
+                    showOpenButton: true,
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HistoryRouteMapView extends StatelessWidget {
+  const _HistoryRouteMapView({
+    required this.waypoints,
+    required this.routeData,
+    required this.showOpenButton,
+  });
+
+  final List<LatLng> waypoints;
+  final TripRouteResponseData? routeData;
+  final bool showOpenButton;
+
+  @override
+  Widget build(BuildContext context) {
+    final polylinePoints = routeData?.polylinePoints ?? waypoints;
+    final center = calculateMapCenter(waypoints);
+
+    return Stack(
+      children: [
+        FlutterMap(
+          options: MapOptions(
+            initialCenter: center,
+            initialZoom: waypoints.length == 1 ? 14 : 10,
+            interactionOptions: const InteractionOptions(
+              flags: InteractiveFlag.drag |
+                  InteractiveFlag.pinchZoom |
+                  InteractiveFlag.doubleTapZoom,
+            ),
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.rahhala.app',
+            ),
+            if (polylinePoints.length > 1)
+              PolylineLayer(
+                polylines: [
+                  Polyline(
+                    points: polylinePoints,
+                    color: AppColors.lightBrown,
+                    strokeWidth: 4,
+                  ),
+                ],
+              ),
+            MarkerLayer(
+              markers: waypoints.asMap().entries.map((entry) {
+                return Marker(
+                  point: entry.value,
+                  width: 34.w,
+                  height: 34.h,
+                  child: _HistoryMapPointMarker(
+                    label: waypointLabel(entry.key),
+                    color: entry.key == 0 ? Colors.red : AppColors.primary,
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+        if (showOpenButton)
+          Positioned(
+            top: 10.h,
+            right: 10.w,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => _HistoryRouteMapFullscreen(
+                      waypoints: waypoints,
+                      routeData: routeData,
+                    ),
+                  ),
+                ),
+                borderRadius: BorderRadius.circular(24.r),
+                child: Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.92),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.open_in_full,
+                    size: 18.sp,
+                    color: AppColors.darkBrown,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        if (routeData != null && showOpenButton)
+          Positioned(
+            left: 10.w,
+            right: 10.w,
+            bottom: 10.h,
+            child: _HistoryRouteSummary(routeData: routeData!),
+          ),
+      ],
+    );
+  }
+}
+
+class _HistoryRouteMapFullscreen extends StatelessWidget {
+  const _HistoryRouteMapFullscreen({
+    required this.waypoints,
+    required this.routeData,
+  });
+
+  final List<LatLng> waypoints;
+  final TripRouteResponseData? routeData;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: _HistoryRouteMapView(
+              waypoints: waypoints,
+              routeData: routeData,
+              showOpenButton: false,
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 12.h,
+            left: 16.w,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => Navigator.pop(context),
+                borderRadius: BorderRadius.circular(24.r),
+                child: Container(
+                  padding: EdgeInsets.all(10.w),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.55),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white,
+                    size: 20.sp,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (routeData != null)
+            Positioned(
+              left: 16.w,
+              right: 16.w,
+              bottom: MediaQuery.of(context).padding.bottom + 16.h,
+              child: _HistoryRouteSummary(routeData: routeData!),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HistoryRouteSummary extends StatelessWidget {
+  const _HistoryRouteSummary({required this.routeData});
+
+  final TripRouteResponseData routeData;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.route_outlined, size: 16.sp, color: AppColors.primary),
+          SizedBox(width: 6.w),
+          Expanded(
+            child: Text(
+              '${routeData.totalDistance} • ${routeData.totalDuration}',
+              style: TextStyle(
+                color: AppColors.darkBrown,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w600,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HistoryMapPointMarker extends StatelessWidget {
+  const _HistoryMapPointMarker({
+    required this.label,
+    required this.color,
+  });
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        label,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 12.sp,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
   }
 }
 

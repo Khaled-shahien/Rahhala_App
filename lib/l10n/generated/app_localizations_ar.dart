@@ -785,4 +785,118 @@ class AppLocalizationsAr extends AppLocalizations {
   String favouritesSavedOn(Object date) {
     return 'تم الحفظ في $date';
   }
+
+  @override
+  String get homeLoadingMorePlaces => 'جارٍ تحميل المزيد من الأماكن...';
+
+  @override
+  String get homeEndOfList => 'لقد شاهدت كل شيء!';
+
+  @override
+  String get homeNoPlaces => 'لا توجد أماكن متاحة الآن.';
+
+  @override
+  String get homeLoadMoreError =>
+      'تعذر تحميل المزيد من الأماكن. حاول مرة أخرى.';
+
+  @override
+  String get homeFavouriteError => 'تعذر تحديث المفضلة. حاول مرة أخرى.';
+
+  @override
+  String get reviewLoginRequired => 'يجب تسجيل الدخول لإضافة تقييم ومراجعة.';
+
+  @override
+  String get reviewSubmitTitle => 'أرسل مراجعتك';
+
+  @override
+  String get reviewYourRate => 'تقييمك';
+
+  @override
+  String get reviewYourRating => 'تقييمك';
+
+  @override
+  String get reviewHint => 'اكتب مراجعتك...';
+
+  @override
+  String get reviewUpdateHint => 'حدّث مراجعتك...';
+
+  @override
+  String get reviewEditTitle => 'تعديل المراجعة';
+
+  @override
+  String get reviewUpdate => 'تحديث المراجعة';
+
+  @override
+  String get reviewSelectRating => 'يرجى اختيار تقييم قبل إرسال المراجعة.';
+
+  @override
+  String get reviewEnterComment => 'يرجى كتابة تعليقك.';
+
+  @override
+  String get reviewSubmit => 'إرسال';
+
+  @override
+  String get reviewDeleteTitle => 'حذف المراجعة';
+
+  @override
+  String get reviewDeleteMessage => 'هل أنت متأكد أنك تريد حذف هذه المراجعة؟';
+
+  @override
+  String get reviewEditTooltip => 'تعديل المراجعة';
+
+  @override
+  String get reviewDeleteTooltip => 'حذف المراجعة';
+
+  @override
+  String get imageSearchHint => 'ابحث بالصورة';
+
+  @override
+  String get imageSearchSearching => 'جارٍ البحث...';
+
+  @override
+  String get imageSearchMatchingPlaces => 'أماكن مشابهة';
+
+  @override
+  String get imageSearchNoMatches => 'لم يتم العثور على أماكن مطابقة';
+
+  @override
+  String get imageSearchTryAnotherImage => 'جرّب صورة أخرى';
+
+  @override
+  String get imageSearchNoCamera => 'لا توجد كاميرا متاحة.';
+
+  @override
+  String get imageSearchCameraUnavailable =>
+      'الكاميرا غير متاحة. تحقق من الإذن وحاول مرة أخرى.';
+
+  @override
+  String get imageSearchPhotoAccessRequired => 'يلزم السماح بالوصول إلى الصور.';
+
+  @override
+  String get imageSearchNoPhotos => 'لا توجد صور.';
+
+  @override
+  String get imageSearchPhotoOpenError => 'تعذر فتح هذه الصورة.';
+
+  @override
+  String get tripLoadingBrand => 'رحّالة AI';
+
+  @override
+  String get tripLoadingSubtitle => 'نصمم تجربة سفر فريدة لك...';
+
+  @override
+  String get tripLoadingPreference => 'نحلل تفضيلات سفرك...';
+
+  @override
+  String get tripLoadingHiddenGems => 'نكتشف أماكن مميزة لرحلتك...';
+
+  @override
+  String get tripLoadingItinerary => 'نصمم برنامجك المخصص...';
+
+  @override
+  String get tripLoadingExperiences => 'نبحث عن تجارب مميزة...';
+
+  @override
+  String get tripLoadingAlmostReady =>
+      'مغامرتك المدعومة بالذكاء الاصطناعي أوشكت على الاكتمال!';
 }

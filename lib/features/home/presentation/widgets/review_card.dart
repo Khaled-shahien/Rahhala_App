@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../../data/models/home_model.dart';
 import 'rating_stars.dart';
@@ -24,6 +25,7 @@ class ReviewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = context.l10n;
 
     final String displayName = review.userName.contains('@')
         ? review.userName.split('@')[0]
@@ -148,7 +150,7 @@ class ReviewCard extends StatelessWidget {
                     IconButton(
                       constraints: const BoxConstraints(),
                       visualDensity: VisualDensity.compact,
-                      tooltip: 'Edit review',
+                      tooltip: l10n.reviewEditTooltip,
                       onPressed: onEdit,
                       icon: Icon(
                         Icons.edit_outlined,
@@ -159,7 +161,7 @@ class ReviewCard extends StatelessWidget {
                     IconButton(
                       constraints: const BoxConstraints(),
                       visualDensity: VisualDensity.compact,
-                      tooltip: 'Delete review',
+                      tooltip: l10n.reviewDeleteTooltip,
                       onPressed: isDeleting ? null : onDelete,
                       icon: isDeleting
                           ? SizedBox(

@@ -16,7 +16,11 @@ class EndPoints {
   static const String editPhoto = '/api/User/edit_photo';
 
   static const String askGemini = '/api/gemini/Ask_Gemini';
+  static const String tripOptions = '/api/trip-options';
   static const String saveTrip = '/api/gemini/Save_Trip';
+  static const String regenerateTrip = '/api/gemini/Regenerate_Trip';
+  static const String myTrips = '/api/gemini/My_Trips';
+  static String myTripById(String tripId) => '$myTrips/$tripId';
   static const String generateSpecificPlan =
       '/api/gemini/Generate_Specific_Plan';
   static const String imageSearch = '/api/PhotoApi/upload';

@@ -5,6 +5,7 @@ import 'package:rahhala_app/core/network/api_consumer.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/core/errors/exceptions.dart';
 import 'package:rahhala_app/core/errors/failures.dart';
+import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/features/profile/data/models/user_model_details.dart';
 import 'package:rahhala_app/features/auth/data/models/success_message_model.dart';
 import 'package:rahhala_app/features/profile/data/repositories/user_repository.dart';
@@ -19,7 +20,12 @@ class UserRepoImpl implements UserRepo {
       try {
         final d = jsonDecode(res);
         if (d is Map<String, dynamic>) return d;
-      } catch (_) {}
+      } catch (e) {
+        AppLogger.instance.w(
+          'UserRepo: Failed to decode response string as JSON',
+          error: e,
+        );
+      }
     }
     return {};
   }

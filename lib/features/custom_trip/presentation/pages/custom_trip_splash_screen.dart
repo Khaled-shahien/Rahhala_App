@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/utils/app_notifications.dart';
 import 'package:rahhala_app/features/custom_trip/presentation/cubit/custom_trip_cubit.dart';
 import 'package:rahhala_app/features/custom_trip/utils/trip_mapper.dart';
@@ -23,15 +24,8 @@ class CustomTripSplashScreen extends StatefulWidget {
 class _CustomTripSplashScreenState extends State<CustomTripSplashScreen> {
   late Timer _textTimer;
 
+  static const int _loadingMessageCount = 5;
   int _messageIndex = 0;
-
-  final List<String> _loadingMessages = [
-    "Analyzing your travel preferences...",
-    "Discovering hidden gems for your trip...",
-    "Designing your personalized itinerary...",
-    "Finding exclusive experiences...",
-    "Your AI-powered adventure is almost ready!"
-  ];
 
   @override
   void initState() {
@@ -40,7 +34,7 @@ class _CustomTripSplashScreenState extends State<CustomTripSplashScreen> {
     _textTimer = Timer.periodic(const Duration(milliseconds: 2500), (timer) {
       if (mounted) {
         setState(() {
-          _messageIndex = (_messageIndex + 1) % _loadingMessages.length;
+          _messageIndex = (_messageIndex + 1) % _loadingMessageCount;
         });
       }
     });
@@ -56,6 +50,13 @@ class _CustomTripSplashScreenState extends State<CustomTripSplashScreen> {
   Widget build(BuildContext context) {
     const Color topColor = AppColors.charcoal;
     const Color bottomColor = AppColors.primary;
+    final loadingMessages = [
+      context.l10n.tripLoadingPreference,
+      context.l10n.tripLoadingHiddenGems,
+      context.l10n.tripLoadingItinerary,
+      context.l10n.tripLoadingExperiences,
+      context.l10n.tripLoadingAlmostReady,
+    ];
 
     return BlocProvider.value(
       value: widget.cubit,
@@ -87,13 +88,14 @@ class _CustomTripSplashScreenState extends State<CustomTripSplashScreen> {
                   builder: (context) => TripDetailsScreen(
                     tripPlan: tripPlanResponse,
                     geminiRequest: geminiRequest,
+                    showActions: false,
                   ),
                 ),
               );
             } else if (state is CustomTripFailure) {
               showAppNotification(
                 context: context,
-                title: "Error",
+                title: context.l10n.commonError,
                 message: state.message,
                 isError: true,
               );
@@ -127,7 +129,7 @@ class _CustomTripSplashScreenState extends State<CustomTripSplashScreen> {
                     ),
                     SizedBox(height: 30.h),
                     Text(
-                      "Rahhala AI",
+                      context.l10n.tripLoadingBrand,
                       style: TextStyle(
                         fontSize: 34.sp,
                         color: Colors.white,
@@ -136,7 +138,7 @@ class _CustomTripSplashScreenState extends State<CustomTripSplashScreen> {
                     ),
                     SizedBox(height: 12.h),
                     Text(
-                      "Crafting your unique travel experience...",
+                      context.l10n.tripLoadingSubtitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.9),
@@ -150,7 +152,7 @@ class _CustomTripSplashScreenState extends State<CustomTripSplashScreen> {
                       transitionBuilder: (child, animation) =>
                           FadeTransition(opacity: animation, child: child),
                       child: Text(
-                        _loadingMessages[_messageIndex],
+                        loadingMessages[_messageIndex % loadingMessages.length],
                         key: ValueKey<int>(_messageIndex),
                         textAlign: TextAlign.center,
                         style: TextStyle(

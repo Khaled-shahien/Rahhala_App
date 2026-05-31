@@ -1,4 +1,4 @@
-import 'package:rahhala_app/features/home/data/models/home_model.dart';
+import 'package:rahhala_app/features/home/domain/entities/home_entities.dart';
 
 abstract class HomeRepository {
   Future<HomeResponse> getHomePlaces({int page = 1, int pageSize = 8});

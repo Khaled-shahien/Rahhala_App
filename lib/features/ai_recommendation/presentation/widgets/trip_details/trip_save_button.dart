@@ -43,8 +43,7 @@ class TripSaveButton extends StatelessWidget {
                     height: 18.w,
                     child: const CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(Colors.white),
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
                 : const Icon(

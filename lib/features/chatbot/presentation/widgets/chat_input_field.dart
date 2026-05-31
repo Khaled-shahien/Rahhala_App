@@ -57,11 +57,13 @@ class ChatInputField extends StatelessWidget {
                   // الحواف
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(25.r),
-                    borderSide: const BorderSide(color: borderColor, width: 1.2),
+                    borderSide:
+                        const BorderSide(color: borderColor, width: 1.2),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(25.r),
-                    borderSide: const BorderSide(color: borderColor, width: 1.8),
+                    borderSide:
+                        const BorderSide(color: borderColor, width: 1.8),
                   ),
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),

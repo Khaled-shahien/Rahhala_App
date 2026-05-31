@@ -12,7 +12,7 @@ class UserSession {
 
   void setFromLogin({required String email, String? displayName}) {
     this.email = email.trim();
-    
+
     this.displayName = (displayName?.trim().isNotEmpty ?? false)
         ? displayName!.trim()
         : _fallbackNameFromEmail(email);
@@ -30,5 +30,11 @@ class UserSession {
     final local = email.split('@').first;
     if (local.isEmpty) return 'there';
     return local[0].toUpperCase() + local.substring(1);
+  }
+
+  void clear() {
+    displayName = null;
+    email = null;
+    avatarUrl = null;
   }
 }

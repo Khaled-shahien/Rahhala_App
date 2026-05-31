@@ -5,7 +5,6 @@ import 'package:rahhala_app/core/utils/token_storage.dart';
 class ApiInterceptors extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    
     options.headers['Accept'] = 'application/json';
     options.headers['Accept-Encoding'] = 'gzip';
 

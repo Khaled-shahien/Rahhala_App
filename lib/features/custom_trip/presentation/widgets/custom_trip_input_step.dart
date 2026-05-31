@@ -45,7 +45,8 @@ class CustomTripInputStep extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20.h),
-              _buildDaysSelector(context, state.numberOfDays, cubit, colorScheme),
+              _buildDaysSelector(
+                  context, state.numberOfDays, cubit, colorScheme),
               SizedBox(height: 60.h),
               _buildNextButton(context, state, onNext),
               SizedBox(height: 44.h),
@@ -204,8 +205,8 @@ class CustomTripInputStep extends StatelessWidget {
     );
   }
 
-  Widget _buildDaysSelector(
-      BuildContext context, int days, CustomTripCubit cubit, ColorScheme colorScheme) {
+  Widget _buildDaysSelector(BuildContext context, int days,
+      CustomTripCubit cubit, ColorScheme colorScheme) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
       decoration: BoxDecoration(
@@ -271,7 +272,8 @@ class CustomTripInputStep extends StatelessWidget {
     );
   }
 
-  Widget _buildNextButton(BuildContext context, CustomTripState state, VoidCallback onNext) {
+  Widget _buildNextButton(
+      BuildContext context, CustomTripState state, VoidCallback onNext) {
     final isEnabled =
         state.selectedRegion != null && state.selectedRegion!.isNotEmpty;
 

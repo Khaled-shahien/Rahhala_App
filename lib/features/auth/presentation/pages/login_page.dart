@@ -3,24 +3,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/routing/app_router.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 
 import 'package:rahhala_app/core/utils/app_notifications.dart';
 import 'package:rahhala_app/core/utils/app_validators.dart';
-import 'package:rahhala_app/core/utils/user_session.dart';
-import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/auth/domain/login/login_cubit.dart';
 import 'package:rahhala_app/features/auth/domain/login/login_state.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/forgot_password_page.dart';
-import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/signup_page.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_button.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_form_text_field.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/or_divider.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/social_login_section.dart';
-import 'package:rahhala_app/features/profile/data/repositories/user_repository.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
 
 class LoginPage extends StatefulWidget {
@@ -86,83 +84,6 @@ class _LoginPageState extends State<LoginPage> {
     context.read<LoginCubit>().loginUser(email: email, password: password);
   }
 
-  Future<void> _handleLoginSuccess(
-    BuildContext listenerContext,
-    LoginSuccess state,
-  ) async {
-    final token = state.loginModel.token;
-    final displayFromLogin = state.loginModel.username;
-    final email = _emailController.text.trim().toLowerCase();
-
-    if (token != null && token.isNotEmpty) {
-      await sl<TokenStorage>().setToken(token);
-    }
-    await sl<TokenStorage>().setEmail(email);
-
-    if (displayFromLogin != null && displayFromLogin.trim().isNotEmpty) {
-      await sl<TokenStorage>().setFullName(displayFromLogin.trim());
-    }
-
-    try {
-      final userRepo = sl<UserRepo>();
-      final detailsEither = await userRepo.getDetails();
-      await detailsEither.fold((f) async {
-        final stored = sl<TokenStorage>().fullName;
-        sl<UserSession>().setFromLogin(
-          email: email,
-          displayName: stored ?? '',
-        );
-      }, (details) async {
-        if (details.fullName.trim().isNotEmpty) {
-          await sl<TokenStorage>().setFullName(details.fullName.trim());
-        }
-        if (details.email.trim().isNotEmpty) {
-          await sl<TokenStorage>().setEmail(details.email.trim().toLowerCase());
-        }
-        sl<UserSession>().setFromLogin(
-          email: details.email.isNotEmpty
-              ? details.email.trim().toLowerCase()
-              : email,
-          displayName: details.fullName.trim().isNotEmpty
-              ? details.fullName.trim()
-              : (sl<TokenStorage>().fullName ?? ''),
-        );
-      });
-    } catch (_) {
-      sl<UserSession>().setFromLogin(
-        email: email,
-        displayName: sl<TokenStorage>().fullName ?? '',
-      );
-    }
-
-    final storedName = sl<TokenStorage>().fullName;
-    if (storedName == null || storedName.trim().isEmpty) {
-      final local = email.split('@').first;
-      final cap = local.isNotEmpty
-          ? local[0].toUpperCase() + local.substring(1)
-          : 'User';
-      await sl<TokenStorage>().setFullName(cap);
-      sl<UserSession>().setFromLogin(email: email, displayName: cap);
-    }
-
-    if (!mounted || !listenerContext.mounted) return;
-
-    final l10n = listenerContext.l10n;
-    showAppNotification(
-      context: listenerContext,
-      title:
-          l10n.authWelcomeBackUser(sl<TokenStorage>().fullName ?? email.split('@').first),
-      message: l10n.authWelcomeBackNotifMessage,
-    );
-
-    if (!mounted || !listenerContext.mounted) return;
-    Navigator.pushAndRemoveUntil(
-      listenerContext,
-      MaterialPageRoute(builder: (_) => const HomePage(isGuest: false)),
-      (route) => false,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -176,8 +97,15 @@ class _LoginPageState extends State<LoginPage> {
           child: BlocConsumer<LoginCubit, LoginState>(
             listener: (context, state) async {
               if (state is LoginSuccess) {
-                final listenerContext = context;
-                await _handleLoginSuccess(listenerContext, state);
+                final email = _emailController.text.trim().toLowerCase();
+                final displayName =
+                    state.session?.displayName ?? email.split('@').first;
+                showAppNotification(
+                  context: context,
+                  title: context.l10n.authWelcomeBackUser(displayName),
+                  message: context.l10n.authWelcomeBackNotifMessage,
+                );
+                context.go(AppRoutes.home);
               } else if (state is LoginFailure) {
                 HapticFeedback.mediumImpact();
                 showAppNotification(
@@ -329,8 +257,10 @@ class _LoginPageState extends State<LoginPage> {
                                               CrossAxisAlignment.stretch,
                                           children: [
                                             CustomFormTextField(
-                                              labelText: context.l10n.authEmailLabel,
-                                              hintText: context.l10n.authEmailHint,
+                                              labelText:
+                                                  context.l10n.authEmailLabel,
+                                              hintText:
+                                                  context.l10n.authEmailHint,
                                               controller: _emailController,
                                               keyboardType:
                                                   TextInputType.emailAddress,
@@ -345,8 +275,8 @@ class _LoginPageState extends State<LoginPage> {
                                             ),
                                             SizedBox(height: 16.h),
                                             CustomFormTextField(
-                                              labelText:
-                                                  context.l10n.authPasswordLabel,
+                                              labelText: context
+                                                  .l10n.authPasswordLabel,
                                               hintText:
                                                   context.l10n.authPasswordHint,
                                               controller: _passwordController,
@@ -364,10 +294,10 @@ class _LoginPageState extends State<LoginPage> {
                                                 ),
                                                 color: ThemeColor.primaryColor,
                                                 tooltip: _isPasswordVisible
-                                                    ? context.l10n
-                                                        .authHidePassword
-                                                    : context.l10n
-                                                        .authShowPassword,
+                                                    ? context
+                                                        .l10n.authHidePassword
+                                                    : context
+                                                        .l10n.authShowPassword,
                                               ),
                                               validator: AppValidators
                                                   .validateLoginPassword,
@@ -384,7 +314,8 @@ class _LoginPageState extends State<LoginPage> {
                                               children: [
                                                 Expanded(
                                                   child: Text(
-                                                    context.l10n.authSecureSignIn,
+                                                    context
+                                                        .l10n.authSecureSignIn,
                                                     style: TextStyle(
                                                       fontSize: 12.sp,
                                                       color: colorScheme
@@ -397,7 +328,8 @@ class _LoginPageState extends State<LoginPage> {
                                                   onPressed:
                                                       _navigateToForgotPassword,
                                                   child: Text(
-                                                    context.l10n.authForgotPassword,
+                                                    context.l10n
+                                                        .authForgotPassword,
                                                     style: const TextStyle(
                                                       color: ThemeColor
                                                           .primaryColor,
@@ -448,11 +380,11 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   child: Column(
                                     children: [
-                                      OrDivider(
-                                          text: context.l10n.commonOr),
+                                      OrDivider(text: context.l10n.commonOr),
                                       SizedBox(height: 18.h),
                                       SocialLoginSection(
-                                        promptText: context.l10n.authDontHaveAccount,
+                                        promptText:
+                                            context.l10n.authDontHaveAccount,
                                         actionText: context.l10n.authSignUp,
                                         onActionTap: _navigateToSignUp,
                                       ),

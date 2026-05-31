@@ -146,7 +146,7 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                               context.l10n.authResetPasswordTitle,
+                              context.l10n.authResetPasswordTitle,
                               style: TextStyle(
                                 fontSize: 22.sp,
                                 fontWeight: FontWeight.bold,
@@ -218,7 +218,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                 CrossAxisAlignment.stretch,
                                             children: [
                                               Text(
-                                                context.l10n.authNewPasswordMustDiffer,
+                                                context.l10n
+                                                    .authNewPasswordMustDiffer,
                                                 style: TextStyle(
                                                   fontSize: 12.sp,
                                                   color: colorScheme
@@ -229,9 +230,10 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                               SizedBox(height: 16.h),
                                               CustomFormTextField(
                                                 controller: _current,
-                                                labelText: context.l10n.authCurrentPassword,
-                                                hintText:
-                                                    context.l10n.authCurrentPasswordHint,
+                                                labelText: context
+                                                    .l10n.authCurrentPassword,
+                                                hintText: context.l10n
+                                                    .authCurrentPasswordHint,
                                                 obscureText: !_currentVisible,
                                                 prefixIcon: Icons.lock_outline,
                                                 suffixIcon: IconButton(
@@ -246,10 +248,11 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                       () => _currentVisible =
                                                           !_currentVisible),
                                                 ),
-                                                validator: (v) =>
-                                                    (v == null || v.isEmpty)
-                                                        ? context.l10n.authPasswordRequired
-                                                        : null,
+                                                validator: (v) => (v == null ||
+                                                        v.isEmpty)
+                                                    ? context.l10n
+                                                        .authPasswordRequired
+                                                    : null,
                                                 textInputAction:
                                                     TextInputAction.next,
                                                 autofillHints: const [
@@ -259,8 +262,10 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                               SizedBox(height: 14.h),
                                               CustomFormTextField(
                                                 controller: _new,
-                                                labelText: context.l10n.authNewPassword,
-                                                hintText: context.l10n.authNewPasswordHint,
+                                                labelText: context
+                                                    .l10n.authNewPassword,
+                                                hintText: context
+                                                    .l10n.authNewPasswordHint,
                                                 obscureText: !_newVisible,
                                                 prefixIcon:
                                                     Icons.lock_reset_outlined,
@@ -342,8 +347,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                     SizedBox(height: 10.h),
                                                     _rule(
                                                         ok: pw.length >= 8,
-                                                        text:
-                                                            context.l10n.passwordRule8Chars,
+                                                        text: context.l10n
+                                                            .passwordRule8Chars,
                                                         textColor: colorScheme
                                                             .onSurfaceVariant,
                                                         inactiveIconColor:
@@ -352,8 +357,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                     _rule(
                                                         ok: RegExp(r'[A-Z]')
                                                             .hasMatch(pw),
-                                                        text:
-                                                            context.l10n.passwordRuleUppercase,
+                                                        text: context.l10n
+                                                            .passwordRuleUppercase,
                                                         textColor: colorScheme
                                                             .onSurfaceVariant,
                                                         inactiveIconColor:
@@ -362,8 +367,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                     _rule(
                                                         ok: RegExp(r'[a-z]')
                                                             .hasMatch(pw),
-                                                        text:
-                                                            context.l10n.passwordRuleLowercase,
+                                                        text: context.l10n
+                                                            .passwordRuleLowercase,
                                                         textColor: colorScheme
                                                             .onSurfaceVariant,
                                                         inactiveIconColor:
@@ -372,8 +377,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                     _rule(
                                                         ok: RegExp(r'\d')
                                                             .hasMatch(pw),
-                                                        text:
-                                                            context.l10n.passwordRuleNumber,
+                                                        text: context.l10n
+                                                            .passwordRuleNumber,
                                                         textColor: colorScheme
                                                             .onSurfaceVariant,
                                                         inactiveIconColor:
@@ -383,8 +388,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                         ok: RegExp(
                                                                 r'[^A-Za-z0-9]')
                                                             .hasMatch(pw),
-                                                        text:
-                                                            context.l10n.passwordRuleSpecial,
+                                                        text: context.l10n
+                                                            .passwordRuleSpecial,
                                                         textColor: colorScheme
                                                             .onSurfaceVariant,
                                                         inactiveIconColor:
@@ -396,10 +401,10 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                               SizedBox(height: 14.h),
                                               CustomFormTextField(
                                                 controller: _confirm,
-                                                labelText:
-                                                    context.l10n.authConfirmNewPassword,
-                                                hintText:
-                                                    context.l10n.authConfirmNewPasswordHint,
+                                                labelText: context.l10n
+                                                    .authConfirmNewPassword,
+                                                hintText: context.l10n
+                                                    .authConfirmNewPasswordHint,
                                                 obscureText: !_confirmVisible,
                                                 prefixIcon: Icons
                                                     .enhanced_encryption_outlined,
@@ -450,7 +455,8 @@ class _ResetPasswordLoggedInPageState extends State<ResetPasswordLoggedInPage> {
                                                       },
                                                 text: isLoading
                                                     ? context.l10n.authUpdating
-                                                    : context.l10n.authResetPassword,
+                                                    : context
+                                                        .l10n.authResetPassword,
                                               ),
                                             ],
                                           ),
