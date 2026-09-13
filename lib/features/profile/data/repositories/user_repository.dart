@@ -10,8 +10,8 @@ abstract class UserRepo {
     required String fullName,
     String? phoneNumber,
     String? country,
-    String? dateOfBirth, // Added dateOfBirth parameter
-    String? gender, // Added gender parameter
+    String? birthDate, // Changed to match backend
+    String? gender, // Will be converted to 'Gender'
   });
 
   Future<Either<Failure, SuccessMessageModel>> deleteProfile();

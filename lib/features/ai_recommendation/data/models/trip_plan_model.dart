@@ -1,9 +1,6 @@
-
-
 import 'package:equatable/equatable.dart';
 
 class TripPlanResponse extends Equatable {
-  
   final bool success;
   final TripPlan response;
   final int savedId;
@@ -17,7 +14,7 @@ class TripPlanResponse extends Equatable {
   factory TripPlanResponse.fromJson(Map<String, dynamic> json) {
     return TripPlanResponse(
       success: json['success'] ?? false,
-      response: TripPlan.fromJson(json['response'] ?? {}),
+      response: TripPlan.fromJson(json['tripData'] ?? {}),
       savedId: json['savedId'] ?? 0,
     );
   }
@@ -29,7 +26,7 @@ class TripPlanResponse extends Equatable {
 class TripPlan extends Equatable {
   final String destination;
   final List<DailyPlan> days;
-  final String totalEstimatedCost; 
+  final String totalEstimatedCost;
   final String budgetTips;
   final String travelTips;
 
@@ -48,7 +45,6 @@ class TripPlan extends Equatable {
               ?.map((dayJson) => DailyPlan.fromJson(dayJson))
               .toList() ??
           [],
-      
       totalEstimatedCost: json['totalEstimatedCost']?.toString() ?? "0",
       budgetTips: json['budgetTips'] ?? '',
       travelTips: json['travelTips'] ?? '',
@@ -63,7 +59,7 @@ class TripPlan extends Equatable {
 class DailyPlan extends Equatable {
   final int day;
   final String title;
-  final String estimatedDayCost; 
+  final String estimatedDayCost;
   final List<Activity> activities;
 
   const DailyPlan({
@@ -77,7 +73,6 @@ class DailyPlan extends Equatable {
     return DailyPlan(
       day: json['day'] ?? 0,
       title: json['title'] ?? 'No Title',
-      
       estimatedDayCost: json['estimatedDayCost']?.toString() ?? "0",
       activities: (json['activities'] as List<dynamic>?)
               ?.map((activityJson) => Activity.fromJson(activityJson))
@@ -94,7 +89,7 @@ class Activity extends Equatable {
   final String time;
   final String place;
   final String description;
-  final String estimatedCost; 
+  final String estimatedCost;
   final List<Transportation> transportation;
 
   const Activity({
@@ -110,7 +105,6 @@ class Activity extends Equatable {
       time: json['time'] ?? 'N/A',
       place: json['place'] ?? 'Unknown Place',
       description: json['description'] ?? '',
-      
       estimatedCost: json['estimatedCost']?.toString() ?? "0",
       transportation: (json['transportation'] as List<dynamic>?)
               ?.map((tJson) => Transportation.fromJson(tJson))
@@ -128,7 +122,7 @@ class Transportation extends Equatable {
   final String from;
   final String to;
   final String method;
-  final String estimatedCost; 
+  final String estimatedCost;
 
   const Transportation({
     required this.from,
@@ -142,7 +136,6 @@ class Transportation extends Equatable {
       from: json['from'] ?? 'N/A',
       to: json['to'] ?? 'N/A',
       method: json['method'] ?? 'N/A',
-      
       estimatedCost: json['estimatedCost']?.toString() ?? "0",
     );
   }

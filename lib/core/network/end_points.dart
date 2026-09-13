@@ -14,6 +14,7 @@ class EndPoints {
   static const String editPhoto = '/api/User/edit_photo';
 
   static const String askGemini = '/api/gemini/Ask_Gemini';
+  static const String saveTrip = '/api/gemini/Save_Trip';
 }
 
 class ApiKey {

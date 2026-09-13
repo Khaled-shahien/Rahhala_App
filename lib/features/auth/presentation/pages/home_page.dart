@@ -232,7 +232,7 @@ class _HomeMainSection extends StatelessWidget {
               ),
               SizedBox(width: 16.w),
               Hero(
-                tag: 'profile_avatar',
+                tag: 'profile_avatar_home',
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,

@@ -12,7 +12,8 @@ class UserModelDetails extends Equatable {
   final String? countryName;
   final DateTime? createdAt;
   final String? gender; // Added gender property
-  final String? dateOfBirth; // Added dateOfBirth property
+  final DateTime?
+      birthDate; // Changed from dateOfBirth to birthDate and use DateTime
 
   const UserModelDetails({
     required this.id,
@@ -26,7 +27,7 @@ class UserModelDetails extends Equatable {
     this.countryName,
     this.createdAt,
     this.gender, // Added gender parameter
-    this.dateOfBirth, // Added dateOfBirth parameter
+    this.birthDate, // Changed to birthDate
   });
 
   factory UserModelDetails.fromJson(Map<String, dynamic> json) {
@@ -72,6 +73,25 @@ class UserModelDetails extends Equatable {
       }
     }
 
+    // Parse birthDate from birthofdate field (exact backend name)
+    DateTime? parsedBirthDate;
+    final birthDateStr =
+        data['birthofdate']?.toString(); // Exact backend field name
+    if (birthDateStr != null && birthDateStr.isNotEmpty) {
+      try {
+        // Handle the format "yyyy-MM-ddTHH:mm:ss"
+        parsedBirthDate = DateTime.parse(birthDateStr);
+      } catch (e) {
+        // If parsing fails, try to parse just the date part
+        try {
+          final datePart = birthDateStr.split('T')[0];
+          parsedBirthDate = DateTime.parse(datePart);
+        } catch (e2) {
+          parsedBirthDate = null;
+        }
+      }
+    }
+
     return UserModelDetails(
       id: data['id']?.toString() ?? '',
       firstName: fName,
@@ -87,10 +107,7 @@ class UserModelDetails extends Equatable {
           data['countryName']?.toString() ?? data['country']?.toString(),
       createdAt: createdDate,
       gender: data['gender']?.toString().trim(), // Added gender
-      dateOfBirth:
-          data['dateOfBirth']?.toString().trim() ?? // Added dateOfBirth
-              data['birthDate']?.toString().trim() ??
-              data['dob']?.toString().trim(),
+      birthDate: parsedBirthDate, // Use parsed birthDate
     );
   }
 
@@ -107,7 +124,7 @@ class UserModelDetails extends Equatable {
       'countryName': countryName,
       'createdAt': createdAt?.toIso8601String(),
       'gender': gender, // Added gender
-      'dateOfBirth': dateOfBirth, // Added dateOfBirth
+      'birthofdate': birthDate?.toIso8601String(), // Use backend field name
     };
   }
 
@@ -123,7 +140,7 @@ class UserModelDetails extends Equatable {
     String? countryName,
     DateTime? createdAt,
     String? gender, // Added gender
-    String? dateOfBirth, // Added dateOfBirth
+    DateTime? birthDate, // Changed to birthDate
   }) {
     return UserModelDetails(
       id: id ?? this.id,
@@ -137,7 +154,7 @@ class UserModelDetails extends Equatable {
       countryName: countryName ?? this.countryName,
       createdAt: createdAt ?? this.createdAt,
       gender: gender ?? this.gender, // Added gender
-      dateOfBirth: dateOfBirth ?? this.dateOfBirth, // Added dateOfBirth
+      birthDate: birthDate ?? this.birthDate, // Changed to birthDate
     );
   }
 
@@ -154,11 +171,11 @@ class UserModelDetails extends Equatable {
         countryName,
         createdAt,
         gender, // Added gender
-        dateOfBirth, // Added dateOfBirth
+        birthDate, // Changed to birthDate
       ];
 
   @override
   String toString() {
-    return 'UserModelDetails(id: $id, fullName: $fullName, email: $email, profileImageUrl: $profileImageUrl, gender: $gender)';
+    return 'UserModelDetails(id: $id, fullName: $fullName, email: $email, profileImageUrl: $profileImageUrl, gender: $gender, birthDate: $birthDate)';
   }
 }

@@ -39,8 +39,7 @@ class TransportationRoute extends StatelessWidget {
     }
 
     final isFree = cost.trim() == "0" || cost.toLowerCase().contains("free");
-    final costText =
-        isFree ? null : (cost.contains("EGP") ? cost : "$cost EGP");
+    final costText = isFree ? null : cost;
 
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),

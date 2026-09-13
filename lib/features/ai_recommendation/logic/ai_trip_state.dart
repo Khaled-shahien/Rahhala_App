@@ -70,8 +70,10 @@ class AiTripLoading extends AiTripData {
 
 class AiTripSuccess extends AiTripData {
   final TripPlanResponse response;
+  final Map<String, dynamic> geminiRequest;
 
-  AiTripSuccess(AiTripData oldState, {required this.response})
+  AiTripSuccess(AiTripData oldState,
+      {required this.response, required this.geminiRequest})
       : super(
           destination: oldState.destination,
           totalDays: oldState.totalDays,
@@ -81,7 +83,7 @@ class AiTripSuccess extends AiTripData {
         );
 
   @override
-  List<Object?> get props => [...super.props, response];
+  List<Object?> get props => [...super.props, response, geminiRequest];
 }
 
 class AiTripFailure extends AiTripData {

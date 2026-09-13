@@ -14,7 +14,6 @@ class ProfileCubit extends Cubit<ProfileState> {
     res.fold(
       (failure) => emit(ProfileFailure(failure.message)),
       (details) {
-        
         if (details.fullName.trim().isNotEmpty) {
           sl<TokenStorage>().setFullName(details.fullName.trim());
         }
@@ -53,11 +52,9 @@ class ProfileCubit extends Cubit<ProfileState> {
         final detailsRes = await repo.getDetails();
         detailsRes.fold(
           (failure) {
-            
             emit(ProfileActionSuccess(success));
           },
           (details) {
-            
             if (details.profileImageUrl != null &&
                 details.profileImageUrl!.isNotEmpty) {
               sl<TokenStorage>().setProfileImageUrl(details.profileImageUrl!);
@@ -80,20 +77,23 @@ class ProfileCubit extends Cubit<ProfileState> {
     required String fullName,
     String? phoneNumber,
     String? country,
+    String? birthDate,
+    String? gender,
   }) async {
     emit(ProfileActionLoading());
     final res = await repo.editProfile(
       fullName: fullName,
       phoneNumber: phoneNumber,
       country: country,
+      birthDate: birthDate,
+      gender: gender,
     );
     res.fold(
       (failure) => emit(ProfileFailure(failure.message)),
       (success) async {
-        
         await sl<TokenStorage>().setFullName(fullName);
         emit(ProfileActionSuccess(success));
-        await fetch(); 
+        await fetch();
       },
     );
   }

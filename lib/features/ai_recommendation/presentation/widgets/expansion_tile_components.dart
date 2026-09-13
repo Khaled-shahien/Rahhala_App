@@ -83,7 +83,7 @@ class CostBadge extends StatelessWidget {
           Icon(Icons.money_rounded, size: 13.sp, color: iconColor),
           SizedBox(width: 3.w),
           Text(
-            cost.contains("EGP") ? cost : "$cost EGP",
+            cost,
             style: TextStyle(
               color: textColor,
               fontSize: 10.sp,

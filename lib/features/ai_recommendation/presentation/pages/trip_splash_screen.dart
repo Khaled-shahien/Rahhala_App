@@ -59,7 +59,8 @@ class _TripSplashScreenState extends State<TripSplashScreen> {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => TripDetailsScreen(
-                plan: state.response.response,
+                tripPlan: state.response,
+                geminiRequest: state.geminiRequest,
               ),
             ),
           );

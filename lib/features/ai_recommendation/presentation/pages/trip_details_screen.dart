@@ -1,13 +1,17 @@
 // lib/features/ai_recommendation/presentation/pages/trip_details_screen.dart
-// ✅ النسخة النهائية - إصلاح Overflow في ExpansionTile
+// ✅ Final version - without EGP text in costs
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_model.dart';
-import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/transportation_widgets.dart';
-import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/expansion_tile_components.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
+import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/utils/app_notifications.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
+import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_model.dart';
+import 'package:rahhala_app/features/ai_recommendation/data/repositories/gemini_repository.dart';
+import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/expansion_tile_components.dart';
+import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/transportation_widgets.dart';
 
 // Using centralized colors from AppColors
 const Color darkBrown = AppColors.darkBrown;
@@ -20,10 +24,80 @@ const Color locationCardBackgroundColor = AppColors.costBadgeBackground;
 const Color screenBackgroundColor = AppColors.screenBackground;
 const Color primaryTextColor = AppColors.darkBrown;
 
-class TripDetailsScreen extends StatelessWidget {
-  final TripPlan plan;
+class TripDetailsScreen extends StatefulWidget {
+  final TripPlanResponse tripPlan;
+  final Map<String, dynamic> geminiRequest;
 
-  const TripDetailsScreen({super.key, required this.plan});
+  const TripDetailsScreen(
+      {super.key, required this.tripPlan, required this.geminiRequest});
+
+  @override
+  State<TripDetailsScreen> createState() => _TripDetailsScreenState();
+}
+
+class _TripDetailsScreenState extends State<TripDetailsScreen> {
+  bool _isSaving = false;
+
+  TripPlan get plan => widget.tripPlan.response;
+
+  Future<void> _saveTrip() async {
+    if (_isSaving) return;
+    setState(() => _isSaving = true);
+
+    try {
+      final repo = sl<GeminiRepository>();
+      final result = await repo.saveTripPlan(
+        tripPlan: widget.tripPlan,
+        geminiRequest: widget.geminiRequest,
+      );
+      if (!mounted) return;
+
+      result.fold(
+        (failure) {
+          HapticFeedback.mediumImpact();
+          showAppNotification(
+            context: context,
+            title: 'Error',
+            message: failure.message,
+            isError: true,
+          );
+        },
+        (data) {
+          final isSuccess = data['success'] == true;
+          final message =
+              data['message']?.toString() ?? 'Trip saved successfully.';
+
+          if (isSuccess) {
+            showAppNotification(
+              context: context,
+              title: 'Saved',
+              message: message,
+            );
+          } else {
+            HapticFeedback.mediumImpact();
+            showAppNotification(
+              context: context,
+              title: 'Error',
+              message: message,
+              isError: true,
+            );
+          }
+        },
+      );
+    } catch (_) {
+      if (mounted) {
+        HapticFeedback.mediumImpact();
+        showAppNotification(
+          context: context,
+          title: 'Error',
+          message: 'Failed to save trip. Please try again.',
+          isError: true,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +132,10 @@ class TripDetailsScreen extends StatelessWidget {
                   children: [
                     _buildTitle(),
                     SizedBox(height: 16.h),
-                    _buildHeaderBar(plan.destination, plan.totalEstimatedCost),
+                    _buildHeaderBar(
+                      plan.destination,
+                      plan.totalEstimatedCost,
+                    ),
                   ],
                 ),
               ),
@@ -108,6 +185,42 @@ class TripDetailsScreen extends StatelessWidget {
           ),
         ),
       ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _isSaving ? null : _saveTrip,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                padding: EdgeInsets.symmetric(vertical: 14.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+              ),
+              icon: _isSaving
+                  ? SizedBox(
+                      width: 18.w,
+                      height: 18.w,
+                      child: const CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Icon(Icons.bookmark_add_outlined, color: Colors.white),
+              label: Text(
+                _isSaving ? 'Saving...' : 'Save trip',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -122,7 +235,8 @@ class TripDetailsScreen extends StatelessWidget {
             from: transport.from,
             to: transport.to,
             method: transport.method,
-            cost: transport.estimatedCost,
+            // Remove EGP from transportation costs
+            cost: transport.estimatedCost.replaceAll("EGP", "").trim(),
             textColor: primaryTextColor,
             borderColor: lightBorderColor,
             backgroundColor: Colors.white,
@@ -168,7 +282,8 @@ class TripDetailsScreen extends StatelessWidget {
                   children: [
                     _buildLocationDetailsContentInner(
                       time: activity.time,
-                      cost: activity.estimatedCost,
+                      // Remove EGP from activity costs
+                      cost: activity.estimatedCost.replaceAll("EGP", "").trim(),
                       description: activity.description,
                     ),
                   ],
@@ -219,9 +334,10 @@ class TripDetailsScreen extends StatelessWidget {
     required String cost,
     required String description,
   }) {
-    final isFree = cost.trim() == "0" || cost.toLowerCase().contains("free");
-    final costText =
-        isFree ? "Free" : (cost.contains("EGP") ? cost : "$cost EGP");
+    // Remove EGP from cost
+    final cleanCost = cost.replaceAll("EGP", "").trim();
+    final isFree = cleanCost == "0" || cleanCost.toLowerCase().contains("free");
+    final costText = isFree ? "Free" : cleanCost;
 
     return Padding(
       padding: EdgeInsets.only(left: 8.w, right: 8.w, top: 4.h, bottom: 8.h),
@@ -329,6 +445,8 @@ class TripDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildHeaderBar(String destination, String totalCost) {
+    final cleanTotal = totalCost.replaceAll("EGP", "").trim();
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -344,9 +462,7 @@ class TripDetailsScreen extends StatelessWidget {
           flex: 1,
           child: _buildPill(
             icon: Icons.monetization_on_outlined,
-            text: totalCost.contains("EGP")
-                ? "cost: $totalCost"
-                : "cost: $totalCost EGP",
+            text: "Cost: $cleanTotal",
           ),
         ),
       ],
@@ -363,7 +479,7 @@ class TripDetailsScreen extends StatelessWidget {
     );
   }
 
-  // ✅ إصلاح مشكلة Overflow في ExpansionTile
+  // ✅ Fix Overflow issue in ExpansionTile + remove EGP from day cost
   Widget _buildDayExpansionTile(
     BuildContext context, {
     required int dayNumber,
@@ -389,18 +505,15 @@ class TripDetailsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(18.r),
         child: Stack(
           children: [
-            // ✅ Price + icon on the far right
             _buildDayExpansionTilePriceIcon(cost),
-
-            // ✅ Main content with Overflow fix
             CustomExpansionTile(
               tilePadding: EdgeInsets.only(
                 left: 16.w,
-                right: 110.w, // ✅ Enough space for price and icon
-                top: 6.h, // ✅ Larger vertical padding
-                bottom: 6.h, // ✅ Larger vertical padding
+                right: 110.w,
+                top: 6.h,
+                bottom: 6.h,
               ),
-              childrenPadding: EdgeInsets.zero, // ✅ Remove excess padding
+              childrenPadding: EdgeInsets.zero,
               trailing: const SizedBox.shrink(),
               collapsedIconColor: primaryTextColor,
               iconColor: primaryTextColor,
@@ -414,13 +527,15 @@ class TripDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildDayExpansionTilePriceIcon(String cost) {
+    final cleanCost = cost.replaceAll("EGP", "").trim();
+
     return Positioned(
       top: 12.h,
       right: 12.w,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildCostBadge(cost),
+          _buildCostBadge(cleanCost),
           Icon(
             Icons.keyboard_arrow_down,
             size: 22.sp,
@@ -434,7 +549,7 @@ class TripDetailsScreen extends StatelessWidget {
 
   Widget _buildDayExpansionTileTitle(int dayNumber, String title) {
     return Padding(
-      padding: EdgeInsets.only(top: 2.h, bottom: 2.h), // ✅ Additional padding
+      padding: EdgeInsets.only(top: 2.h, bottom: 2.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -443,7 +558,7 @@ class TripDetailsScreen extends StatelessWidget {
             "Day $dayNumber",
             style: TextStyle(
               color: lightBorderColor,
-              fontSize: 15.sp, // ✅ Slightly smaller size
+              fontSize: 15.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -452,7 +567,7 @@ class TripDetailsScreen extends StatelessWidget {
             title,
             style: TextStyle(
               color: primaryTextColor,
-              fontSize: 13.sp, // ✅ Slightly smaller size
+              fontSize: 13.sp,
               fontWeight: FontWeight.w600,
               height: 1.3,
             ),
@@ -519,7 +634,7 @@ class TripDetailsScreen extends StatelessWidget {
       from: from,
       to: to,
       method: method,
-      cost: cost,
+      cost: cost.replaceAll("EGP", "").trim(),
       textColor: primaryTextColor,
       borderColor: lightBorderColor,
       backgroundColor: Colors.white,
@@ -534,7 +649,7 @@ class TripDetailsScreen extends StatelessWidget {
     return TransportationPill(
       text: text,
       icon: icon,
-      cost: cost,
+      cost: cost?.replaceAll("EGP", "").trim(),
       textColor: primaryTextColor,
       borderColor: lightBorderColor,
       backgroundColor: Colors.white,
@@ -566,7 +681,7 @@ class TripDetailsScreen extends StatelessWidget {
       ),
       child: CustomExpansionTile(
         tilePadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
-        childrenPadding: EdgeInsets.zero, // ✅ إزالة padding زائد
+        childrenPadding: EdgeInsets.zero,
         leading: Container(
           padding: EdgeInsets.all(8.w),
           decoration: BoxDecoration(

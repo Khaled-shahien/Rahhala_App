@@ -1,5 +1,3 @@
-
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rahhala_app/features/ai_recommendation/data/repositories/gemini_repository.dart';
 import 'package:rahhala_app/features/ai_recommendation/logic/ai_trip_state.dart';
@@ -71,16 +69,42 @@ class AiTripCubit extends Cubit<AiTripState> {
     final numbers =
         RegExp(r'\d+').allMatches(range).map((m) => m.group(0)!).toList();
     if (numbers.length == 2) {
-      
       return (double.tryParse(numbers[1]) ?? 10000.0).toInt().toString();
     }
-    return "10000"; 
+    return "10000";
+  }
+
+  /// Maps a season display text to the corresponding season name
+  String _mapSeasonToBackendFormat(String seasonDisplayText) {
+    if (seasonDisplayText.startsWith('Winter')) return 'winter';
+    if (seasonDisplayText.startsWith('Spring')) return 'spring';
+    if (seasonDisplayText.startsWith('Summer')) return 'summer';
+    if (seasonDisplayText.startsWith('Autumn')) return 'autumn';
+
+    // Default to summer if season is not recognized
+    return 'summer';
+  }
+
+  /// Extracts country from a region string (e.g., "Dakahlia, Egypt" -> "Egypt")
+  String _extractCountry(String? region) {
+    if (region == null || region.isEmpty) return "Egypt";
+
+    // If region contains a comma, extract the part after the last comma
+    if (region.contains(',')) {
+      final parts = region.split(',');
+      if (parts.isNotEmpty) {
+        return parts.last.trim();
+      }
+    }
+    // Return the region as-is if no comma or parsing fails
+    return region.trim();
   }
 
   Future<void> generateTripPlan() async {
     if (state is! AiTripData || state is AiTripLoading) return;
     final currentState = state as AiTripData;
 
+    // Validate all required fields
     if (currentState.destination == null || currentState.destination!.isEmpty) {
       emit(
           AiTripFailure(currentState, message: "Please select a destination."));
@@ -89,7 +113,7 @@ class AiTripCubit extends Cubit<AiTripState> {
     if (currentState.selectedMonth == null ||
         currentState.selectedMonth!.isEmpty) {
       emit(AiTripFailure(currentState,
-          message: "Please select a travel month."));
+          message: "Please select a travel season."));
       return;
     }
     if (currentState.selectedRange == null) {
@@ -105,25 +129,43 @@ class AiTripCubit extends Cubit<AiTripState> {
 
     emit(AiTripLoading(currentState));
 
-    final String region = "${currentState.destination!}, Egypt";
-    final int numberOfDays = currentState.totalDays;
-    final String budget =
-        _parseBudget(currentState.selectedRange); 
-    final List<String> interestTypes = currentState.selectedInterests;
-    final String travelMonth = currentState.selectedMonth!;
+    try {
+      // Map UI fields to backend contract
+      final String country = _extractCountry(currentState.destination);
+      final int numberOfDays = currentState.totalDays;
+      final String budget = _parseBudget(currentState.selectedRange);
+      final List<String> interestTypes = currentState.selectedInterests;
+      final String season =
+          _mapSeasonToBackendFormat(currentState.selectedMonth!);
 
-    final result = await geminiRepository.getTripPlan(
-      region: region,
-      numberOfDays: numberOfDays,
-      budget: budget, 
-      interestTypes: interestTypes,
-      travelMonth: travelMonth,
-    );
+      final result = await geminiRepository.getTripPlan(
+        country: country,
+        numberOfDays: numberOfDays,
+        budget: budget,
+        interestTypes: interestTypes,
+        season: season,
+      );
 
-    result.fold(
-      (failure) => emit(AiTripFailure(currentState, message: failure.message)),
-      (tripPlanResponse) =>
-          emit(AiTripSuccess(currentState, response: tripPlanResponse)),
-    );
+      result.fold(
+        (failure) =>
+            emit(AiTripFailure(currentState, message: failure.message)),
+        (tripPlanResponse) => emit(
+          AiTripSuccess(
+            currentState,
+            response: tripPlanResponse,
+            geminiRequest: {
+              'country': country,
+              'numberOfDays': numberOfDays,
+              'budget': budget,
+              'interestTypes': interestTypes,
+              'season': season,
+            },
+          ),
+        ),
+      );
+    } catch (e) {
+      emit(AiTripFailure(currentState,
+          message: "An unexpected error occurred. Please try again."));
+    }
   }
 }

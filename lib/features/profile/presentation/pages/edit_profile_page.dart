@@ -66,10 +66,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _selectDateOfBirth(BuildContext context) async {
+    // Set default date to 18 years ago if no date is selected
+    final DateTime defaultDate = _dobController.text.trim().isNotEmpty
+        ? DateTime.parse(_dobController.text.trim())
+        : DateTime.now().subtract(const Duration(days: 6570));
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate:
-          DateTime.now().subtract(const Duration(days: 6570)), // 18 years ago
+      initialDate: defaultDate,
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       builder: (context, child) {
@@ -87,7 +91,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
     if (picked != null) {
       setState(() {
-        _dobController.text = '${picked.toLocal()}'.split(' ')[0];
+        // Format date as YYYY-MM-DD
+        _dobController.text =
+            "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
       });
     }
   }
@@ -127,17 +133,33 @@ class _EditProfilePageState extends State<EditProfilePage> {
             (details.countryName?.trim().isNotEmpty ?? false)) {
           _countryController.text = details.countryName!.trim();
         }
-        // إصلاح: تحميل تاريخ الميلاد
-        if (_dobController.text.trim().isEmpty &&
-            (details.dateOfBirth?.trim().isNotEmpty ?? false)) {
-          _dobController.text = details.dateOfBirth!.trim();
+        // Fix: Load birth date
+        if (_dobController.text.trim().isEmpty && (details.birthDate != null)) {
+          // Format date as YYYY-MM-DD
+          _dobController.text =
+              "${details.birthDate!.year}-${details.birthDate!.month.toString().padLeft(2, '0')}-${details.birthDate!.day.toString().padLeft(2, '0')}";
         }
-        // إصلاح: تحميل الجنس وتحديثه في المتغيرات
+        // Fix: Load gender and update in variables
         if (_genderController.text.trim().isEmpty &&
             (details.gender?.trim().isNotEmpty ?? false)) {
           setState(() {
             _selectedGender = details.gender!.trim();
             _genderController.text = details.gender!.trim();
+          });
+        }
+        // Set default values if no data exists
+        if (_dobController.text.trim().isEmpty) {
+          // Set default birth date to 18 years ago
+          final defaultDate =
+              DateTime.now().subtract(const Duration(days: 6570));
+          _dobController.text =
+              "${defaultDate.year}-${defaultDate.month.toString().padLeft(2, '0')}-${defaultDate.day.toString().padLeft(2, '0')}";
+        }
+        if (_genderController.text.trim().isEmpty) {
+          // Set default gender to "Prefer not to say"
+          setState(() {
+            _selectedGender = "Prefer not to say";
+            _genderController.text = "Prefer not to say";
           });
         }
         if (details.profileImageUrl != null &&
@@ -609,7 +631,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         hintText: 'Select date',
                                         prefixIcon: Icons.cake_outlined,
                                         validator: (v) =>
-                                            v!.isEmpty ? 'Required' : null,
+                                            null, // Make birth date not required
                                       ),
                                     ),
                                   ),
@@ -625,7 +647,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         hintText: 'Select',
                                         prefixIcon: Icons.transgender_outlined,
                                         validator: (v) =>
-                                            v!.isEmpty ? 'Required' : null,
+                                            null, // Make gender not required
                                       ),
                                     ),
                                   ),
@@ -703,12 +725,30 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   ? null
                                   : () {
                                       if (_formKey.currentState!.validate()) {
+                                        // Format date properly before sending
+                                        String? formattedDob;
+                                        if (_dobController.text
+                                            .trim()
+                                            .isNotEmpty) {
+                                          try {
+                                            // Ensure date is in ISO format (YYYY-MM-DD)
+                                            final date = DateTime.parse(
+                                                _dobController.text.trim());
+                                            formattedDob =
+                                                "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+                                          } catch (e) {
+                                            // If parsing fails, send as is
+                                            formattedDob =
+                                                _dobController.text.trim();
+                                          }
+                                        }
+
                                         context.read<EditProfileCubit>().save(
                                               fullName: _name.text.trim(),
                                               phoneNumber: _phone.text.trim(),
-                                              country:
-                                                  _countryController.text.trim(),
-                                              dob: _dobController.text.trim(),
+                                              country: _countryController.text
+                                                  .trim(),
+                                              dob: formattedDob ?? '',
                                               gender: _selectedGender ?? '',
                                             );
                                       } else {

@@ -5,6 +5,7 @@ import 'package:rahhala_app/core/constants/app_text_styles.dart';
 import 'package:rahhala_app/features/ai_recommendation/logic/ai_trip_cubit.dart';
 import 'package:rahhala_app/features/ai_recommendation/logic/ai_trip_state.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/button.dart';
+import 'package:country_picker/country_picker.dart';
 
 class TripInfoScreen extends StatelessWidget {
   final VoidCallback onNext;
@@ -15,48 +16,11 @@ class TripInfoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<AiTripCubit>();
 
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    final governorates = [
-      'Alexandria',
-      'Aswan',
-      'Asyut',
-      'Beheira',
-      'Beni Suef',
-      'Cairo',
-      'Dakahlia',
-      'Damietta',
-      'Faiyum',
-      'Gharbia',
-      'Giza',
-      'Ismailia',
-      'Kafr El Sheikh',
-      'Luxor',
-      'Matrouh',
-      'Minya',
-      'Monufia',
-      'New Valley',
-      'North Sinai',
-      'Port Said',
-      'Qalyubia',
-      'Qena',
-      'Red Sea',
-      'Sharqia',
-      'Sohag',
-      'South Sinai',
-      'Suez'
+    final seasons = [
+      {'value': 'Winter', 'label': 'Winter (December - February)'},
+      {'value': 'Spring', 'label': 'Spring (March - May)'},
+      {'value': 'Summer', 'label': 'Summer (June - August)'},
+      {'value': 'Autumn', 'label': 'Autumn (September - November)'},
     ];
 
     return BlocBuilder<AiTripCubit, AiTripState>(
@@ -74,17 +38,13 @@ class TripInfoScreen extends StatelessWidget {
               SizedBox(height: 20.h),
               Text('Where do you want to go?', style: AppTextStyles.heading),
               SizedBox(height: 28.h),
-              _buildGovernorateSelector(
-                governorates,
-                state.destination,
-                cubit,
-              ),
+              _buildCountrySelector(context, state.destination, cubit),
               SizedBox(height: 44.h),
               Text('When do you want to go?', style: AppTextStyles.heading),
               SizedBox(height: 28.h),
               _buildDaysSelector(state.totalDays, cubit),
               SizedBox(height: 28.h),
-              _buildMonthSelector(months, state.selectedMonth, cubit),
+              _buildSeasonSelector(seasons, state.selectedMonth, cubit),
               SizedBox(height: 76.h),
               NextButton(
                 onPressed: onNext,
@@ -97,51 +57,50 @@ class TripInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGovernorateSelector(List<String> governorates,
-      String? selectedGovernorate, AiTripCubit cubit) {
-    final bool isValueValid = selectedGovernorate != null &&
-        governorates.contains(selectedGovernorate);
-
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 6.h),
-      decoration: BoxDecoration(
-        color: const Color(0xFF6A4D3B).withOpacity(0.12),
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(
-          color: const Color(0xFFA88866),
-          width: 1.8.w,
-        ),
-      ),
-      child: DropdownButton<String>(
-        value: isValueValid ? selectedGovernorate : null,
-        hint: Text(
-          'Select a governorate',
-          style: TextStyle(
-            color: const Color(0xFF6A4D3B).withOpacity(0.8),
-            fontSize: 17.sp,
+  Widget _buildCountrySelector(
+      BuildContext context, String? selectedCountry, AiTripCubit cubit) {
+    return GestureDetector(
+      onTap: () {
+        showCountryPicker(
+          context: context,
+          showPhoneCode: false,
+          onSelect: (Country country) {
+            cubit.updateDestination(country.name);
+          },
+        );
+      },
+      child: AbsorbPointer(
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
+          decoration: BoxDecoration(
+            color: const Color(0xFF6A4D3B).withOpacity(0.12),
+            borderRadius: BorderRadius.circular(18.r),
+            border: Border.all(
+              color: const Color(0xFFA88866),
+              width: 1.8.w,
+            ),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.public, color: Color(0xFF6A4D3B)),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  selectedCountry ?? 'Select a country',
+                  style: TextStyle(
+                    color: selectedCountry != null
+                        ? const Color(0xFF6A4D3B)
+                        : const Color(0xFF6A4D3B).withOpacity(0.8),
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const Icon(Icons.arrow_drop_down, color: Color(0xFF6A4D3B)),
+            ],
           ),
         ),
-        isExpanded: true,
-        underline: const SizedBox.shrink(),
-        icon: const Icon(Icons.map_outlined, color: Color(0xFF6A4D3B)),
-        style: TextStyle(
-          color: const Color(0xFF6A4D3B),
-          fontSize: 17.sp,
-          fontWeight: FontWeight.w500,
-        ),
-        dropdownColor: Colors.white,
-        onChanged: (String? newValue) {
-          if (newValue != null) {
-            cubit.updateDestination(newValue);
-          }
-        },
-        items: governorates.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
-        }).toList(),
       ),
     );
   }
@@ -181,10 +140,10 @@ class TripInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMonthSelector(
-      List<String> months, String? selectedMonth, AiTripCubit cubit) {
-    final bool isValueValid =
-        selectedMonth != null && months.contains(selectedMonth);
+  Widget _buildSeasonSelector(List<Map<String, String>> seasons,
+      String? selectedSeason, AiTripCubit cubit) {
+    final hasValidSelection = selectedSeason != null &&
+        seasons.any((season) => season['value'] == selectedSeason);
 
     return Container(
       width: double.infinity,
@@ -198,9 +157,9 @@ class TripInfoScreen extends StatelessWidget {
         ),
       ),
       child: DropdownButton<String>(
-        value: isValueValid ? selectedMonth : null,
+        value: hasValidSelection ? selectedSeason : null,
         hint: Text(
-          'Select a month',
+          'Select a season',
           style: TextStyle(
             color: const Color(0xFF6A4D3B).withOpacity(0.8),
             fontSize: 17.sp,
@@ -221,10 +180,10 @@ class TripInfoScreen extends StatelessWidget {
             cubit.selectMonth(newValue);
           }
         },
-        items: months.map<DropdownMenuItem<String>>((String month) {
+        items: seasons.map<DropdownMenuItem<String>>((season) {
           return DropdownMenuItem<String>(
-            value: month,
-            child: Text(month),
+            value: season['value'],
+            child: Text(season['label']!),
           );
         }).toList(),
       ),

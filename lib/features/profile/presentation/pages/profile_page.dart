@@ -280,7 +280,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Column(
                     children: [
                       Hero(
-                        tag: 'profile_avatar',
+                        tag: 'profile_avatar_main',
                         child: Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,

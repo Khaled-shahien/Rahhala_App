@@ -77,19 +77,32 @@ class UserRepoImpl implements UserRepo {
     required String fullName,
     String? phoneNumber,
     String? country,
-    String? dateOfBirth, // Added dateOfBirth parameter
-    String? gender, // Added gender parameter
+    String? birthDate, // Changed to match backend
+    String? gender, // Will be converted to 'Gender'
   }) async {
     try {
+      // Ensure date is in proper ISO format
+      String? formattedDate;
+      if (birthDate != null && birthDate.isNotEmpty) {
+        try {
+          // Parse and reformat date to ensure ISO format
+          final date = DateTime.parse(birthDate);
+          formattedDate = date.toIso8601String().split('T')[0];
+        } catch (e) {
+          // If parsing fails, send as is
+          formattedDate = birthDate;
+        }
+      }
+
       final res = await api.put(
         EndPoints.editProfile,
         data: {
           'fullName': fullName,
           if (phoneNumber != null) 'phoneNumber': phoneNumber,
           if (country != null) 'country': country,
-          if (dateOfBirth != null)
-            'dateOfBirth': dateOfBirth, // Added dateOfBirth
-          if (gender != null) 'gender': gender, // Added gender
+          if (formattedDate != null)
+            'Birthofdate': formattedDate, // Fixed typo to match backend
+          if (gender != null) 'Gender': gender, // Capital G to match backend
         },
       );
       return Right(SuccessMessageModel.fromJson(_ensureMap(res)));

@@ -64,17 +64,17 @@ class TripInterestsScreen extends StatelessWidget {
                 onPressed: () {
                   cubit.generateTripPlan();
 
+                  // Navigate to splash screen with the cubit
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => BlocProvider.value(
+                      builder: (context) => BlocProvider.value(
                         value: cubit,
                         child: const TripSplashScreen(),
                       ),
                     ),
                   );
                 },
-                text: 'Generate My Custom Trip',
               ),
               SizedBox(height: 44.h),
             ],

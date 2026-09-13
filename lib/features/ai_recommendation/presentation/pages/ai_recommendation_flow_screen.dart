@@ -1,11 +1,8 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rahhala_app/core/constants/app_colors.dart';
-import 'package:rahhala_app/features/ai_recommendation/logic/budget_cubit.dart';
-import 'package:rahhala_app/features/ai_recommendation/logic/interests_cubit.dart';
-import 'package:rahhala_app/features/ai_recommendation/logic/trib_cubit.dart';
+import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/features/ai_recommendation/logic/ai_trip_cubit.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/pages/trip_budget_range_screen.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/pages/trip_info_screen.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/pages/trip_interests_screen.dart';
@@ -51,37 +48,29 @@ class _AIRecommendationFlowScreenState
 
   void _onBackPressed() {
     if (_currentStep == 0) {
-      
       Navigator.pop(context);
     } else {
-      
       _previousPage();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => TripCubit()),
-        BlocProvider(create: (context) => BudgetCubit()),
-        BlocProvider(create: (context) => InterestsCubit()),
-      ],
+    return BlocProvider(
+      create: (context) => AiTripCubit(geminiRepository: sl()),
       child: Scaffold(
-        backgroundColor: AppColors.white, 
+        backgroundColor: AppColors.white,
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new_outlined,
                 color: Colors.black),
-            onPressed: _onBackPressed, 
+            onPressed: _onBackPressed,
           ),
           backgroundColor: AppColors.white,
           elevation: 0,
         ),
         body: PageView(
           controller: _pageController,
-          
           physics: const NeverScrollableScrollPhysics(),
           onPageChanged: (page) {
             setState(() {
@@ -89,10 +78,9 @@ class _AIRecommendationFlowScreenState
             });
           },
           children: [
-            
             TripInfoScreen(onNext: _nextPage),
             TripBudgetRangeScreen(onNext: _nextPage),
-            const TripInterestsScreen(), 
+            const TripInterestsScreen(),
           ],
         ),
       ),
