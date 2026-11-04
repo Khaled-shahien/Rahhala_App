@@ -56,8 +56,8 @@ void main() {
         DioExceptionType.connectionError,
         DioExceptionType.badCertificate,
       ]) {
-        expect(mapDioException(_dio(type)).errorModel.type,
-            FailureType.network);
+        expect(
+            mapDioException(_dio(type)).errorModel.type, FailureType.network);
       }
     });
 

@@ -80,8 +80,7 @@ void main() {
           expect((cubit.state as HomeError).message, en.errorParsing),
     );
 
-    test('a refresh discards a load-more response that arrives late',
-        () async {
+    test('a refresh discards a load-more response that arrives late', () async {
       final slowPage2 = Completer<HomeResponse>();
       when(() => repository.getHomePlaces(page: 1, pageSize: 8))
           .thenAnswer((_) async => _page(_places(0, 8)));
@@ -119,8 +118,7 @@ void main() {
     test('a failed favourite toggle rolls back and reports it', () async {
       when(() => repository.getHomePlaces(page: 1, pageSize: 8))
           .thenAnswer((_) async => _page([_place('a')]));
-      when(() => repository.addFavourite('a'))
-          .thenThrow(Exception('offline'));
+      when(() => repository.addFavourite('a')).thenThrow(Exception('offline'));
 
       final cubit = HomeCubit(repository);
       await cubit.getHomeData();

@@ -102,8 +102,7 @@ void main() {
 
     test('fails open when the config host errors', () async {
       final service = AppUpdateService(
-        dio: Dio()
-          ..httpClientAdapter = _JsonAdapter('oops', statusCode: 500),
+        dio: Dio()..httpClientAdapter = _JsonAdapter('oops', statusCode: 500),
         configUrl: 'https://config.example.com/app.json',
         currentBuild: () => 2,
       );
