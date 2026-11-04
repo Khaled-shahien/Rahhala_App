@@ -9,12 +9,10 @@ import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/utils/app_notifications.dart';
 import 'package:rahhala_app/core/utils/app_validators.dart';
-import 'package:rahhala_app/core/utils/user_session.dart';
-import 'package:rahhala_app/core/utils/token_storage.dart';
 
 import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/otp_verification_page.dart';
-import 'package:rahhala_app/features/auth/presentation/constants/auth_strings.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_button.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_form_text_field.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/or_divider.dart';
@@ -75,22 +73,13 @@ class _SignUpPageState extends State<SignUpPage> {
     BuildContext listenerContext,
     RegisterSuccess state,
   ) async {
-    final fullName = _nameController.text.trim();
     final email = _emailController.text.trim().toLowerCase();
-
-    await sl<TokenStorage>().setFullName(fullName);
-    await sl<TokenStorage>().setEmail(email);
-
-    sl<UserSession>().setFromRegister(
-      fullName: fullName,
-      email: email,
-    );
 
     if (!mounted || !listenerContext.mounted) return;
 
     showAppNotification(
       context: listenerContext,
-      title: AuthStrings.successTitle,
+      title: context.l10n.commonSuccess,
       message: state.model.message,
     );
 
@@ -127,10 +116,13 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocProvider(
       create: (_) => sl<RegisterCubit>(),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         body: SafeArea(
           child: BlocConsumer<RegisterCubit, RegisterState>(
             listener: (context, state) async {
@@ -141,7 +133,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 HapticFeedback.mediumImpact();
                 showAppNotification(
                   context: context,
-                  title: AuthStrings.errorTitle,
+                  title: context.l10n.commonError,
                   message: state.errorMessage,
                   isError: true,
                 );
@@ -177,14 +169,18 @@ class _SignUpPageState extends State<SignUpPage> {
                                     children: [
                                       IconButton(
                                         style: IconButton.styleFrom(
-                                          backgroundColor: Colors.grey[100],
+                                          backgroundColor: colorScheme
+                                              .surfaceContainerHighest
+                                              .withValues(alpha: 0.5),
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(12),
                                           ),
                                         ),
-                                        icon: const Icon(
-                                            Icons.arrow_back_ios_new),
+                                        icon: Icon(
+                                          Icons.arrow_back_ios_new,
+                                          color: colorScheme.onSurface,
+                                        ),
                                         onPressed: () => Navigator.pop(context),
                                       ),
                                       const SizedBox.shrink(),
@@ -198,15 +194,16 @@ class _SignUpPageState extends State<SignUpPage> {
                                       vertical: 18.h,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: colorScheme.surface,
                                       borderRadius: BorderRadius.circular(22),
                                       border: Border.all(
-                                        color: Colors.grey[200]!,
+                                        color: colorScheme.outline.withValues(
+                                            alpha: isDark ? 0.35 : 0.2),
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black
-                                              .withValues(alpha: 0.04),
+                                          color: Colors.black.withValues(
+                                              alpha: isDark ? 0.2 : 0.04),
                                           blurRadius: 22,
                                           offset: const Offset(0, 12),
                                         ),
@@ -223,28 +220,31 @@ class _SignUpPageState extends State<SignUpPage> {
                                           ),
                                         ),
                                         SizedBox(height: 10.h),
-                                        const Text(
-                                          AuthStrings.createAccountTitle,
+                                        Text(
+                                          context.l10n.authCreateAccountTitle,
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 28,
                                             fontWeight: FontWeight.bold,
                                             color: ThemeColor.primaryColor,
                                           ),
                                         ),
                                         SizedBox(height: 6.h),
-                                        const Text(
-                                          AuthStrings.createAccountSubtitle,
+                                        Text(
+                                          context
+                                              .l10n.authCreateAccountSubtitle,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 16,
-                                            color: Colors.grey,
+                                            color: colorScheme.onSurfaceVariant,
                                           ),
                                         ),
                                         SizedBox(height: 24.h),
                                         CustomFormTextField(
-                                          labelText: AuthStrings.fullNameLabel,
-                                          hintText: AuthStrings.fullNameHint,
+                                          labelText:
+                                              context.l10n.authFullNameLabel,
+                                          hintText:
+                                              context.l10n.authFullNameHint,
                                           controller: _nameController,
                                           prefixIcon: Icons.person_outline,
                                           validator: AppValidators.validateName,
@@ -252,8 +252,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
-                                          labelText: AuthStrings.emailLabel,
-                                          hintText: AuthStrings.emailHint,
+                                          labelText:
+                                              context.l10n.authEmailLabel,
+                                          hintText: context.l10n.authEmailHint,
                                           controller: _emailController,
                                           keyboardType:
                                               TextInputType.emailAddress,
@@ -268,8 +269,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
                                           labelText:
-                                              AuthStrings.phoneNumberLabel,
-                                          hintText: AuthStrings.phoneNumberHint,
+                                              context.l10n.authPhoneLabel,
+                                          hintText: context.l10n.authPhoneHint,
                                           controller: _phoneController,
                                           keyboardType: TextInputType.phone,
                                           prefixIcon: Icons.phone_outlined,
@@ -286,8 +287,10 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
-                                          labelText: AuthStrings.passwordLabel,
-                                          hintText: AuthStrings.passwordHint,
+                                          labelText:
+                                              context.l10n.authPasswordLabel,
+                                          hintText:
+                                              context.l10n.authPasswordHint,
                                           controller: _passwordController,
                                           obscureText: _obscurePassword,
                                           prefixIcon: Icons.lock_outline,
@@ -296,7 +299,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                               _obscurePassword
                                                   ? Icons.visibility_off
                                                   : Icons.visibility,
-                                              color: Colors.grey,
+                                              color:
+                                                  colorScheme.onSurfaceVariant,
                                             ),
                                             onPressed: () => setState(() =>
                                                 _obscurePassword =
@@ -311,10 +315,10 @@ class _SignUpPageState extends State<SignUpPage> {
                                         ),
                                         SizedBox(height: 16.h),
                                         CustomFormTextField(
-                                          labelText:
-                                              AuthStrings.confirmPasswordLabel,
-                                          hintText:
-                                              AuthStrings.confirmPasswordHint,
+                                          labelText: context
+                                              .l10n.authConfirmPasswordLabel,
+                                          hintText: context
+                                              .l10n.authConfirmPasswordHint,
                                           controller:
                                               _confirmPasswordController,
                                           obscureText: _obscureConfirmPassword,
@@ -324,7 +328,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                               _obscureConfirmPassword
                                                   ? Icons.visibility_off
                                                   : Icons.visibility,
-                                              color: Colors.grey,
+                                              color:
+                                                  colorScheme.onSurfaceVariant,
                                             ),
                                             onPressed: () => setState(() =>
                                                 _obscureConfirmPassword =
@@ -356,8 +361,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                           child: AbsorbPointer(
                                             child: CustomFormTextField(
                                               labelText:
-                                                  AuthStrings.countryLabel,
-                                              hintText: AuthStrings.countryHint,
+                                                  context.l10n.authCountryLabel,
+                                              hintText:
+                                                  context.l10n.authCountryHint,
                                               controller:
                                                   _countryController, // 5. . "ŝ^" "S
                                               prefixIcon: Icons.public,
@@ -410,8 +416,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                                   }
                                                 },
                                           text: isLoading
-                                              ? AuthStrings.createAccountLoading
-                                              : AuthStrings.createAccount,
+                                              ? context.l10n.authCreatingAccount
+                                              : context.l10n.authCreateAccount,
                                         ),
                                       ],
                                     ),
@@ -423,15 +429,16 @@ class _SignUpPageState extends State<SignUpPage> {
                                       vertical: 18.h,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: colorScheme.surface,
                                       borderRadius: BorderRadius.circular(16),
                                       border: Border.all(
-                                        color: Colors.grey[200]!,
+                                        color: colorScheme.outline.withValues(
+                                            alpha: isDark ? 0.35 : 0.2),
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black
-                                              .withValues(alpha: 0.03),
+                                          color: Colors.black.withValues(
+                                              alpha: isDark ? 0.16 : 0.03),
                                           blurRadius: 18,
                                           offset: const Offset(0, 10),
                                         ),
@@ -439,8 +446,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     ),
                                     child: Column(
                                       children: [
-                                        const OrDivider(
-                                            text: AuthStrings.orDivider),
+                                        OrDivider(text: context.l10n.commonOr),
                                         SizedBox(height: 18.h),
                                         _buildSocialLoginSection(),
                                       ],
@@ -455,7 +461,8 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       if (isLoading)
                         Container(
-                          color: Colors.black45,
+                          color: Colors.black
+                              .withValues(alpha: isDark ? 0.5 : 0.28),
                           alignment: Alignment.center,
                           child: const CircularProgressIndicator(
                               color: ThemeColor.primaryColor),
@@ -472,20 +479,25 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget _buildSocialLoginSection() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              AuthStrings.alreadyHaveAccount,
-              style: TextStyle(fontSize: 14),
+            Text(
+              context.l10n.authAlreadyHaveAccount,
+              style: TextStyle(
+                fontSize: 14,
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
             TextButton(
               onPressed: _navigateToLogin,
-              child: const Text(
-                AuthStrings.logIn,
-                style: TextStyle(
+              child: Text(
+                context.l10n.authLogIn,
+                style: const TextStyle(
                   color: ThemeColor.primaryColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,

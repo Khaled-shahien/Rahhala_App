@@ -1,0 +1,21 @@
+{
+  "minDays": 1,
+  "maxDays": 14,
+  "budgetRanges": [
+    { "id": "less_5000", "label": "Less 5000", "value": "5000" },
+    { "id": "from_5000_to_10000", "label": "From 5000 to 10000", "value": "10000" },
+    { "id": "from_10000_to_15000", "label": "From 10000 to 15000", "value": "15000" },
+    { "id": "from_15000_to_20000", "label": "From 15000 to 20000", "value": "20000" },
+    { "id": "more_than_20000", "label": "More than 20000", "value": "25000" }
+  ],
+  "interests": [
+    { "id": "nature", "label": "Nature", "value": "Nature" },
+    { "id": "adventure", "label": "Adventure", "value": "Adventure" },
+    { "id": "relaxation", "label": "Relaxation", "value": "Relaxation" },
+    { "id": "historical_sites", "label": "Historical sites", "value": "Historical sites" },
+    { "id": "morning_activity", "label": "Morning activity", "value": "Morning activity" },
+    { "id": "night_activity", "label": "Night activity", "value": "Night activity" },
+    { "id": "shopping", "label": "Shopping", "value": "Shopping" },
+    { "id": "hidden_gems", "label": "Hidden gems", "value": "Hidden gems" }
+  ]
+}

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:rahhala_app/features/profile/data/models/user_model_details.dart';
-import 'package:rahhala_app/features/auth/data/models/success_message_model.dart';
+import 'package:rahhala_app/features/profile/domain/entities/user_details.dart';
+import 'package:rahhala_app/features/auth/domain/entities/success_message.dart';
 
 abstract class ProfileState extends Equatable {
   const ProfileState();
@@ -26,12 +26,24 @@ class ProfileFailure extends ProfileState {
   List<Object?> get props => [message];
 }
 
-class ProfileActionLoading extends ProfileState {} 
+class ProfileActionLoading extends ProfileState {}
 
 class ProfileActionSuccess extends ProfileState {
-  
   final SuccessMessageModel model;
   const ProfileActionSuccess(this.model);
   @override
   List<Object?> get props => [model];
+}
+
+/// The account was deleted on the server. The UI must end the session.
+class ProfileAccountDeleted extends ProfileState {
+  final SuccessMessageModel model;
+  const ProfileAccountDeleted(this.model);
+  @override
+  List<Object?> get props => [model];
+}
+
+/// There's no signed-in user (guest mode), so no profile is fetched.
+class ProfileGuest extends ProfileState {
+  const ProfileGuest();
 }

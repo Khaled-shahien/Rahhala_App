@@ -15,14 +15,20 @@ class SocialLoginSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        // Wrap instead of Row: on narrow screens, large text scale or longer
+        // translations the action moves to the next line instead of
+        // overflowing.
+        Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Text(
               promptText,
-              style: const TextStyle(color: Colors.grey),
+              style: TextStyle(color: colorScheme.onSurfaceVariant),
             ),
             TextButton(
               onPressed: onActionTap,
@@ -40,5 +46,4 @@ class SocialLoginSection extends StatelessWidget {
       ],
     );
   }
-
 }

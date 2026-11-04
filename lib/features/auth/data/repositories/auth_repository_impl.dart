@@ -1,10 +1,11 @@
-
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:rahhala_app/core/network/api_consumer.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/core/errors/exceptions.dart';
 import 'package:rahhala_app/core/errors/failures.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
+import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/features/auth/data/models/login_model.dart';
 import 'package:rahhala_app/features/auth/data/models/success_message_model.dart';
 import 'package:rahhala_app/features/auth/data/repositories/auth_repository.dart';
@@ -51,7 +52,12 @@ class AuthRepoImpl extends AuthRepo {
       try {
         final d = jsonDecode(response);
         if (d is Map<String, dynamic>) return d;
-      } catch (_) {}
+      } catch (e) {
+        AppLogger.instance.w(
+          'AuthRepo: Failed to decode response string as JSON',
+          error: e,
+        );
+      }
     }
     return <String, dynamic>{};
   }
@@ -73,6 +79,8 @@ class AuthRepoImpl extends AuthRepo {
         map['Message'] ??
         map['msg'] ??
         map['detail'] ??
+        map['error'] ??
+        map['errors'] ??
         (map['data'] is Map<String, dynamic>
             ? (map['data']['message'] ?? map['data']['detail'])
             : null) ??
@@ -80,6 +88,23 @@ class AuthRepoImpl extends AuthRepo {
     return (m?.toString().isNotEmpty ?? false)
         ? m.toString()
         : 'Operation completed successfully.';
+  }
+
+  bool _looksLikeFailure(Map<String, dynamic> map) {
+    final status = map['status']?.toString().toLowerCase().trim();
+    if (status == 'error' ||
+        status == 'failed' ||
+        status == 'failure' ||
+        status == 'invalid' ||
+        status == 'badrequest' ||
+        status == 'bad_request') {
+      return true;
+    }
+
+    final type = map['type']?.toString().toLowerCase().trim();
+    return map['error'] != null ||
+        map['errors'] != null ||
+        (type?.contains('error') ?? false);
   }
 
   @override
@@ -94,45 +119,57 @@ class AuthRepoImpl extends AuthRepo {
       );
       final map = _ensureJsonMap(res);
       final s = _readSuccess(map);
-      if (s == false) {
+      if (s == false || (s == null && _looksLikeFailure(map))) {
         return Left(ServerFailure(message: _readMessage(map)));
       }
       final loginModel = Login.fromJson(map);
+      final token = loginModel.token;
+      if (token == null || token.trim().isEmpty) {
+        // A "successful" response without a token would leave the user
+        // signed out on the next route guard. Treat it as a failure.
+        return Left(ServerFailure(
+          message: AppMessages.current.errorLoginMissingToken,
+          type: FailureType.parsing,
+        ));
+      }
       return Right(loginModel);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
   @override
   Future<Either<Failure, SuccessMessageModel>> registerUser({
     required String fullName,
-    required String username, 
+    required String username,
     required String email,
     required String password,
-    required String confirmPassword, 
+    required String confirmPassword,
     required String phoneNumber,
     required String country,
   }) async {
     try {
-      
       final res = await apiConsumer.post(
         EndPoints.register,
         data: {
           'fullName': fullName,
+          'username': username,
           'email': email,
           'phoneNumber': phoneNumber,
           'country': country,
           'password': password,
+          'confirmPassword': confirmPassword,
         },
       );
       final map = _ensureJsonMap(res);
       final s = _readSuccess(map);
       final msg = _readMessage(map);
-      if (s == false) return Left(ServerFailure(message: msg));
+      if (s == false || (s == null && _looksLikeFailure(map))) {
+        return Left(ServerFailure(message: msg));
+      }
       return Right(SuccessMessageModel.fromJson(map));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -143,15 +180,19 @@ class AuthRepoImpl extends AuthRepo {
     try {
       final res = await apiConsumer.post(
         EndPoints.forgotPassword,
+        // TODO: Move email to the request body when the backend accepts it.
+        // Query-string reset identifiers can be captured by logs and proxies.
         queryParameters: {ApiKey.email: email},
       );
       final map = _ensureJsonMap(res);
       final s = _readSuccess(map);
       final msg = _readMessage(map);
-      if (s == false) return Left(ServerFailure(message: msg));
+      if (s == false || (s == null && _looksLikeFailure(map))) {
+        return Left(ServerFailure(message: msg));
+      }
       return Right(SuccessMessageModel.fromJson(map));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -163,6 +204,8 @@ class AuthRepoImpl extends AuthRepo {
     try {
       final res = await apiConsumer.post(
         EndPoints.verifyOtp,
+        // TODO: Move email and OTP to the request body when the backend
+        // accepts it. Keeping query parameters preserves current API behavior.
         queryParameters: {
           ApiKey.email: _normalizeEmail(email),
           'otp': _normalizeOtp(otp),
@@ -171,10 +214,12 @@ class AuthRepoImpl extends AuthRepo {
       final map = _ensureJsonMap(res);
       final s = _readSuccess(map);
       final msg = _readMessage(map);
-      if (s == false) return Left(ServerFailure(message: msg));
+      if (s == false || (s == null && _looksLikeFailure(map))) {
+        return Left(ServerFailure(message: msg));
+      }
       return Right(SuccessMessageModel.fromJson(map));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -183,25 +228,27 @@ class AuthRepoImpl extends AuthRepo {
     required String email,
     required String otp,
     required String password,
-    required String confirmPassword, 
+    required String confirmPassword,
   }) async {
     try {
-      
       final res = await apiConsumer.post(
         EndPoints.resetPassword,
         data: {
           'email': _normalizeEmail(email),
           'otp': _normalizeOtp(otp),
           'newPassword': password,
+          'confirmPassword': confirmPassword,
         },
       );
       final map = _ensureJsonMap(res);
       final s = _readSuccess(map);
       final msg = _readMessage(map);
-      if (s == false) return Left(ServerFailure(message: msg));
+      if (s == false || (s == null && _looksLikeFailure(map))) {
+        return Left(ServerFailure(message: msg));
+      }
       return Right(SuccessMessageModel.fromJson(map));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 }

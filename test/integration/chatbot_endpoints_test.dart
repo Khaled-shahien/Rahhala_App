@@ -1,7 +1,11 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:rahhala_app/features/chatbot/data/sources/chat_bot_api_service.dart';
 import 'package:rahhala_app/features/chatbot/domain/entities/chat_message.dart';
+
+const bool runLiveChatbotTests = bool.fromEnvironment('RUN_LIVE_CHATBOT_TESTS');
 
 void main() {
   group('ChatBot API Service Tests', () {
@@ -294,5 +298,8 @@ void main() {
         }
       }, timeout: const Timeout(Duration(seconds: 30)));
     });
-  });
+  },
+      skip: runLiveChatbotTests
+          ? false
+          : 'Live chatbot endpoint tests are skipped by default. Run with --dart-define=RUN_LIVE_CHATBOT_TESTS=true to enable them.');
 }

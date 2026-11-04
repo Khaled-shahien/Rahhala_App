@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_text_styles.dart';
 import 'package:rahhala_app/features/custom_trip/presentation/constants/egypt_governorates.dart';
 import 'package:rahhala_app/features/custom_trip/presentation/cubit/custom_trip_cubit.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class CustomTripInputStep extends StatelessWidget {
   final VoidCallback onNext;
@@ -13,6 +14,8 @@ class CustomTripInputStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<CustomTripCubit>();
+
+    final colorScheme = Theme.of(context).colorScheme;
 
     return BlocBuilder<CustomTripCubit, CustomTripState>(
       builder: (context, state) {
@@ -26,20 +29,26 @@ class CustomTripInputStep extends StatelessWidget {
               _buildProgressIndicator(),
               SizedBox(height: 36.h),
               Text(
-                'Where do you want to go?',
-                style: AppTextStyles.heading,
+                context.l10n.customTripWhereToGo,
+                style: AppTextStyles.heading.copyWith(
+                  color: colorScheme.onSurface,
+                ),
               ),
               SizedBox(height: 16.h),
-              _buildGovernorateSelector(context, state.selectedRegion, cubit),
+              _buildGovernorateSelector(
+                  context, state.selectedRegion, cubit, colorScheme),
               SizedBox(height: 44.h),
               Text(
-                'How many days?',
-                style: AppTextStyles.heading,
+                context.l10n.customTripHowManyDays,
+                style: AppTextStyles.heading.copyWith(
+                  color: colorScheme.onSurface,
+                ),
               ),
               SizedBox(height: 20.h),
-              _buildDaysSelector(state.numberOfDays, cubit),
+              _buildDaysSelector(
+                  context, state.numberOfDays, cubit, colorScheme),
               SizedBox(height: 60.h),
-              _buildNextButton(state, onNext),
+              _buildNextButton(context, state, onNext),
               SizedBox(height: 44.h),
             ],
           ),
@@ -53,12 +62,10 @@ class CustomTripInputStep extends StatelessWidget {
       children: List.generate(1, (i) {
         return Expanded(
           child: Container(
-            margin: EdgeInsets.only(right: i < 2 ? 8.w : 0),
+            margin: EdgeInsetsDirectional.only(end: i < 2 ? 8.w : 0),
             height: 4.h,
             decoration: BoxDecoration(
-              color: i == 0
-                  ? const Color(0xFFA88866)
-                  : const Color(0xFFA88866).withValues(alpha: 0.25),
+              color: const Color(0xFFA88866),
               borderRadius: BorderRadius.circular(2.r),
             ),
           ),
@@ -71,6 +78,7 @@ class CustomTripInputStep extends StatelessWidget {
     BuildContext context,
     String? selected,
     CustomTripCubit cubit,
+    ColorScheme colorScheme,
   ) {
     return GestureDetector(
       onTap: () => _showGovernorateSheet(context, selected, cubit),
@@ -79,7 +87,7 @@ class CustomTripInputStep extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
           decoration: BoxDecoration(
-            color: const Color(0xFF6A4D3B).withValues(alpha: 0.08),
+            color: colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(18.r),
             border: Border.all(
               color: const Color(0xFFA88866),
@@ -88,21 +96,21 @@ class CustomTripInputStep extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const Icon(Icons.location_on_outlined, color: Color(0xFF6A4D3B)),
+              const Icon(Icons.location_on_outlined, color: Color(0xFFA88866)),
               SizedBox(width: 12.w),
               Expanded(
                 child: Text(
-                  selected ?? 'Select a governorate',
+                  selected ?? context.l10n.customTripSelectGovernorate,
                   style: TextStyle(
                     color: selected != null
-                        ? const Color(0xFF6A4D3B)
-                        : const Color(0xFF6A4D3B).withValues(alpha: 0.6),
+                        ? colorScheme.onSurface
+                        : colorScheme.onSurface.withValues(alpha: 0.6),
                     fontSize: 17.sp,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-              const Icon(Icons.arrow_drop_down, color: Color(0xFF6A4D3B)),
+              const Icon(Icons.arrow_drop_down, color: Color(0xFFA88866)),
             ],
           ),
         ),
@@ -115,9 +123,10 @@ class CustomTripInputStep extends StatelessWidget {
     String? selected,
     CustomTripCubit cubit,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
@@ -136,17 +145,17 @@ class CustomTripInputStep extends StatelessWidget {
                   width: 40.w,
                   height: 4.h,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(2.r),
                   ),
                 ),
                 SizedBox(height: 16.h),
                 Text(
-                  'Select Governorate',
+                  context.l10n.customTripSelectGovernorateTitle,
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF3E3431),
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 SizedBox(height: 12.h),
@@ -158,7 +167,7 @@ class CustomTripInputStep extends StatelessWidget {
                     itemCount: egyptGovernorates.length,
                     separatorBuilder: (_, __) => Divider(
                       height: 1,
-                      color: Colors.grey.shade100,
+                      color: colorScheme.outlineVariant,
                     ),
                     itemBuilder: (_, index) {
                       final gov = egyptGovernorates[index];
@@ -172,17 +181,12 @@ class CustomTripInputStep extends StatelessWidget {
                             fontWeight: isSelected
                                 ? FontWeight.bold
                                 : FontWeight.normal,
-                            color: isSelected
-                                ? const Color(0xFF6A4D3B)
-                                : const Color(0xFF3E3431),
+                            color: colorScheme.onSurface,
                           ),
                         ),
                         trailing: isSelected
-                            ? Icon(
-                                Icons.check_circle,
-                                color: const Color(0xFFA88866),
-                                size: 20.sp,
-                              )
+                            ? Icon(Icons.check_circle,
+                                color: const Color(0xFFA88866), size: 20.sp)
                             : null,
                         onTap: () {
                           cubit.updateRegion(gov);
@@ -201,11 +205,12 @@ class CustomTripInputStep extends StatelessWidget {
     );
   }
 
-  Widget _buildDaysSelector(int days, CustomTripCubit cubit) {
+  Widget _buildDaysSelector(BuildContext context, int days,
+      CustomTripCubit cubit, ColorScheme colorScheme) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF6A4D3B).withValues(alpha: 0.08),
+        color: colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(18.r),
         border: Border.all(
           color: const Color(0xFFA88866),
@@ -216,11 +221,11 @@ class CustomTripInputStep extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Total days',
+            context.l10n.customTripTotalDays,
             style: TextStyle(
               fontSize: 17.sp,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF6A4D3B),
+              color: colorScheme.onSurface,
             ),
           ),
           Row(
@@ -237,7 +242,7 @@ class CustomTripInputStep extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF3E3431),
+                  color: colorScheme.onSurface,
                 ),
               ),
               SizedBox(width: 16.w),
@@ -252,10 +257,8 @@ class CustomTripInputStep extends StatelessWidget {
     );
   }
 
-  Widget _buildDayButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
+  Widget _buildDayButton(
+      {required IconData icon, required VoidCallback onPressed}) {
     return InkWell(
       onTap: onPressed,
       child: Container(
@@ -269,7 +272,8 @@ class CustomTripInputStep extends StatelessWidget {
     );
   }
 
-  Widget _buildNextButton(CustomTripState state, VoidCallback onNext) {
+  Widget _buildNextButton(
+      BuildContext context, CustomTripState state, VoidCallback onNext) {
     final isEnabled =
         state.selectedRegion != null && state.selectedRegion!.isNotEmpty;
 
@@ -279,15 +283,15 @@ class CustomTripInputStep extends StatelessWidget {
         onPressed: isEnabled ? onNext : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFA88866),
-          disabledBackgroundColor: const Color(0xFFA88866).withValues(alpha: 0.4),
+          disabledBackgroundColor:
+              const Color(0xFFA88866).withValues(alpha: 0.4),
           padding: EdgeInsets.symmetric(vertical: 16.h),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30.r),
-          ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
           elevation: 0,
         ),
         child: Text(
-          'Next',
+          context.l10n.commonNext,
           style: TextStyle(
             color: Colors.white,
             fontSize: 18.sp,

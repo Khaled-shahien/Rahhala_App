@@ -1,8 +1,4 @@
 class EndPoints {
-  static const String baseUrl = 'https://rahhallaweb2026.runasp.net';
-  static const String chatBotBaseUrl =
-      'https://express-js-on-vercel-ten-roan-21.vercel.app';
-
   static const String login = '/api/Auth/Login';
   static const String register = '/api/Auth/register';
   static const String forgotPassword = '/api/Auth/forgot-password';
@@ -16,7 +12,11 @@ class EndPoints {
   static const String editPhoto = '/api/User/edit_photo';
 
   static const String askGemini = '/api/gemini/Ask_Gemini';
+  static const String tripOptions = '/api/trip-options';
   static const String saveTrip = '/api/gemini/Save_Trip';
+  static const String regenerateTrip = '/api/gemini/Regenerate_Trip';
+  static const String myTrips = '/api/gemini/My_Trips';
+  static String myTripById(String tripId) => '$myTrips/$tripId';
   static const String generateSpecificPlan =
       '/api/gemini/Generate_Specific_Plan';
   static const String imageSearch = '/api/PhotoApi/upload';
@@ -25,6 +25,15 @@ class EndPoints {
   static const String chatBot = '/api/chat';
   static const String createChatContext = '/api/chat/context';
   static const String discardChatContext = '/api/chat/context/discard';
+
+  static const String getHome = '/api/Home/GetHome';
+  static String placeDetails(String id) => '/api/Home/Places/$id';
+  static String reviewById(String id) => '/api/Home/Reviews/$id';
+  static const String favourites = '/api/Home/Favourites';
+  static String favouriteByPlaceId(String placeId) => '$favourites/$placeId';
+
+  static const String nearbyPlaces = '/api/places/nearby';
+  static const String getActivityRoute = '/api/activityroute/get-route';
 }
 
 class ApiKey {

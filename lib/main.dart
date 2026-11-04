@@ -1,17 +1,46 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:rahhala_app/core/crash/app_error_reporter.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/localization/app_locale_controller.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
+import 'package:rahhala_app/core/routing/app_router.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
-import 'package:rahhala_app/features/splash/presentation/pages/splash_screen.dart';
+import 'package:rahhala_app/core/theme/theme_controller.dart';
+import 'package:rahhala_app/l10n/generated/app_localizations.dart';
 
 /// Entry point of the Rahhala travel application
 void main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Route every uncaught error to the logger and crash reporter. These are
+  // installed first so failures during startup are captured too.
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    AppErrorReporter.record(
+      'Uncaught Flutter framework error',
+      error: details.exception,
+      stackTrace: details.stack,
+      fatal: true,
+    );
+  };
+  PlatformDispatcher.instance.onError = (error, stackTrace) {
+    AppErrorReporter.record(
+      'Uncaught asynchronous error',
+      error: error,
+      stackTrace: stackTrace,
+      fatal: true,
+    );
+    return true;
+  };
+
   // Initialize dependency injection
   await setupServiceLocator();
-
+  await sl<AppLocaleController>().initialize();
+  await sl<AppThemeController>().initialize();
   // Run the application
   runApp(const RahhalaApp());
 }
@@ -28,14 +57,41 @@ class RahhalaApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (_, __) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Rahhala App',
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: ThemeMode
-              .system, // Can be ThemeMode.light, ThemeMode.dark, or ThemeMode.system
-          home: const SplashScreen(),
+        final localeController = sl<AppLocaleController>();
+        final themeController = sl<AppThemeController>();
+        return ListenableBuilder(
+          listenable: Listenable.merge([localeController, themeController]),
+          builder: (context, child) {
+            return MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              onGenerateTitle: (context) => context.l10n.appTitle,
+              routerConfig: AppRouter.router,
+              locale: localeController.locale,
+              supportedLocales: AppLocaleController.supportedLocales,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              localeResolutionCallback: (locale, supportedLocales) {
+                if (locale == null) {
+                  return AppLocaleController.fallbackLocale;
+                }
+
+                for (final supportedLocale in supportedLocales) {
+                  if (supportedLocale.languageCode == locale.languageCode) {
+                    return supportedLocale;
+                  }
+                }
+
+                return AppLocaleController.fallbackLocale;
+              },
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeController.themeMode,
+            );
+          },
         );
       },
     );

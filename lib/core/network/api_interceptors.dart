@@ -1,16 +1,18 @@
 import 'package:dio/dio.dart';
-import 'package:rahhala_app/core/di/service_locator.dart';
-import 'package:rahhala_app/core/utils/token_storage.dart';
 
+/// Adds JSON headers and the bearer token to every request.
 class ApiInterceptors extends Interceptor {
+  ApiInterceptors({required String? Function() tokenProvider})
+      : _tokenProvider = tokenProvider;
+
+  final String? Function() _tokenProvider;
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    
     options.headers['Accept'] = 'application/json';
-    options.headers['Accept-Encoding'] = 'gzip';
 
-    final isMultipart = options.data is FormData;
-    if (isMultipart) {
+    if (options.data is FormData) {
+      // Let Dio set the multipart boundary.
       options.headers.remove('Content-Type');
     } else {
       options.headers.putIfAbsent(
@@ -19,8 +21,7 @@ class ApiInterceptors extends Interceptor {
       );
     }
 
-    final tokenStorage = sl<TokenStorage>();
-    final token = tokenStorage.token;
+    final token = _tokenProvider();
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     } else {

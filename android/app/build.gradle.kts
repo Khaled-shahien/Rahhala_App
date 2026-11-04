@@ -1,3 +1,27 @@
+import java.io.File
+import java.io.FileInputStream
+import java.util.Properties
+
+val keystoreProperties = Properties()
+val repoRootDir: File = rootProject.projectDir.parentFile
+val keyPropertiesCandidates =
+    listOf(
+        File(repoRootDir, "key.properties"),
+        rootProject.file("key.properties"),
+    )
+val keystorePropertiesFile = keyPropertiesCandidates.firstOrNull { it.exists() }
+
+if (keystorePropertiesFile != null) {
+    FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
+}
+
+fun signingProperty(name: String): String? =
+    keystoreProperties.getProperty(name)?.takeIf { it.isNotBlank() }
+
+val hasReleaseSigningProperties =
+    listOf("keyAlias", "keyPassword", "storeFile", "storePassword")
+        .all { signingProperty(it) != null }
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -6,7 +30,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.auth_app"
+    namespace = "com.rahhala.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,22 +45,101 @@ android {
 
     defaultConfig {
         
-        applicationId = "com.example.auth_app"
+        applicationId = "com.rahhala.app"
 
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["appLabel"] = "Rahhala"
+    }
+
+    flavorDimensions += "environment"
+
+    productFlavors {
+        create("development") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            manifestPlaceholders["appLabel"] = "Rahhala Dev"
+        }
+
+        create("staging") {
+            dimension = "environment"
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+            manifestPlaceholders["appLabel"] = "Rahhala Staging"
+        }
+
+        create("production") {
+            dimension = "environment"
+            manifestPlaceholders["appLabel"] = "Rahhala"
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            if (hasReleaseSigningProperties) {
+                keyAlias = signingProperty("keyAlias")!!
+                keyPassword = signingProperty("keyPassword")!!
+                val configuredStoreFile = File(signingProperty("storeFile")!!)
+                storeFile =
+                    if (configuredStoreFile.isAbsolute) {
+                        configuredStoreFile
+                    } else {
+                        File(keystorePropertiesFile!!.parentFile, configuredStoreFile.path)
+                    }
+                storePassword = signingProperty("storePassword")!!
+            }
+        }
     }
 
     buildTypes {
         release {
-
-            signingConfig = signingConfigs.getByName("debug")
+            // R8 code shrinking and obfuscation (Flutter enables it for release
+            // by default; stated explicitly so it can't be switched off silently).
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig =
+                if (hasReleaseSigningProperties) {
+                    signingConfigs.getByName("release")
+                } else {
+                    logger.warn(
+                        "WARNING: key.properties is missing or incomplete. The release " +
+                            "build is signed with the DEBUG key and will be rejected by " +
+                            "Google Play. See docs/android_release_signing.md.",
+                    )
+                    signingConfigs.getByName("debug")
+                }
         }
     }
 }
 
 flutter {
     source = "../.."
+}
+
+tasks.register("copyProductionReleaseApkForFlutter") {
+    dependsOn("assembleProductionRelease")
+
+    doLast {
+        val flutterApkDir = File(repoRootDir, "build/app/outputs/flutter-apk")
+        val productionApk = File(flutterApkDir, "app-production-release.apk")
+
+        if (productionApk.exists()) {
+            productionApk.copyTo(File(flutterApkDir, "app-release.apk"), overwrite = true)
+        }
+
+        val productionSha1 = File(flutterApkDir, "app-production-release.apk.sha1")
+        if (productionSha1.exists()) {
+            productionSha1.copyTo(
+                File(flutterApkDir, "app-release.apk.sha1"),
+                overwrite = true,
+            )
+        }
+    }
+}
+
+tasks.matching { it.name == "assembleRelease" }.configureEach {
+    finalizedBy("copyProductionReleaseApkForFlutter")
 }

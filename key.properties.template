@@ -1,0 +1,7 @@
+# Copy this file to key.properties and fill in real release signing values.
+# When key.properties is absent or incomplete, release APKs fall back to
+# Android's debug signing config so local release builds still complete.
+storePassword=YOUR_STORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=rahhala
+storeFile=android/app/rahhala-release-key.jks

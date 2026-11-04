@@ -112,7 +112,8 @@ class FeatureCard extends StatelessWidget {
           Icon(
             Icons.arrow_forward_ios,
             size: 16.r,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
         ],
       ),
@@ -160,8 +161,10 @@ class StatCard extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
                 ),
             textAlign: TextAlign.center,
           ),

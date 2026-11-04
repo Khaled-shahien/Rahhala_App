@@ -2,21 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:rahhala_app/core/auth/auth_session_service.dart';
+import 'package:rahhala_app/core/auth/session_manager.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/localization/app_locale_controller.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
+import 'package:rahhala_app/core/routing/app_router.dart';
 
 import 'package:rahhala_app/core/theme/app_theme.dart';
+import 'package:rahhala_app/core/theme/theme_controller.dart';
 import 'package:rahhala_app/core/utils/app_notifications.dart';
-import 'package:rahhala_app/core/utils/token_storage.dart';
 
-import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
-import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/reset_password_logged_in_page.dart';
-import 'package:rahhala_app/features/auth/presentation/pages/welcome_page.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/profile_list_tile.dart';
 
 import 'package:rahhala_app/features/profile/domain/profile/profile_cubit.dart';
 import 'package:rahhala_app/features/profile/domain/profile/profile_state.dart';
 import 'package:rahhala_app/features/profile/presentation/pages/edit_profile_page.dart';
+import 'package:rahhala_app/features/profile/presentation/widgets/language_picker_bottom_sheet.dart';
 
 import 'package:rahhala_app/core/widgets/rahhala_bottom_bar.dart';
 import 'package:rahhala_app/core/widgets/soft_arc_notch.dart';
@@ -46,16 +50,19 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void dispose() {
+    _profileCubit.close();
     super.dispose();
   }
 
   void _showComingSoon(String featureName) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
         ),
+        backgroundColor: Theme.of(context).cardTheme.color,
         child: Padding(
           padding: EdgeInsets.all(28.w),
           child: Column(
@@ -76,20 +83,20 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               SizedBox(height: 24.h),
               Text(
-                'Coming Soon!',
+                l10n.commonComingSoon,
                 style: TextStyle(
                   fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               SizedBox(height: 16.h),
               Text(
-                '$featureName feature is under development.',
+                l10n.routerFeatureUnderDevelopment(featureName),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16.sp,
-                  color: Colors.grey[600],
+                  color: Colors.grey[500],
                   height: 1.5,
                 ),
               ),
@@ -107,7 +114,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   child: Text(
-                    'Got it',
+                    l10n.commonGotIt,
                     style: TextStyle(
                       fontSize: 17.sp,
                       fontWeight: FontWeight.w600,
@@ -127,15 +134,18 @@ class _ProfilePageState extends State<ProfilePage> {
     required String okLabel,
     required Color okColor,
   }) {
+    final l10n = context.l10n;
     return showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
+        backgroundColor: Theme.of(context).cardTheme.color,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(title),
+        title: Text(title,
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('CANCEL')),
+              child: Text(l10n.commonCancel)),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: okColor,
@@ -152,9 +162,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> deleteAccount() async {
+    final l10n = context.l10n;
     final confirm = await _confirm(
-      title: 'Delete your account permanently?',
-      okLabel: 'DELETE',
+      title: l10n.profileDeleteAccountConfirm,
+      okLabel: l10n.profileDeleteAction,
       okColor: Colors.red,
     );
     if (confirm != true) return;
@@ -163,29 +174,40 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> logout() async {
+    final l10n = context.l10n;
     final confirm = await _confirm(
-      title: 'Log out from your account?',
-      okLabel: 'LOGOUT',
+      title: l10n.profileLogoutConfirm,
+      okLabel: l10n.profileLogoutAction,
       okColor: ThemeColor.primaryColor,
     );
     if (confirm != true) return;
 
-    await sl<TokenStorage>().clearAll();
+    await sl<SessionManager>().endSession(SessionEndReason.logout);
     if (!mounted) return;
 
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const WelcomePage()),
-      (_) => false,
+    context.go(AppRoutes.welcome);
+  }
+
+  Future<void> _showLanguagePicker() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Theme.of(context).cardTheme.color,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => LanguagePickerBottomSheet(
+        localeController: sl<AppLocaleController>(),
+      ),
     );
   }
 
   Widget buildContent(ProfileState state) {
-    final storage = sl<TokenStorage>();
-
-    String displayName = storage.displayName;
-    String displayEmail = storage.email ?? 'No email';
-    String? profileImageUrl = storage.profileImageUrl;
+    final l10n = context.l10n;
+    final session = sl<AuthSessionService>();
+    final themeController = sl<AppThemeController>();
+    String displayName = session.displayName;
+    String displayEmail = session.email ?? l10n.profileNoEmail;
+    String? profileImageUrl = session.profileImageUrl;
 
     if (state is ProfileLoaded) {
       if (state.details.fullName.trim().isNotEmpty) {
@@ -204,7 +226,7 @@ class _ProfilePageState extends State<ProfilePage> {
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
+            padding: EdgeInsetsDirectional.fromSTEB(20.w, 16.h, 20.w, 24.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -213,21 +235,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       IconButton(
                         onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const HomePage(isGuest: false),
-                            ),
-                            (route) => false,
-                          );
+                          context.go(AppRoutes.home);
                         },
                         icon: Icon(
                           Icons.arrow_back_ios_new_rounded,
                           size: 24.sp,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                         style: IconButton.styleFrom(
-                          backgroundColor: Colors.grey[100],
+                          backgroundColor: themeController.isDarkMode
+                              ? Colors.grey[900]
+                              : Colors.grey[100],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -235,42 +253,40 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       SizedBox(width: 16.w),
                       Text(
-                        'Profile',
+                        l10n.profileTitle,
                         style: TextStyle(
                           fontSize: 20.sp,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
-                      const Spacer(),
                     ],
                   ),
                 if (!widget.embedded) SizedBox(height: 20.h),
 
-                // Profile header with improved styling
+                // Profile Header Original
                 Container(
-                  padding: EdgeInsets.fromLTRB(20.w, 22.h, 20.w, 24.h),
+                  padding:
+                      EdgeInsetsDirectional.fromSTEB(20.w, 22.h, 20.w, 24.h),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                      begin: AlignmentDirectional.topStart,
+                      end: AlignmentDirectional.bottomEnd,
                       colors: [
                         ThemeColor.primaryColor.withValues(alpha: 0.08),
-                        Colors.white,
+                        Theme.of(context).cardTheme.color!,
                       ],
                     ),
                     borderRadius: BorderRadius.circular(28),
-                    border: Border.all(color: Colors.grey[200]!),
+                    border: Border.all(
+                        color: themeController.isDarkMode
+                            ? Colors.grey[800]!
+                            : Colors.grey[200]!),
                     boxShadow: [
                       BoxShadow(
                         color: ThemeColor.primaryColor.withValues(alpha: 0.1),
                         blurRadius: 30,
                         offset: const Offset(0, 12),
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.06),
-                        blurRadius: 12,
-                        offset: const Offset(0, 6),
                       ),
                     ],
                   ),
@@ -315,20 +331,23 @@ class _ProfilePageState extends State<ProfilePage> {
                         style: TextStyle(
                           fontSize: 26.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 10.h),
                       Container(
                         padding: EdgeInsets.symmetric(
-                          horizontal: 14.w,
-                          vertical: 10.h,
-                        ),
+                            horizontal: 14.w, vertical: 10.h),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: themeController.isDarkMode
+                              ? Colors.grey[900]
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: Colors.grey[200]!),
+                          border: Border.all(
+                              color: themeController.isDarkMode
+                                  ? Colors.grey[800]!
+                                  : Colors.grey[200]!),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -345,7 +364,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 displayEmail,
                                 style: TextStyle(
                                   fontSize: 14.sp,
-                                  color: Colors.grey[700],
+                                  color: Colors.grey[500],
                                   height: 1.3,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -377,12 +396,12 @@ class _ProfilePageState extends State<ProfilePage> {
           sliver: SliverList(
             delegate: SliverChildListDelegate([
               SizedBox(height: 16.h),
-              _sectionTitle('Account'),
+              _sectionTitle(l10n.profileAccount),
               SizedBox(height: 12.h),
-              _sectionCard([
+              _sectionCard(context, [
                 ProfileListTile(
                   icon: Icons.edit_outlined,
-                  title: 'Edit profile',
+                  title: l10n.profileEdit,
                   onTap: () async {
                     await Navigator.push(
                       context,
@@ -393,20 +412,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     _profileCubit.fetch();
                   },
                 ),
-                Divider(height: 1, color: Colors.grey[200]),
+                _divider(themeController),
                 ProfileListTile(
                   icon: Icons.history_rounded,
-                  title: 'Plan History',
+                  title: l10n.profilePlanHistory,
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (_) => const TripHistoryScreen()),
                   ),
                 ),
-                Divider(height: 1, color: Colors.grey[200]),
+                _divider(themeController),
                 ProfileListTile(
                   icon: Icons.lock_outline,
-                  title: 'Change password',
+                  title: l10n.profileChangePassword,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -418,67 +437,79 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ]),
               SizedBox(height: 22.h),
-              _sectionTitle('Preferences'),
+              _sectionTitle(l10n.profilePreferences),
               SizedBox(height: 12.h),
-              _sectionCard([
-                ProfileListTile(
-                  icon: Icons.notifications_outlined,
-                  title: 'Notification',
-                  onTap: () => _showComingSoon('Notification'),
-                ),
-                Divider(height: 1, color: Colors.grey[200]),
+              _sectionCard(context, [
                 ProfileListTile(
                   icon: Icons.language_outlined,
-                  title: 'Language',
-                  onTap: () => _showComingSoon('Language'),
+                  title: l10n.profileLanguage,
+                  onTap: _showLanguagePicker,
                 ),
-                Divider(height: 1, color: Colors.grey[200]),
-                ProfileListTile(
-                  icon: Icons.card_membership_outlined,
-                  title: 'Plans',
-                  onTap: () => _showComingSoon('Plans'),
-                ),
-                Divider(height: 1, color: Colors.grey[200]),
-                ProfileListTile(
-                  icon: Icons.palette_outlined,
-                  title: 'Appearance',
-                  onTap: () => _showComingSoon('Appearance'),
+                _divider(themeController),
+                ListenableBuilder(
+                  listenable: themeController,
+                  builder: (context, _) {
+                    return ListTile(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
+                      leading: Icon(
+                        themeController.isDarkMode
+                            ? Icons.dark_mode_rounded
+                            : Icons.palette_outlined,
+                        color: themeController.isDarkMode
+                            ? Colors.amber
+                            : Colors.grey[600],
+                        size: 22.sp,
+                      ),
+                      title: Text(
+                        l10n.profileAppearance,
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      trailing: Switch(
+                        value: themeController.isDarkMode,
+                        onChanged: (value) {
+                          themeController.toggleTheme(value);
+                        },
+                        activeThumbColor: ThemeColor.primaryColor,
+                      ),
+                    );
+                  },
                 ),
               ]),
               SizedBox(height: 22.h),
-              _sectionTitle('Support'),
+              _sectionTitle(l10n.profileDangerZone),
               SizedBox(height: 12.h),
-              _sectionCard([
-                ProfileListTile(
-                  icon: Icons.help_outline_rounded,
-                  title: 'Help and Support',
-                  onTap: () => _showComingSoon('Help and Support'),
-                ),
-              ]),
-              SizedBox(height: 22.h),
-              _sectionTitle('Danger zone'),
-              SizedBox(height: 12.h),
-              _sectionCard([
+              _sectionCard(context, [
                 ProfileListTile(
                   icon: Icons.logout_rounded,
-                  title: 'Logout',
+                  title: l10n.profileLogout,
                   tint: ThemeColor.primaryColor,
                   onTap: logout,
                 ),
-                Divider(height: 1, color: Colors.grey[200]),
+                _divider(themeController),
                 ProfileListTile(
                   icon: Icons.delete_outline_rounded,
-                  title: 'Delete Account',
+                  title: l10n.profileDeleteAccount,
                   tint: Colors.red,
                   onTap: deleteAccount,
                 ),
               ]),
-              SizedBox(height: 36.h),
+              SizedBox(height: 120.h),
             ]),
           ),
         ),
       ],
     );
+  }
+
+  Widget _divider(AppThemeController themeController) {
+    return Divider(
+        height: 1,
+        color:
+            themeController.isDarkMode ? Colors.grey[800] : Colors.grey[200]);
   }
 
   Widget _sectionTitle(String title) {
@@ -489,19 +520,22 @@ class _ProfilePageState extends State<ProfilePage> {
         style: TextStyle(
           fontSize: 14.sp,
           fontWeight: FontWeight.w600,
-          color: Colors.grey[600],
+          color: Colors.grey[500],
           letterSpacing: 0.3,
         ),
       ),
     );
   }
 
-  Widget _sectionCard(List<Widget> children) {
+  Widget _sectionCard(BuildContext context, List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(
+            color: sl<AppThemeController>().isDarkMode
+                ? Colors.grey[800]!
+                : Colors.grey[200]!),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -520,42 +554,32 @@ class _ProfilePageState extends State<ProfilePage> {
       value: _profileCubit,
       child: BlocConsumer<ProfileCubit, ProfileState>(
         listener: (context, state) async {
-          if (state is! ProfileLoading && state is! ProfileActionLoading) {
-            if (Navigator.canPop(context)) {
-              final route = ModalRoute.of(context);
-              if (route != null && !route.isCurrent) {
-                Navigator.pop(context);
-              }
-            }
-          }
-
           if (state is ProfileFailure) {
             HapticFeedback.mediumImpact();
             showAppNotification(
               context: context,
-              title: 'Error',
+              title: context.l10n.commonError,
               message: state.message,
               isError: true,
             );
+          } else if (state is ProfileAccountDeleted) {
+            showAppNotification(
+              context: context,
+              title: context.l10n.commonSuccess,
+              message: state.model.message,
+            );
+            await sl<SessionManager>().endSession(
+              SessionEndReason.accountDeleted,
+            );
+            if (!context.mounted) return;
+            context.go(AppRoutes.welcome);
           } else if (state is ProfileActionSuccess) {
             showAppNotification(
               context: context,
-              title: 'Success',
+              title: context.l10n.commonSuccess,
               message: state.model.message,
             );
-
-            final msg = state.model.message.toLowerCase();
-            if (msg.contains('delete')) {
-              await sl<TokenStorage>().clearAll();
-              if (!context.mounted) return;
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-                (_) => false,
-              );
-            } else {
-              if (mounted) setState(() {});
-            }
+            if (mounted) setState(() {});
           } else if (state is ProfileLoaded) {
             if (mounted) setState(() {});
           }
@@ -564,12 +588,10 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
 
-    if (widget.embedded) {
-      return content;
-    }
+    if (widget.embedded) return content;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       extendBody: true,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
@@ -582,17 +604,12 @@ class _ProfilePageState extends State<ProfilePage> {
               spreadRadius: 6,
               offset: const Offset(0, 8),
             ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.18),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
           ],
         ),
         child: FloatingActionButton(
           onPressed: () {
             HapticFeedback.selectionClick();
-            _showComingSoon('Search');
+            _showComingSoon(context.l10n.homeSearch);
           },
           backgroundColor: ThemeColor.primaryColor,
           elevation: 0,
@@ -608,17 +625,12 @@ class _ProfilePageState extends State<ProfilePage> {
         child: RahhalaBottomBar(
           currentIndex: 2,
           onTap: (i) {
-            if (i == 2) {
-              return;
-            } else {
-              Navigator.pop(context);
-            }
+            if (i == 2) return;
+            Navigator.pop(context);
           },
         ),
       ),
-      body: SafeArea(
-        child: content,
-      ),
+      body: SafeArea(child: content),
     );
   }
 }

@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rahhala_app/core/errors/exceptions.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:rahhala_app/features/chatbot/domain/entities/chat_message.dart';
 import 'package:rahhala_app/features/chatbot/domain/usecases/send_message_usecase.dart';
 import 'package:rahhala_app/features/chatbot/domain/usecases/stream_message_usecase.dart';
@@ -21,6 +25,7 @@ class ChatBotCubit extends Cubit<ChatBotState> {
   String? _currentContextId;
   final List<ChatMessage> _conversationHistory = [];
   bool _isStreaming = false;
+  StreamSubscription<String>? _streamSubscription;
 
   ChatBotCubit({
     required this.sendMessageUseCase,
@@ -44,12 +49,18 @@ class ChatBotCubit extends Cubit<ChatBotState> {
   /// Initialize a new conversation context
   /// Optionally pass initial items to store in the context
   Future<void> initializeContext({Map<String, dynamic>? items}) async {
+    if (_currentContextId != null) {
+      emit(ChatBotContextCreated(contextId: _currentContextId!));
+      return;
+    }
+
     try {
       final result = await createContextUseCase(items: items);
       result.fold(
         (failure) {
           // Continue without context on failure
-          emit(const ChatBotError(errorMessage: 'Failed to create context'));
+          emit(ChatBotError(
+              errorMessage: AppMessages.current.errorChatContextFailed));
         },
         (context) {
           _currentContextId = context.contextId;
@@ -57,7 +68,7 @@ class ChatBotCubit extends Cubit<ChatBotState> {
         },
       );
     } catch (e) {
-      emit(ChatBotError(errorMessage: e.toString()));
+      emit(ChatBotError(errorMessage: failureFromError(e).message));
     }
   }
 
@@ -96,7 +107,7 @@ class ChatBotCubit extends Cubit<ChatBotState> {
         },
       );
     } catch (e) {
-      emit(ChatBotError(errorMessage: e.toString()));
+      emit(ChatBotError(errorMessage: failureFromError(e).message));
       // Remove the failed message from history
       if (_conversationHistory.isNotEmpty &&
           _conversationHistory.last.role == 'user') {
@@ -132,13 +143,31 @@ class ChatBotCubit extends Cubit<ChatBotState> {
         conversationHistory: _conversationHistory,
       );
 
-      await for (final chunk in stream) {
-        buffer.write(chunk);
-        emit(ChatBotStreaming(
-          messages: List.unmodifiable(_conversationHistory),
-          currentChunk: buffer.toString(),
-        ));
-      }
+      await _streamSubscription?.cancel();
+      final completer = Completer<void>();
+      _streamSubscription = stream.listen(
+        (chunk) {
+          if (isClosed) return;
+          buffer.write(chunk);
+          emit(ChatBotStreaming(
+            messages: List.unmodifiable(_conversationHistory),
+            currentChunk: buffer.toString(),
+          ));
+        },
+        onError: (Object error, StackTrace stackTrace) {
+          if (!completer.isCompleted) {
+            completer.completeError(error, stackTrace);
+          }
+        },
+        onDone: () {
+          if (!completer.isCompleted) completer.complete();
+        },
+        cancelOnError: true,
+      );
+
+      await completer.future;
+      await _streamSubscription?.cancel();
+      _streamSubscription = null;
 
       _isStreaming = false;
 
@@ -146,7 +175,9 @@ class ChatBotCubit extends Cubit<ChatBotState> {
       _addAssistantResponse(buffer.toString());
     } catch (e) {
       _isStreaming = false;
-      emit(ChatBotError(errorMessage: e.toString()));
+      await _streamSubscription?.cancel();
+      _streamSubscription = null;
+      emit(ChatBotError(errorMessage: failureFromError(e).message));
       // Remove the failed message from history
       if (_conversationHistory.isNotEmpty &&
           _conversationHistory.last.role == 'user') {
@@ -171,7 +202,8 @@ class ChatBotCubit extends Cubit<ChatBotState> {
   /// Update items in the current context
   Future<void> updateContext(Map<String, dynamic> items) async {
     if (_currentContextId == null) {
-      emit(const ChatBotError(errorMessage: 'No active context'));
+      emit(ChatBotError(
+          errorMessage: AppMessages.current.errorChatContextFailed));
       return;
     }
 
@@ -191,14 +223,15 @@ class ChatBotCubit extends Cubit<ChatBotState> {
         },
       );
     } catch (e) {
-      emit(ChatBotError(errorMessage: e.toString()));
+      emit(ChatBotError(errorMessage: failureFromError(e).message));
     }
   }
 
   /// Retrieve and display current context data
   Future<void> loadContext() async {
     if (_currentContextId == null) {
-      emit(const ChatBotError(errorMessage: 'No active context'));
+      emit(ChatBotError(
+          errorMessage: AppMessages.current.errorChatContextFailed));
       return;
     }
 
@@ -215,12 +248,14 @@ class ChatBotCubit extends Cubit<ChatBotState> {
         },
       );
     } catch (e) {
-      emit(ChatBotError(errorMessage: e.toString()));
+      emit(ChatBotError(errorMessage: failureFromError(e).message));
     }
   }
 
   /// Clear conversation and reset to initial state
-  void clearConversation() {
+  Future<void> clearConversation() async {
+    await _streamSubscription?.cancel();
+    _streamSubscription = null;
     _conversationHistory.clear();
     _currentContextId = null;
     _isStreaming = false;
@@ -229,8 +264,11 @@ class ChatBotCubit extends Cubit<ChatBotState> {
 
   /// Discard current context and clear conversation
   Future<void> discardContext() async {
-    if (_currentContextId != null) {
-      final result = await discardContextUseCase(contextId: _currentContextId!);
+    final contextId = _currentContextId;
+    await clearConversation();
+
+    if (contextId != null) {
+      final result = await discardContextUseCase(contextId: contextId);
       result.fold(
         (failure) {
           emit(ChatBotError(errorMessage: failure.message));
@@ -240,6 +278,13 @@ class ChatBotCubit extends Cubit<ChatBotState> {
         },
       );
     }
-    clearConversation();
+  }
+
+  @override
+  Future<void> close() async {
+    _isStreaming = false;
+    await _streamSubscription?.cancel();
+    _streamSubscription = null;
+    return super.close();
   }
 }

@@ -1,13 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rahhala_app/core/auth/auth_session_service.dart';
+import 'package:rahhala_app/core/auth/session_manager.dart';
+import 'package:rahhala_app/core/utils/app_notifications.dart';
 import 'package:rahhala_app/core/constants/app_assets.dart';
+import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
-import 'package:rahhala_app/features/auth/presentation/constants/auth_strings.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
+
+  @override
+  State<WelcomePage> createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _showSessionEndNotice());
+  }
+
+  void _showSessionEndNotice() {
+    if (!mounted) return;
+    final reason = sl<SessionManager>().consumeEndReason();
+    if (reason != SessionEndReason.expired) return;
+    showAppNotification(
+      context: context,
+      title: context.l10n.commonError,
+      message: context.l10n.errorSessionExpired,
+      isError: true,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +57,9 @@ class WelcomePage extends StatelessWidget {
       ));
     }
 
-    void continueAsGuest() {
+    Future<void> continueAsGuest() async {
+      await sl<AuthSessionService>().clearSession();
+      if (!context.mounted) return;
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const HomePage(isGuest: true)),
@@ -52,7 +82,7 @@ class WelcomePage extends StatelessWidget {
                   children: [
                     SizedBox(height: 210.h),
                     Text(
-                      AuthStrings.welcomeSlogan,
+                      context.l10n.authWelcomeSlogan,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: brandDarkBlue.withValues(alpha: 0.8),
@@ -83,7 +113,7 @@ class WelcomePage extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              AuthStrings.getStarted,
+                              context.l10n.authGetStarted,
                               style: TextStyle(
                                   fontSize: 23.sp, fontWeight: FontWeight.bold),
                             ),
@@ -104,7 +134,7 @@ class WelcomePage extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              AuthStrings.guest,
+                              context.l10n.authGuest,
                               style: TextStyle(
                                 color: brandDarkBlue,
                                 fontSize: 26.sp,

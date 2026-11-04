@@ -6,6 +6,7 @@ class CustomExpansionTile extends StatelessWidget {
   final List<Widget> children;
   final EdgeInsetsGeometry tilePadding;
   final EdgeInsetsGeometry childrenPadding;
+  final double minTileHeight;
   final Color iconColor;
   final Color collapsedIconColor;
   final Widget? trailing;
@@ -17,6 +18,7 @@ class CustomExpansionTile extends StatelessWidget {
     required this.children,
     this.tilePadding = EdgeInsets.zero,
     this.childrenPadding = EdgeInsets.zero,
+    this.minTileHeight = 60,
     required this.iconColor,
     required this.collapsedIconColor,
     this.trailing,
@@ -30,6 +32,7 @@ class CustomExpansionTile extends StatelessWidget {
       child: ExpansionTile(
         tilePadding: tilePadding,
         childrenPadding: childrenPadding,
+        minTileHeight: minTileHeight,
         trailing: trailing,
         leading: leading,
         title: title,

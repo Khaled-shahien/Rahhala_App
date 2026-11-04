@@ -3,24 +3,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/routing/app_router.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 
 import 'package:rahhala_app/core/utils/app_notifications.dart';
 import 'package:rahhala_app/core/utils/app_validators.dart';
-import 'package:rahhala_app/core/utils/user_session.dart';
-import 'package:rahhala_app/core/utils/token_storage.dart';
 import 'package:rahhala_app/features/auth/domain/login/login_cubit.dart';
 import 'package:rahhala_app/features/auth/domain/login/login_state.dart';
-import 'package:rahhala_app/features/auth/presentation/constants/auth_strings.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/forgot_password_page.dart';
-import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/signup_page.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_button.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/custom_form_text_field.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/or_divider.dart';
 import 'package:rahhala_app/features/auth/presentation/widgets/social_login_section.dart';
-import 'package:rahhala_app/features/profile/data/repositories/user_repository.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
 
 class LoginPage extends StatefulWidget {
@@ -86,99 +84,33 @@ class _LoginPageState extends State<LoginPage> {
     context.read<LoginCubit>().loginUser(email: email, password: password);
   }
 
-  Future<void> _handleLoginSuccess(
-    BuildContext listenerContext,
-    LoginSuccess state,
-  ) async {
-    final token = state.loginModel.token;
-    final displayFromLogin = state.loginModel.username;
-    final email = _emailController.text.trim().toLowerCase();
-
-    if (token != null && token.isNotEmpty) {
-      await sl<TokenStorage>().setToken(token);
-    }
-    await sl<TokenStorage>().setEmail(email);
-
-    if (displayFromLogin != null && displayFromLogin.trim().isNotEmpty) {
-      await sl<TokenStorage>().setFullName(displayFromLogin.trim());
-    }
-
-    try {
-      final userRepo = sl<UserRepo>();
-      final detailsEither = await userRepo.getDetails();
-      await detailsEither.fold((f) async {
-        final stored = sl<TokenStorage>().fullName;
-        sl<UserSession>().setFromLogin(
-          email: email,
-          displayName: stored ?? '',
-        );
-      }, (details) async {
-        if (details.fullName.trim().isNotEmpty) {
-          await sl<TokenStorage>().setFullName(details.fullName.trim());
-        }
-        if (details.email.trim().isNotEmpty) {
-          await sl<TokenStorage>().setEmail(details.email.trim().toLowerCase());
-        }
-        sl<UserSession>().setFromLogin(
-          email: details.email.isNotEmpty
-              ? details.email.trim().toLowerCase()
-              : email,
-          displayName: details.fullName.trim().isNotEmpty
-              ? details.fullName.trim()
-              : (sl<TokenStorage>().fullName ?? ''),
-        );
-      });
-    } catch (_) {
-      sl<UserSession>().setFromLogin(
-        email: email,
-        displayName: sl<TokenStorage>().fullName ?? '',
-      );
-    }
-
-    final storedName = sl<TokenStorage>().fullName;
-    if (storedName == null || storedName.trim().isEmpty) {
-      final local = email.split('@').first;
-      final cap = local.isNotEmpty
-          ? local[0].toUpperCase() + local.substring(1)
-          : 'User';
-      await sl<TokenStorage>().setFullName(cap);
-      sl<UserSession>().setFromLogin(email: email, displayName: cap);
-    }
-
-    if (!mounted || !listenerContext.mounted) return;
-
-    showAppNotification(
-      context: listenerContext,
-      title:
-          'Welcome Back, ${sl<TokenStorage>().fullName ?? email.split('@').first}!',
-      message: AuthStrings.welcomeBackNotificationMessage,
-    );
-
-    if (!mounted || !listenerContext.mounted) return;
-    Navigator.pushAndRemoveUntil(
-      listenerContext,
-      MaterialPageRoute(builder: (_) => const HomePage(isGuest: false)),
-      (route) => false,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocProvider(
       create: (_) => sl<LoginCubit>(),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         body: SafeArea(
           child: BlocConsumer<LoginCubit, LoginState>(
             listener: (context, state) async {
               if (state is LoginSuccess) {
-                final listenerContext = context;
-                await _handleLoginSuccess(listenerContext, state);
+                final email = _emailController.text.trim().toLowerCase();
+                final displayName =
+                    state.session?.displayName ?? email.split('@').first;
+                showAppNotification(
+                  context: context,
+                  title: context.l10n.authWelcomeBackUser(displayName),
+                  message: context.l10n.authWelcomeBackNotifMessage,
+                );
+                context.go(AppRoutes.home);
               } else if (state is LoginFailure) {
                 HapticFeedback.mediumImpact();
                 showAppNotification(
                   context: context,
-                  title: AuthStrings.errorTitle,
+                  title: context.l10n.commonError,
                   message: state.errorMessage,
                   isError: true,
                 );
@@ -268,19 +200,19 @@ class _LoginPageState extends State<LoginPage> {
                                     vertical: 22.h,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: colorScheme.surface,
                                     borderRadius: BorderRadius.circular(28.r),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black
-                                            .withValues(alpha: 0.06),
+                                        color: Colors.black.withValues(
+                                            alpha: isDark ? 0.22 : 0.06),
                                         blurRadius: 22,
                                         offset: const Offset(0, 12),
                                       ),
                                     ],
                                     border: Border.all(
-                                      color: ThemeColor.primaryColor
-                                          .withValues(alpha: 0.08),
+                                      color: colorScheme.outline.withValues(
+                                          alpha: isDark ? 0.35 : 0.2),
                                     ),
                                   ),
                                   child: Column(
@@ -297,21 +229,21 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                       SizedBox(height: 10.h),
                                       Text(
-                                        AuthStrings.welcomeBackTitle,
+                                        context.l10n.authWelcomeBackTitle,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 24.sp,
                                           fontWeight: FontWeight.w800,
-                                          color: ThemeColor.charcoalColor,
+                                          color: colorScheme.onSurface,
                                         ),
                                       ),
                                       SizedBox(height: 6.h),
                                       Text(
-                                        AuthStrings.welcomeBackSubtitle,
+                                        context.l10n.authWelcomeBackSubtitle,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 14.sp,
-                                          color: Colors.grey[600],
+                                          color: colorScheme.onSurfaceVariant,
                                           height: 1.4,
                                         ),
                                       ),
@@ -325,8 +257,10 @@ class _LoginPageState extends State<LoginPage> {
                                               CrossAxisAlignment.stretch,
                                           children: [
                                             CustomFormTextField(
-                                              labelText: AuthStrings.emailLabel,
-                                              hintText: AuthStrings.emailHint,
+                                              labelText:
+                                                  context.l10n.authEmailLabel,
+                                              hintText:
+                                                  context.l10n.authEmailHint,
                                               controller: _emailController,
                                               keyboardType:
                                                   TextInputType.emailAddress,
@@ -341,10 +275,10 @@ class _LoginPageState extends State<LoginPage> {
                                             ),
                                             SizedBox(height: 16.h),
                                             CustomFormTextField(
-                                              labelText:
-                                                  AuthStrings.passwordLabel,
+                                              labelText: context
+                                                  .l10n.authPasswordLabel,
                                               hintText:
-                                                  AuthStrings.passwordHint,
+                                                  context.l10n.authPasswordHint,
                                               controller: _passwordController,
                                               obscureText: !_isPasswordVisible,
                                               prefixIcon: Icons.lock_outline,
@@ -360,10 +294,10 @@ class _LoginPageState extends State<LoginPage> {
                                                 ),
                                                 color: ThemeColor.primaryColor,
                                                 tooltip: _isPasswordVisible
-                                                    ? AuthStrings
-                                                        .hidePasswordTooltip
-                                                    : AuthStrings
-                                                        .showPasswordTooltip,
+                                                    ? context
+                                                        .l10n.authHidePassword
+                                                    : context
+                                                        .l10n.authShowPassword,
                                               ),
                                               validator: AppValidators
                                                   .validateLoginPassword,
@@ -380,10 +314,12 @@ class _LoginPageState extends State<LoginPage> {
                                               children: [
                                                 Expanded(
                                                   child: Text(
-                                                    'Secure sign-in to continue your journey.',
+                                                    context
+                                                        .l10n.authSecureSignIn,
                                                     style: TextStyle(
                                                       fontSize: 12.sp,
-                                                      color: Colors.grey[600],
+                                                      color: colorScheme
+                                                          .onSurfaceVariant,
                                                       height: 1.4,
                                                     ),
                                                   ),
@@ -391,9 +327,10 @@ class _LoginPageState extends State<LoginPage> {
                                                 TextButton(
                                                   onPressed:
                                                       _navigateToForgotPassword,
-                                                  child: const Text(
-                                                    AuthStrings.forgotPassword,
-                                                    style: TextStyle(
+                                                  child: Text(
+                                                    context.l10n
+                                                        .authForgotPassword,
+                                                    style: const TextStyle(
                                                       color: ThemeColor
                                                           .primaryColor,
                                                       fontWeight:
@@ -410,8 +347,8 @@ class _LoginPageState extends State<LoginPage> {
                                                   : () =>
                                                       _submit(context, state),
                                               text: isLoading
-                                                  ? AuthStrings.loggingIn
-                                                  : AuthStrings.logIn,
+                                                  ? context.l10n.authLoggingIn
+                                                  : context.l10n.authLogIn,
                                             ),
                                           ],
                                         ),
@@ -426,15 +363,16 @@ class _LoginPageState extends State<LoginPage> {
                                     vertical: 20.h,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: colorScheme.surface,
                                     borderRadius: BorderRadius.circular(20.r),
                                     border: Border.all(
-                                      color: Colors.grey[100]!,
+                                      color: colorScheme.outline.withValues(
+                                          alpha: isDark ? 0.35 : 0.2),
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black
-                                            .withValues(alpha: 0.04),
+                                        color: Colors.black.withValues(
+                                            alpha: isDark ? 0.18 : 0.04),
                                         blurRadius: 18,
                                         offset: const Offset(0, 10),
                                       ),
@@ -442,12 +380,12 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   child: Column(
                                     children: [
-                                      const OrDivider(
-                                          text: AuthStrings.orDivider),
+                                      OrDivider(text: context.l10n.commonOr),
                                       SizedBox(height: 18.h),
                                       SocialLoginSection(
-                                        promptText: AuthStrings.dontHaveAccount,
-                                        actionText: AuthStrings.signUp,
+                                        promptText:
+                                            context.l10n.authDontHaveAccount,
+                                        actionText: context.l10n.authSignUp,
                                         onActionTap: _navigateToSignUp,
                                       ),
                                     ],
@@ -461,7 +399,8 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       if (isLoading)
                         Container(
-                          color: Colors.black26,
+                          color: Colors.black
+                              .withValues(alpha: isDark ? 0.45 : 0.26),
                           alignment: Alignment.center,
                           child: const CircularProgressIndicator(
                             color: ThemeColor.primaryColor,

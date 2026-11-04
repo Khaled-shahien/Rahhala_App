@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rahhala_app/features/auth/data/repositories/auth_repository.dart';
+import 'package:rahhala_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:rahhala_app/features/auth/domain/register/register_state.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {

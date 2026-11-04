@@ -2,9 +2,11 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:rahhala_app/core/auth/auth_session_service.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/errors/failures.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
+import 'package:rahhala_app/core/utils/user_session.dart';
 import 'package:rahhala_app/features/profile/data/models/user_model_details.dart';
 import 'package:rahhala_app/features/profile/data/repositories/user_repository.dart';
 import 'package:rahhala_app/features/profile/domain/profile/profile_cubit.dart';
@@ -24,7 +26,15 @@ void main() {
 
     await sl.reset();
     sl.registerSingleton<TokenStorage>(tokenStorage);
+    sl.registerLazySingleton<UserSession>(() => UserSession());
+    sl.registerLazySingleton<AuthSessionService>(
+      () => AuthSessionService(
+        tokenStorage: sl<TokenStorage>(),
+        userSession: sl<UserSession>(),
+      ),
+    );
 
+    when(() => tokenStorage.hasToken).thenReturn(true);
     when(() => tokenStorage.setFullName(any())).thenAnswer((_) async {});
     when(() => tokenStorage.setEmail(any())).thenAnswer((_) async {});
     when(() => tokenStorage.setProfileImageUrl(any())).thenAnswer((_) async {});
@@ -49,7 +59,10 @@ void main() {
           ),
         ),
       );
-      return ProfileCubit(repo: userRepo);
+      return ProfileCubit(
+        repo: userRepo,
+        authSessionService: sl<AuthSessionService>(),
+      );
     },
     act: (cubit) => cubit.fetch(),
     expect: () => <ProfileState>[
@@ -78,9 +91,13 @@ void main() {
     'emits [ProfileLoading, ProfileFailure] when repository fails',
     build: () {
       when(() => userRepo.getDetails()).thenAnswer(
-        (_) async => Left(ServerFailure(message: 'Unable to load profile')),
+        (_) async =>
+            const Left(ServerFailure(message: 'Unable to load profile')),
       );
-      return ProfileCubit(repo: userRepo);
+      return ProfileCubit(
+        repo: userRepo,
+        authSessionService: sl<AuthSessionService>(),
+      );
     },
     act: (cubit) => cubit.fetch(),
     expect: () => <ProfileState>[

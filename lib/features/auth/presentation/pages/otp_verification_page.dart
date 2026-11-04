@@ -11,6 +11,7 @@ import 'package:rahhala_app/features/auth/presentation/widgets/custom_button.dar
 import 'package:rahhala_app/features/auth/domain/verify_otp/verify_otp_cubit.dart';
 import 'package:rahhala_app/features/auth/domain/verify_otp/verify_otp_state.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 enum VerifyFlow { signUp, resetPassword }
 
@@ -50,6 +51,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   }
 
   Widget _buildOtpField(int index) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SizedBox(
       width: 45.w, // Reduced width to prevent overflow
       child: TextFormField(
@@ -70,10 +73,13 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         decoration: InputDecoration(
           counterText: "",
           filled: true,
-          fillColor: Colors.grey.shade100,
+          fillColor:
+              colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),
-            borderSide: BorderSide(color: Colors.grey.shade300),
+            borderSide: BorderSide(
+              color: colorScheme.outline.withValues(alpha: 0.4),
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),
@@ -105,12 +111,15 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocProvider(
       create: (_) => sl<VerifyOtpCubit>(),
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: colorScheme.surface,
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -119,7 +128,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                     if (state is VerifyOtpSuccess) {
                       showAppNotification(
                         context: context,
-                        title: 'Verified',
+                        title: context.l10n.authVerified,
                         message: state.model.message,
                         isError: false,
                       );
@@ -136,7 +145,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                       HapticFeedback.mediumImpact();
                       showAppNotification(
                         context: context,
-                        title: 'Error',
+                        title: context.l10n.commonError,
                         message: state.errorMessage,
                         isError: true,
                       );
@@ -151,8 +160,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                         HapticFeedback.mediumImpact();
                         showAppNotification(
                           context: context,
-                          title: 'Error',
-                          message: 'Please enter the 6-digit code.',
+                          title: context.l10n.commonError,
+                          message: context.l10n.authEnterOtp,
                           isError: true,
                         );
                         return;
@@ -195,14 +204,18 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                   children: [
                                     IconButton(
                                       style: IconButton.styleFrom(
-                                        backgroundColor: Colors.grey[100],
+                                        backgroundColor: colorScheme
+                                            .surfaceContainerHighest
+                                            .withValues(alpha: 0.5),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
                                         ),
                                       ),
-                                      icon:
-                                          const Icon(Icons.arrow_back_ios_new),
+                                      icon: Icon(
+                                        Icons.arrow_back_ios_new,
+                                        color: colorScheme.onSurface,
+                                      ),
                                       onPressed: () => Navigator.pop(context),
                                     ),
                                     const SizedBox.shrink(),
@@ -216,15 +229,17 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                     vertical: 16.h, // Reduced padding
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: colorScheme.surface,
                                     borderRadius: BorderRadius.circular(
                                         20), // Reduced radius
                                     border: Border.all(
-                                      color: Colors.grey[200]!,
+                                      color: colorScheme.outline.withValues(
+                                          alpha: isDark ? 0.35 : 0.2),
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.04),
+                                        color: Colors.black.withValues(
+                                            alpha: isDark ? 0.2 : 0.04),
                                         blurRadius: 20, // Reduced blur
                                         offset: const Offset(
                                             0, 10), // Reduced offset
@@ -235,10 +250,10 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
                                     children: [
-                                      const Text(
-                                        'Verify Code',
+                                      Text(
+                                        context.l10n.authVerifyCodeTitle,
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize:
                                               26, // Slightly reduced font size
                                           fontWeight: FontWeight.bold,
@@ -248,13 +263,15 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                       SizedBox(height: 8.h), // Reduced height
                                       Text(
                                         widget.flow == VerifyFlow.signUp
-                                            ? "Enter the 6-digit verification code sent to your email to activate your account."
-                                            : "Enter the 6-digit verification code sent to your email to reset your password.",
+                                            ? context
+                                                .l10n.authVerifyCodeSignUpDesc
+                                            : context
+                                                .l10n.authVerifyCodeResetDesc,
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                           fontSize:
                                               15, // Slightly reduced font size
-                                          color: Colors.grey,
+                                          color: ThemeColor.neutral600,
                                         ),
                                       ),
                                       SizedBox(height: 22.h), // Reduced height
@@ -264,11 +281,15 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                           vertical: 12.h, // Reduced padding
                                         ),
                                         decoration: BoxDecoration(
-                                          color: Colors.grey.shade50,
+                                          color: colorScheme
+                                              .surfaceContainerHighest
+                                              .withValues(alpha: 0.2),
                                           borderRadius: BorderRadius.circular(
                                               14), // Reduced radius
                                           border: Border.all(
-                                            color: Colors.grey[200]!,
+                                            color: colorScheme.outline
+                                                .withValues(
+                                                    alpha: isDark ? 0.35 : 0.2),
                                           ),
                                         ),
                                         child: Row(
@@ -282,8 +303,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                       CustomButton(
                                         onTap: isLoading ? null : onVerifyTap,
                                         text: widget.flow == VerifyFlow.signUp
-                                            ? 'Verify Code'
-                                            : 'Continue',
+                                            ? context.l10n.authVerifyCodeTitle
+                                            : context.l10n.authContinue,
                                       ),
                                     ],
                                   ),
@@ -302,7 +323,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                           content,
                           if (isLoading)
                             Container(
-                              color: Colors.black45,
+                              color: Colors.black
+                                  .withValues(alpha: isDark ? 0.5 : 0.28),
                               alignment: Alignment.center,
                               child: const CircularProgressIndicator(
                                 color: ThemeColor.primaryColor,

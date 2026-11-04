@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-
+import 'package:rahhala_app/features/home/presentation/pages/home_screen.dart';
+import 'package:rahhala_app/features/home/presentation/pages/favourites_screen.dart';
 import 'package:rahhala_app/core/theme/app_theme.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/utils/token_storage.dart';
+import 'package:rahhala_app/core/widgets/anis_avatar.dart';
 import 'package:rahhala_app/features/image_search/presentation/widgets/image_search_bar.dart';
+import 'package:rahhala_app/features/nearby/presentation/pages/nearby_screen.dart';
 import 'package:rahhala_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:rahhala_app/features/trip_type_selection/presentation/pages/trip_type_selection_screen.dart';
 import 'package:rahhala_app/features/chatbot/presentation/pages/chat_bot_screen.dart';
@@ -26,92 +31,83 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  static const int _tabCount = 5;
+
   late int _currentIndex;
+  final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
+
+  /// Tabs are built the first time they're opened and then kept alive by the
+  /// IndexedStack. This avoids firing every tab's network calls at startup
+  /// (DECISIONS D-10).
+  late final Set<int> _builtTabs;
 
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.initialIndex;
-  }
-
-  //int _currentIndex = 0;
-  final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
-
-  void _notifyComingSoon(String text) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(text),
-        duration: const Duration(seconds: 1),
-        backgroundColor: ThemeColor.primaryColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
-        margin: EdgeInsets.only(
-          bottom: 60.h,
-          right: 20.w,
-          left: 20.w,
-        ),
-      ),
-    );
+    _currentIndex = widget.initialIndex.clamp(0, _tabCount - 1);
+    _builtTabs = {_currentIndex};
   }
 
   void _onTabTapped(int index) {
-    setState(() => _currentIndex = index);
+    setState(() {
+      _currentIndex = index;
+      _builtTabs.add(index);
+    });
+    HapticFeedback.mediumImpact();
+  }
 
-    if (index == 1) {
-      _notifyComingSoon('Wishlist page - Coming soon!');
-    } else if (index == 2) {
-      HapticFeedback.mediumImpact();
-      _notifyComingSoon('Search - Coming soon!');
+  Widget _buildTab(int index) {
+    switch (index) {
+      case 0:
+        final storage = sl<TokenStorage>();
+        return _HomeMainSection(
+          isGuest: widget.isGuest,
+          displayName: widget.isGuest ? null : storage.displayName,
+          email: widget.isGuest ? '' : storage.email ?? '',
+          profileImageUrl: widget.isGuest ? null : storage.profileImageUrl,
+        );
+      case 1:
+        return const FavouritesScreen();
+      case 2:
+        return NearbyScreen(isGuest: widget.isGuest);
+      case 3:
+        return const TripTypeSelectionScreen();
+      default:
+        return const ProfilePage(embedded: true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final storage = sl<TokenStorage>();
-    final displayName = storage.displayName;
-    final email = storage.email ?? '';
-    final profileImageUrl = storage.profileImageUrl;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = context.l10n;
 
-    final List<Widget> pages = [
-      _HomeMainSection(
-        isGuest: widget.isGuest,
-        displayName: displayName,
-        email: email,
-        profileImageUrl: profileImageUrl,
-      ),
-      const _SoonPage(title: 'Wishlist'),
-      const _SoonPage(title: 'Search'),
-      const TripTypeSelectionScreen(),
-      const ProfilePage(embedded: true),
+    final List<Widget> pages = List<Widget>.generate(
+      _tabCount,
+      (index) => _builtTabs.contains(index)
+          ? _buildTab(index)
+          : const SizedBox.shrink(),
+    );
+    final navLabels = <String>[
+      l10n.a11yNavHome,
+      l10n.a11yNavFavourites,
+      l10n.a11yNavNearby,
+      l10n.a11yNavTrips,
+      l10n.a11yNavProfile,
     ];
 
     return Scaffold(
-      backgroundColor: ThemeColor.bgColor,
+      backgroundColor: colorScheme.surface,
       extendBody: true,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              ThemeColor.primaryColor.withValues(alpha: 0.1),
-              ThemeColor.primaryColor.withValues(alpha: 0.15),
-              ThemeColor.primaryColor.withValues(alpha: 0.18),
-            ],
-          ),
           boxShadow: [
             BoxShadow(
-              color: ThemeColor.primaryColor.withValues(alpha: 0.2),
-              blurRadius: 22,
+              color: ThemeColor.primaryColor
+                  .withValues(alpha: isDark ? 0.3 : 0.15),
+              blurRadius: 20,
               offset: const Offset(0, -4),
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 14,
-              offset: const Offset(0, -3),
             ),
           ],
         ),
@@ -120,105 +116,51 @@ class _HomePageState extends State<HomePage> {
           index: _currentIndex,
           height: 70.0,
           items: <Widget>[
-            Icon(
-              Icons.home_outlined,
-              size: 34,
-              color: _currentIndex == 0
-                  ? Colors.white
-                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
-            ),
-            Icon(
-              Icons.favorite_border,
-              size: 34,
-              color: _currentIndex == 1
-                  ? Colors.white
-                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
-            ),
-            Icon(
-              Icons.search,
-              size: 34,
-              color: _currentIndex == 2
-                  ? Colors.white
-                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
-            ),
-            Icon(
-              Icons.auto_awesome,
-              size: 34,
-              color: _currentIndex == 3
-                  ? Colors.white
-                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
-            ),
-            Icon(
-              Icons.person_outline,
-              size: 34,
-              color: _currentIndex == 4
-                  ? Colors.white
-                  : ThemeColor.charcoalColor.withValues(alpha: 0.9),
-            ),
+            _buildNavIcon(Icons.home_outlined, 0, navLabels[0]),
+            _buildNavIcon(Icons.favorite_border, 1, navLabels[1]),
+            _buildNavIcon(Icons.search, 2, navLabels[2]),
+            _buildNavIcon(Icons.auto_awesome, 3, navLabels[3]),
+            _buildNavIcon(Icons.person_outline, 4, navLabels[4]),
           ],
           color: ThemeColor.primaryColor,
-          buttonBackgroundColor: ThemeColor.charcoalColor,
+          buttonBackgroundColor:
+              isDark ? colorScheme.secondary : ThemeColor.charcoalColor,
           backgroundColor: Colors.transparent,
           animationCurve: Curves.easeInOutCubic,
           animationDuration: const Duration(milliseconds: 400),
           onTap: _onTabTapped,
-          letIndexChange: (index) => true,
         ),
       ),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.dark.copyWith(
-          statusBarColor: Colors.transparent,
-        ),
+        value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
         child: SafeArea(
+          bottom: false,
           child: Stack(
             children: [
               IndexedStack(
                 index: _currentIndex,
                 children: pages,
               ),
-              // Floating Chat Button
-              Positioned(
-                right: 16.w,
-                bottom: 80.h,
-                child: FloatingActionButton(
-                  onPressed: () {
-                    HapticFeedback.mediumImpact();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ChatBotScreen(),
-                      ),
-                    );
-                  },
-                  backgroundColor: ThemeColor.primaryColor,
-                  elevation: 8,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: Container(
-                    padding: EdgeInsets.all(12.r),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          ThemeColor.primaryColor,
-                          ThemeColor.primaryColor.withValues(alpha: 0.8),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(20.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: ThemeColor.primaryColor.withValues(alpha: 0.4),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.smart_toy_outlined,
-                      color: Colors.white,
-                      size: 28,
+              PositionedDirectional(
+                end: 20.w,
+                bottom: 100.h,
+                child: Semantics(
+                  button: true,
+                  label: l10n.a11yOpenAssistant,
+                  excludeSemantics: true,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ChatBotScreen()),
+                      );
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.all(4),
+                      child: AnisAvatar(size: 76),
                     ),
                   ),
                 ),
@@ -226,6 +168,20 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildNavIcon(IconData icon, int index, String label) {
+    final selected = _currentIndex == index;
+    return Semantics(
+      label: label,
+      selected: selected,
+      button: true,
+      child: Icon(
+        icon,
+        size: 30.sp,
+        color: selected ? Colors.white : Colors.white.withValues(alpha: 0.7),
       ),
     );
   }
@@ -246,6 +202,9 @@ class _HomeMainSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: EdgeInsets.all(20.w),
       child: Column(
@@ -260,8 +219,8 @@ class _HomeMainSection extends StatelessWidget {
                   children: [
                     Text(
                       isGuest
-                          ? 'Welcome, Guest! 👋'
-                          : 'Hi, ${displayName ?? (email.isNotEmpty ? email.split('@').first : 'there')}! 👋',
+                          ? '${l10n.homeWelcomeGuest} 👋'
+                          : '${l10n.homeWelcomeUser(displayName ?? (email.isNotEmpty ? email.split('@').first : 'there'))} 👋',
                       style: TextStyle(
                         fontSize: 23.sp,
                         fontWeight: FontWeight.bold,
@@ -273,10 +232,10 @@ class _HomeMainSection extends StatelessWidget {
                     ),
                     SizedBox(height: 10.h),
                     Text(
-                      'Explore amazing destinations',
+                      l10n.homeExploreDestinations,
                       style: TextStyle(
-                        fontSize: 17.sp,
-                        color: ThemeColor.neutralGrayColor,
+                        fontSize: 16.sp,
+                        color: colorScheme.onSurfaceVariant,
                         height: 1.4,
                       ),
                     ),
@@ -299,17 +258,23 @@ class _HomeMainSection extends StatelessWidget {
                   ),
                   child: CircleAvatar(
                     radius: 30.r,
-                    backgroundColor: ThemeColor.primaryColor.withValues(alpha: 0.15),
+                    backgroundColor:
+                        ThemeColor.primaryColor.withValues(alpha: 0.15),
                     backgroundImage:
                         (profileImageUrl != null && profileImageUrl!.isNotEmpty)
-                            ? NetworkImage(profileImageUrl!)
+                            ? CachedNetworkImageProvider(
+                                profileImageUrl!,
+                                maxWidth: 180,
+                                maxHeight: 180,
+                              )
+                            : null,
+                    onBackgroundImageError:
+                        (profileImageUrl != null && profileImageUrl!.isNotEmpty)
+                            ? (_, __) {}
                             : null,
                     child: (profileImageUrl == null || profileImageUrl!.isEmpty)
-                        ? Icon(
-                            Icons.person,
-                            size: 30.sp,
-                            color: ThemeColor.primaryColor,
-                          )
+                        ? Icon(Icons.person,
+                            size: 30.sp, color: ThemeColor.primaryColor)
                         : null,
                   ),
                 ),
@@ -318,72 +283,9 @@ class _HomeMainSection extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           const ImageSearchBar(),
-          SizedBox(height: 36.h),
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 130.w,
-                    height: 130.w,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          ThemeColor.primaryColor.withValues(alpha: 0.2),
-                          ThemeColor.primaryColor.withValues(alpha: 0.08),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.explore_outlined,
-                      size: 65.sp,
-                      color: ThemeColor.primaryColor.withValues(alpha: 0.8),
-                    ),
-                  ),
-                  SizedBox(height: 28.h),
-                  Text(
-                    'Home Page Content',
-                    style: TextStyle(
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.w600,
-                      color: ThemeColor.charcoalColor,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'Coming Soon...',
-                    style: TextStyle(
-                      fontSize: 17.sp,
-                      color: ThemeColor.neutralGrayColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          SizedBox(height: 24.h),
+          const Expanded(child: HomeScreen()),
         ],
-      ),
-    );
-  }
-}
-
-class _SoonPage extends StatelessWidget {
-  final String title;
-  const _SoonPage({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        '$title — Coming soon',
-        style: TextStyle(
-          fontSize: 17.sp,
-          color: ThemeColor.neutralGrayColor,
-        ),
       ),
     );
   }

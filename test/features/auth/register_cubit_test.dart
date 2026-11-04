@@ -76,7 +76,7 @@ void main() {
           country: any(named: 'country'),
         ),
       ).thenAnswer(
-        (_) async => Left(ServerFailure(message: 'Email already exists')),
+        (_) async => const Left(ServerFailure(message: 'Email already exists')),
       );
       return cubit;
     },

@@ -134,6 +134,7 @@ class DailyPlan extends Equatable {
 class Activity extends Equatable {
   final String time;
   final String place;
+  final String? coordinates;
   final String description;
   final String estimatedCost;
   final String? image;
@@ -142,6 +143,7 @@ class Activity extends Equatable {
   const Activity({
     required this.time,
     required this.place,
+    this.coordinates,
     required this.description,
     required this.estimatedCost,
     this.image,
@@ -152,6 +154,7 @@ class Activity extends Equatable {
     return Activity(
       time: json['time'] ?? 'N/A',
       place: json['place'] ?? 'Unknown Place',
+      coordinates: json['coordinates']?.toString(),
       description: json['description'] ?? '',
       estimatedCost: json['estimatedCost']?.toString() ?? "0",
       image: json['image']?.toString(),
@@ -163,8 +166,15 @@ class Activity extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [time, place, description, estimatedCost, image, transportation];
+  List<Object?> get props => [
+        time,
+        place,
+        coordinates,
+        description,
+        estimatedCost,
+        image,
+        transportation
+      ];
 }
 
 class Transportation extends Equatable {

@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
+import 'package:rahhala_app/core/errors/exceptions.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/features/chatbot/domain/entities/chat_message.dart';
 
@@ -38,7 +41,7 @@ class ChatBotApiService {
 
       return response.data;
     } on DioException catch (e) {
-      throw _handleDioError(e);
+      handleDioException(e);
     }
   }
 
@@ -70,14 +73,14 @@ class ChatBotApiService {
       );
 
       // Process the stream response
-      final stream = response.data.stream as Stream<List<int>>;
+      final body = response.data;
+      if (body is! ResponseBody) return;
 
-      await for (final chunk in stream) {
-        final text = String.fromCharCodes(chunk);
-        yield text;
-      }
+      // Decode as UTF-8 across chunk boundaries. Decoding each chunk on its
+      // own (or as Latin-1) corrupts multi-byte characters such as Arabic.
+      yield* body.stream.cast<List<int>>().transform(utf8.decoder);
     } on DioException catch (e) {
-      throw _handleDioError(e);
+      handleDioException(e);
     }
   }
 
@@ -102,7 +105,7 @@ class ChatBotApiService {
 
       return response.data;
     } on DioException catch (e) {
-      throw _handleDioError(e);
+      handleDioException(e);
     }
   }
 
@@ -130,7 +133,7 @@ class ChatBotApiService {
 
       return response.data;
     } on DioException catch (e) {
-      throw _handleDioError(e);
+      handleDioException(e);
     }
   }
 
@@ -155,7 +158,7 @@ class ChatBotApiService {
 
       return response.data;
     } on DioException catch (e) {
-      throw _handleDioError(e);
+      handleDioException(e);
     }
   }
 
@@ -180,30 +183,7 @@ class ChatBotApiService {
 
       return response.data;
     } on DioException catch (e) {
-      throw _handleDioError(e);
-    }
-  }
-
-  /// Handle Dio errors and convert to user-friendly exceptions
-  Exception _handleDioError(DioException error) {
-    switch (error.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout:
-        return Exception('Connection timeout. Please try again.');
-      case DioExceptionType.badResponse:
-        final statusCode = error.response?.statusCode;
-        if (statusCode == 401) {
-          return Exception('Unauthorized. Please login again.');
-        } else if (statusCode == 503) {
-          return Exception(
-              'Service temporarily unavailable. Please try again later.');
-        }
-        return Exception('Server error. Please try again.');
-      case DioExceptionType.cancel:
-        return Exception('Request was cancelled.');
-      default:
-        return Exception('Network error. Please check your connection.');
+      handleDioException(e);
     }
   }
 }

@@ -14,6 +14,7 @@ import 'package:rahhala_app/features/auth/presentation/widgets/custom_form_text_
 import 'package:rahhala_app/features/auth/domain/forgot_password/forgot_password_cubit.dart';
 import 'package:rahhala_app/features/auth/domain/forgot_password/forgot_password_state.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -40,17 +41,20 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocProvider(
       create: (_) => sl<ForgotPasswordCubit>(),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         body: SafeArea(
           child: BlocConsumer<ForgotPasswordCubit, ForgotPasswordState>(
             listener: (context, state) {
               if (state is ForgotPasswordSuccess) {
                 showAppNotification(
                     context: context,
-                    title: 'Success',
+                    title: context.l10n.commonSuccess,
                     message: state.model.message);
                 Navigator.push(
                   context,
@@ -65,7 +69,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 HapticFeedback.mediumImpact();
                 showAppNotification(
                     context: context,
-                    title: 'Error',
+                    title: context.l10n.commonError,
                     message: state.errorMessage,
                     isError: true);
               }
@@ -99,14 +103,18 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     children: [
                                       IconButton(
                                         style: IconButton.styleFrom(
-                                          backgroundColor: Colors.grey[100],
+                                          backgroundColor: colorScheme
+                                              .surfaceContainerHighest
+                                              .withValues(alpha: 0.5),
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(12),
                                           ),
                                         ),
-                                        icon: const Icon(
-                                            Icons.arrow_back_ios_new),
+                                        icon: Icon(
+                                          Icons.arrow_back_ios_new,
+                                          color: colorScheme.onSurface,
+                                        ),
                                         onPressed: () => Navigator.pop(context),
                                       ),
                                       const SizedBox.shrink(),
@@ -120,14 +128,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                       vertical: 18.h,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: colorScheme.surface,
                                       borderRadius: BorderRadius.circular(22),
                                       border: Border.all(
-                                        color: Colors.grey[200]!,
+                                        color: colorScheme.outline.withValues(
+                                            alpha: isDark ? 0.35 : 0.2),
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.04),
+                                          color: Colors.black.withValues(
+                                              alpha: isDark ? 0.2 : 0.04),
                                           blurRadius: 22,
                                           offset: const Offset(0, 12),
                                         ),
@@ -145,30 +155,31 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                           ),
                                         ),
                                         SizedBox(height: 10.h),
-                                        const Text(
-                                          'Forgot Password',
+                                        Text(
+                                          context.l10n.authForgotPasswordTitle,
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 28,
                                             fontWeight: FontWeight.bold,
                                             color: ThemeColor.primaryColor,
                                           ),
                                         ),
                                         SizedBox(height: 8.h),
-                                        const Text(
-                                          "Enter your email address below and we'll send you a verification code to reset your password.",
+                                        Text(
+                                          context.l10n.authForgotPasswordDesc,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 16,
-                                            color: Colors.grey,
+                                            color: colorScheme.onSurfaceVariant,
                                             height: 1.5,
                                           ),
                                         ),
                                         SizedBox(height: 26.h),
                                         CustomFormTextField(
                                           controller: _emailController,
-                                          labelText: 'Email Address',
-                                          hintText: 'Enter your email',
+                                          labelText:
+                                              context.l10n.authEmailAddress,
+                                          hintText: context.l10n.authEmailHint,
                                           keyboardType:
                                               TextInputType.emailAddress,
                                           prefixIcon: Icons.email_outlined,
@@ -211,8 +222,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                                   }
                                                 },
                                           text: isLoading
-                                              ? 'Sending...'
-                                              : 'Send Code',
+                                              ? context.l10n.authSendingCode
+                                              : context.l10n.authSendCode,
                                         ),
                                       ],
                                     ),
@@ -224,14 +235,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                       vertical: 18.h,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: colorScheme.surface,
                                       borderRadius: BorderRadius.circular(16),
                                       border: Border.all(
-                                        color: Colors.grey[200]!,
+                                        color: colorScheme.outline.withValues(
+                                            alpha: isDark ? 0.35 : 0.2),
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.03),
+                                          color: Colors.black.withValues(
+                                              alpha: isDark ? 0.16 : 0.03),
                                           blurRadius: 18,
                                           offset: const Offset(0, 10),
                                         ),
@@ -240,19 +253,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     child: Column(
                                       children: [
                                         Text(
-                                          'Remembered your password?',
+                                          context.l10n.authRememberedPassword,
                                           style: TextStyle(
                                             fontSize: 14.sp,
-                                            color: Colors.grey[700],
+                                            color: colorScheme.onSurfaceVariant,
                                           ),
                                         ),
                                         SizedBox(height: 10.h),
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.pop(context),
-                                          child: const Text(
-                                            "Back to Login",
-                                            style: TextStyle(
+                                          child: Text(
+                                            context.l10n.authBackToLogin,
+                                            style: const TextStyle(
                                               color: ThemeColor.primaryColor,
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -270,7 +283,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ),
                       if (isLoading)
                         Container(
-                          color: Colors.black45,
+                          color: Colors.black
+                              .withValues(alpha: isDark ? 0.5 : 0.28),
                           alignment: Alignment.center,
                           child: const CircularProgressIndicator(
                               color: ThemeColor.primaryColor),

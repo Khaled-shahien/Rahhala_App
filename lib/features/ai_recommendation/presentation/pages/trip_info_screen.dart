@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/constants/app_text_styles.dart';
+import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_cubit.dart';
+import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_options.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_state.dart';
 import 'package:rahhala_app/features/ai_recommendation/presentation/widgets/button.dart';
 import 'package:country_picker/country_picker.dart';
@@ -15,12 +17,14 @@ class TripInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<AiTripCubit>();
+    final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     final seasons = [
-      {'value': 'Winter', 'label': 'Winter (December - February)'},
-      {'value': 'Spring', 'label': 'Spring (March - May)'},
-      {'value': 'Summer', 'label': 'Summer (June - August)'},
-      {'value': 'Autumn', 'label': 'Autumn (September - November)'},
+      {'value': 'Winter', 'label': l10n.tripInfoSeasonWinter},
+      {'value': 'Spring', 'label': l10n.tripInfoSeasonSpring},
+      {'value': 'Summer', 'label': l10n.tripInfoSeasonSummer},
+      {'value': 'Autumn', 'label': l10n.tripInfoSeasonAutumn},
     ];
 
     return BlocBuilder<AiTripCubit, AiTripState>(
@@ -28,6 +32,12 @@ class TripInfoScreen extends StatelessWidget {
         if (state is! AiTripData) {
           return const Center(child: CircularProgressIndicator());
         }
+        final hasDestination = (state.destination?.trim().isNotEmpty ?? false);
+        final hasValidSeason = state.selectedMonth != null &&
+            seasons.any((season) => season['value'] == state.selectedMonth);
+        final hasValidDays = state.totalDays >= state.tripOptions.minDays &&
+            state.totalDays <= state.tripOptions.maxDays;
+        final canGoNext = hasDestination && hasValidSeason && hasValidDays;
 
         return SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -36,18 +46,28 @@ class TripInfoScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 20.h),
-              Text('Where do you want to go?', style: AppTextStyles.heading),
+              Text(
+                l10n.tripInfoWhereToGo,
+                style: AppTextStyles.heading
+                    .copyWith(color: colorScheme.onSurface),
+              ),
               SizedBox(height: 28.h),
               _buildCountrySelector(context, state.destination, cubit),
               SizedBox(height: 44.h),
-              Text('When do you want to go?', style: AppTextStyles.heading),
+              Text(
+                l10n.tripInfoWhenToGo,
+                style: AppTextStyles.heading
+                    .copyWith(color: colorScheme.onSurface),
+              ),
               SizedBox(height: 28.h),
-              _buildDaysSelector(state.totalDays, cubit),
+              _buildDaysSelector(context, state.totalDays, cubit),
               SizedBox(height: 28.h),
-              _buildSeasonSelector(seasons, state.selectedMonth, cubit),
+              _buildSeasonSelector(
+                  context, seasons, state.selectedMonth, cubit),
               SizedBox(height: 76.h),
               NextButton(
-                onPressed: onNext,
+                onPressed: canGoNext ? onNext : null,
+                text: l10n.commonNext,
               ),
               SizedBox(height: 44.h),
             ],
@@ -59,11 +79,18 @@ class TripInfoScreen extends StatelessWidget {
 
   Widget _buildCountrySelector(
       BuildContext context, String? selectedCountry, AiTripCubit cubit) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+
     return GestureDetector(
       onTap: () {
         showCountryPicker(
           context: context,
           showPhoneCode: false,
+          countryListTheme: CountryListThemeData(
+            backgroundColor: colorScheme.surface,
+            textStyle: TextStyle(color: colorScheme.onSurface),
+          ),
           onSelect: (Country country) {
             cubit.updateDestination(country.name);
           },
@@ -74,30 +101,30 @@ class TripInfoScreen extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
           decoration: BoxDecoration(
-            color: const Color(0xFF6A4D3B).withValues(alpha: 0.12),
+            color: colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(18.r),
             border: Border.all(
-              color: const Color(0xFFA88866),
+              color: colorScheme.primary.withValues(alpha: 0.5),
               width: 1.8.w,
             ),
           ),
           child: Row(
             children: [
-              const Icon(Icons.public, color: Color(0xFF6A4D3B)),
+              Icon(Icons.public, color: colorScheme.primary),
               SizedBox(width: 12.w),
               Expanded(
                 child: Text(
-                  selectedCountry ?? 'Select a country',
+                  selectedCountry ?? l10n.tripInfoSelectCountry,
                   style: TextStyle(
                     color: selectedCountry != null
-                        ? const Color(0xFF6A4D3B)
-                        : const Color(0xFF6A4D3B).withValues(alpha: 0.8),
+                        ? colorScheme.onSurface
+                        : colorScheme.onSurface.withValues(alpha: 0.6),
                     fontSize: 17.sp,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-              const Icon(Icons.arrow_drop_down, color: Color(0xFF6A4D3B)),
+              Icon(Icons.arrow_drop_down, color: colorScheme.primary),
             ],
           ),
         ),
@@ -105,43 +132,77 @@ class TripInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDaysSelector(int days, AiTripCubit cubit) {
+  Widget _buildDaysSelector(BuildContext context, int days, AiTripCubit cubit) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Total days', style: AppTextStyles.dayLabel),
+        Text(
+          l10n.tripInfoTotalDays,
+          style: AppTextStyles.dayLabel.copyWith(color: colorScheme.onSurface),
+        ),
         Row(
           children: [
-            _buildDayButton(Icons.remove, () {
+            _buildDayButton(context, Icons.remove, () {
               if (days > 1) cubit.updateDays(days - 1);
-            }),
+            }, enabled: days > AiTripOptions.minDays),
             SizedBox(width: 14.w),
             Text('$days',
-                style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                style: TextStyle(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface)),
             SizedBox(width: 14.w),
-            _buildDayButton(Icons.add, () => cubit.updateDays(days + 1)),
+            _buildDayButton(
+              context,
+              Icons.add,
+              () => cubit.updateDays(days + 1),
+              enabled: days < AiTripOptions.maxDays,
+            ),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildDayButton(IconData icon, VoidCallback onPressed) {
+  Widget _buildDayButton(
+    BuildContext context,
+    IconData icon,
+    VoidCallback onPressed, {
+    bool enabled = true,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return InkWell(
-      onTap: onPressed,
+      onTap: enabled ? onPressed : null,
       child: Container(
         padding: EdgeInsets.all(10.r),
-        decoration: const BoxDecoration(
-          color: Color(0xFFA88866),
+        decoration: BoxDecoration(
+          color: enabled
+              ? colorScheme.primary
+              : colorScheme.onSurface.withValues(alpha: 0.18),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, size: 22, color: Colors.white),
+        child: Icon(
+          icon,
+          size: 22,
+          color: enabled
+              ? colorScheme.onPrimary
+              : colorScheme.onSurface.withValues(alpha: 0.45),
+        ),
       ),
     );
   }
 
-  Widget _buildSeasonSelector(List<Map<String, String>> seasons,
-      String? selectedSeason, AiTripCubit cubit) {
+  Widget _buildSeasonSelector(
+      BuildContext context,
+      List<Map<String, String>> seasons,
+      String? selectedSeason,
+      AiTripCubit cubit) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     final hasValidSelection = selectedSeason != null &&
         seasons.any((season) => season['value'] == selectedSeason);
 
@@ -149,32 +210,31 @@ class TripInfoScreen extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF6A4D3B).withValues(alpha: 0.12),
+        color: colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(18.r),
         border: Border.all(
-          color: const Color(0xFFA88866),
+          color: colorScheme.primary.withValues(alpha: 0.5),
           width: 1.8.w,
         ),
       ),
       child: DropdownButton<String>(
         value: hasValidSelection ? selectedSeason : null,
         hint: Text(
-          'Select a season',
+          l10n.tripInfoSelectSeason,
           style: TextStyle(
-            color: const Color(0xFF6A4D3B).withValues(alpha: 0.8),
+            color: colorScheme.onSurface.withValues(alpha: 0.6),
             fontSize: 17.sp,
           ),
         ),
         isExpanded: true,
         underline: const SizedBox.shrink(),
-        icon:
-            const Icon(Icons.calendar_month_outlined, color: Color(0xFF6A4D3B)),
+        icon: Icon(Icons.calendar_month_outlined, color: colorScheme.primary),
         style: TextStyle(
-          color: const Color(0xFF6A4D3B),
+          color: colorScheme.onSurface,
           fontSize: 17.sp,
           fontWeight: FontWeight.w500,
         ),
-        dropdownColor: Colors.white,
+        dropdownColor: colorScheme.surface,
         onChanged: (String? newValue) {
           if (newValue != null) {
             cubit.selectMonth(newValue);

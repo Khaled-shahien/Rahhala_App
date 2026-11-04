@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:rahhala_app/features/auth/data/models/login_model.dart';
+import 'package:rahhala_app/features/auth/domain/entities/login.dart';
+import 'package:rahhala_app/features/auth/domain/usecases/post_login_session_use_case.dart';
 
 abstract class LoginState extends Equatable {
   const LoginState();
@@ -13,7 +14,8 @@ class LoginLoading extends LoginState {}
 
 class LoginSuccess extends LoginState {
   final Login loginModel;
-  const LoginSuccess({required this.loginModel});
+  final PostLoginSessionResult? session;
+  const LoginSuccess({required this.loginModel, this.session});
 
   @override
   List<Object> get props => [loginModel];
