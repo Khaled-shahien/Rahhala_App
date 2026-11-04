@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:rahhala_app/features/home/presentation/pages/home_screen.dart';
 import 'package:rahhala_app/features/home/presentation/pages/favourites_screen.dart';
@@ -30,43 +31,70 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  static const int _tabCount = 5;
+
   late int _currentIndex;
   final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
+
+  /// Tabs are built the first time they're opened and then kept alive by the
+  /// IndexedStack. This avoids firing every tab's network calls at startup
+  /// (DECISIONS D-10).
+  late final Set<int> _builtTabs;
 
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.initialIndex;
+    _currentIndex = widget.initialIndex.clamp(0, _tabCount - 1);
+    _builtTabs = {_currentIndex};
   }
 
   void _onTabTapped(int index) {
-    setState(() => _currentIndex = index);
-
-    ////////
+    setState(() {
+      _currentIndex = index;
+      _builtTabs.add(index);
+    });
     HapticFeedback.mediumImpact();
+  }
+
+  Widget _buildTab(int index) {
+    switch (index) {
+      case 0:
+        final storage = sl<TokenStorage>();
+        return _HomeMainSection(
+          isGuest: widget.isGuest,
+          displayName: widget.isGuest ? null : storage.displayName,
+          email: widget.isGuest ? '' : storage.email ?? '',
+          profileImageUrl: widget.isGuest ? null : storage.profileImageUrl,
+        );
+      case 1:
+        return const FavouritesScreen();
+      case 2:
+        return NearbyScreen(isGuest: widget.isGuest);
+      case 3:
+        return const TripTypeSelectionScreen();
+      default:
+        return const ProfilePage(embedded: true);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = context.l10n;
 
-    final storage = sl<TokenStorage>();
-    final displayName = storage.displayName;
-    final email = storage.email ?? '';
-    final profileImageUrl = storage.profileImageUrl;
-
-    final List<Widget> pages = [
-      _HomeMainSection(
-        isGuest: widget.isGuest,
-        displayName: widget.isGuest ? null : displayName,
-        email: widget.isGuest ? '' : email,
-        profileImageUrl: widget.isGuest ? null : profileImageUrl,
-      ),
-      const FavouritesScreen(),
-      NearbyScreen(isGuest: widget.isGuest),
-      const TripTypeSelectionScreen(),
-      const ProfilePage(embedded: true),
+    final List<Widget> pages = List<Widget>.generate(
+      _tabCount,
+      (index) => _builtTabs.contains(index)
+          ? _buildTab(index)
+          : const SizedBox.shrink(),
+    );
+    final navLabels = <String>[
+      l10n.a11yNavHome,
+      l10n.a11yNavFavourites,
+      l10n.a11yNavNearby,
+      l10n.a11yNavTrips,
+      l10n.a11yNavProfile,
     ];
 
     return Scaffold(
@@ -88,11 +116,11 @@ class _HomePageState extends State<HomePage> {
           index: _currentIndex,
           height: 70.0,
           items: <Widget>[
-            _buildNavIcon(Icons.home_outlined, 0),
-            _buildNavIcon(Icons.favorite_border, 1),
-            _buildNavIcon(Icons.search, 2),
-            _buildNavIcon(Icons.auto_awesome, 3),
-            _buildNavIcon(Icons.person_outline, 4),
+            _buildNavIcon(Icons.home_outlined, 0, navLabels[0]),
+            _buildNavIcon(Icons.favorite_border, 1, navLabels[1]),
+            _buildNavIcon(Icons.search, 2, navLabels[2]),
+            _buildNavIcon(Icons.auto_awesome, 3, navLabels[3]),
+            _buildNavIcon(Icons.person_outline, 4, navLabels[4]),
           ],
           color: ThemeColor.primaryColor,
           buttonBackgroundColor:
@@ -113,22 +141,27 @@ class _HomePageState extends State<HomePage> {
                 index: _currentIndex,
                 children: pages,
               ),
-              Positioned(
-                right: 20.w,
+              PositionedDirectional(
+                end: 20.w,
                 bottom: 100.h,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    HapticFeedback.mediumImpact();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ChatBotScreen()),
-                    );
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.all(4),
-                    child: AnisAvatar(size: 76),
+                child: Semantics(
+                  button: true,
+                  label: l10n.a11yOpenAssistant,
+                  excludeSemantics: true,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ChatBotScreen()),
+                      );
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.all(4),
+                      child: AnisAvatar(size: 76),
+                    ),
                   ),
                 ),
               ),
@@ -139,13 +172,17 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildNavIcon(IconData icon, int index) {
-    return Icon(
-      icon,
-      size: 30.sp,
-      color: _currentIndex == index
-          ? Colors.white
-          : Colors.white.withValues(alpha: 0.7),
+  Widget _buildNavIcon(IconData icon, int index, String label) {
+    final selected = _currentIndex == index;
+    return Semantics(
+      label: label,
+      selected: selected,
+      button: true,
+      child: Icon(
+        icon,
+        size: 30.sp,
+        color: selected ? Colors.white : Colors.white.withValues(alpha: 0.7),
+      ),
     );
   }
 }
@@ -225,7 +262,15 @@ class _HomeMainSection extends StatelessWidget {
                         ThemeColor.primaryColor.withValues(alpha: 0.15),
                     backgroundImage:
                         (profileImageUrl != null && profileImageUrl!.isNotEmpty)
-                            ? NetworkImage(profileImageUrl!)
+                            ? CachedNetworkImageProvider(
+                                profileImageUrl!,
+                                maxWidth: 180,
+                                maxHeight: 180,
+                              )
+                            : null,
+                    onBackgroundImageError:
+                        (profileImageUrl != null && profileImageUrl!.isNotEmpty)
+                            ? (_, __) {}
                             : null,
                     child: (profileImageUrl == null || profileImageUrl!.isEmpty)
                         ? Icon(Icons.person,
