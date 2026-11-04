@@ -203,7 +203,7 @@ void main() {
   test('image search emits real repository failure message', () async {
     final repository = _MockImageSearchRepository();
     when(() => repository.searchByImage('image.jpg')).thenAnswer(
-      (_) async => Left(ServerFailure(message: 'backend is down')),
+      (_) async => const Left(ServerFailure(message: 'backend is down')),
     );
 
     final cubit = ImageSearchCubit(

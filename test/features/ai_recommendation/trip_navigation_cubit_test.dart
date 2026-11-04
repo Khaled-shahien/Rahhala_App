@@ -112,8 +112,7 @@ void main() {
     ],
     verify: (_) {
       expect(routePollingService.started, isTrue);
-      verify(() => navigationService.speakInstruction('Go straight'))
-          .called(1);
+      verify(() => navigationService.speakInstruction('Go straight')).called(1);
     },
   );
 

@@ -10,7 +10,9 @@ import 'package:rahhala_app/core/crash/app_error_reporter.dart';
 import 'package:rahhala_app/core/crash/crash_reporting_service.dart';
 import 'package:rahhala_app/core/crash/firebase_crash_reporting_service.dart';
 import 'package:rahhala_app/core/logging/app_logger.dart';
-import 'package:rahhala_app/core/network/end_points.dart';
+import 'package:rahhala_app/core/config/app_config.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rahhala_app/core/services/image_picker_service.dart';
 import 'package:rahhala_app/core/services/image_picker_service_impl.dart';
 import 'package:rahhala_app/core/theme/theme_controller.dart';
@@ -36,7 +38,6 @@ import 'package:rahhala_app/features/trip_history/domain/cubits/trip_history_cub
 import 'package:rahhala_app/features/trip_history/domain/trip_history_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rahhala_app/core/localization/app_locale_controller.dart';
-import 'package:rahhala_app/core/startup/startup_preferences_service.dart';
 import 'package:rahhala_app/core/startup/app_bootstrap_cubit.dart';
 import 'package:rahhala_app/core/startup/app_bootstrap_service.dart';
 
@@ -108,17 +109,16 @@ Future<void> setupServiceLocator() async {
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
     iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
   );
+  await _clearStaleKeychainOnFreshInstall(prefs, secureStorage);
   final tokenStorage = TokenStorage(
     secureStorage: secureStorage,
     legacyPrefs: prefs,
   );
   await tokenStorage.initialize();
-  sl.registerSingleton<AppLocaleController>(
-    AppLocaleController(preferences: prefs),
-  );
-  sl.registerSingleton<StartupPreferencesService>(
-    StartupPreferencesService(preferences: prefs),
-  );
+  final localeController = AppLocaleController(preferences: prefs);
+  sl.registerSingleton<AppLocaleController>(localeController);
+  // Lets the data layer produce messages in the language the UI shows.
+  AppMessages.localeResolver = () => localeController.locale;
   sl.registerLazySingleton<OnboardingRepository>(
     () => SharedPreferencesOnboardingRepository(preferences: prefs),
   );
@@ -155,21 +155,26 @@ Future<void> setupServiceLocator() async {
   );
   AppErrorReporter.configure(sl<CrashReportingService>());
 
-  final dio = Dio();
-  dio.interceptors.add(ApiInterceptors());
-  dio.interceptors.add(RetryInterceptor(dio: dio));
+  // The main API client is configured once, here. DioConsumer and the
+  // repositories that use Dio directly share this instance, so base URL,
+  // timeouts and interceptors are identical for every request.
+  final dio = createApiDio(
+    baseUrl: AppConfig.apiBaseUrl,
+    tokenProvider: () => sl<TokenStorage>().token,
+  );
   sl.registerLazySingleton<Dio>(() => dio);
   sl.registerLazySingleton<ApiConsumer>(() => DioConsumer(dio: sl<Dio>()));
 
-  // ChatBot Dio instance with its own base URL
+  // The chatbot backend is a separate service with its own base URL and no
+  // bearer token.
   final chatBotDio = Dio(BaseOptions(
-    baseUrl: EndPoints.chatBotBaseUrl,
+    baseUrl: AppConfig.chatBotBaseUrl,
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     },
-    connectTimeout: const Duration(seconds: 30),
-    receiveTimeout: const Duration(seconds: 60),
+    connectTimeout: AppConfig.connectTimeout,
+    receiveTimeout: AppConfig.receiveTimeout,
     responseType: ResponseType.json,
   ));
   chatBotDio.interceptors.add(RetryInterceptor(dio: chatBotDio));
@@ -266,11 +271,8 @@ Future<void> setupServiceLocator() async {
       CustomTripCubit(generateTripPlanUsecase: sl<GenerateTripPlanUsecase>()));
 
   sl.registerLazySingleton<ImageSearchRepository>(
-    () => ImageSearchRepositoryImpl(dio: sl<Dio>()),
+    () => ImageSearchRepositoryImpl(api: sl<ApiConsumer>()),
   );
-  // sl.registerLazySingleton<ImageSearchRepository>(
-  //   () => ImageSearchRepositoryImpl(dio: sl<Dio>()),
-  // );
   sl.registerLazySingleton<ImageAcquisitionService>(
     () => ImageAcquisitionServiceImpl(
       imagePickerService: sl<ImagePickerService>(),
@@ -313,7 +315,7 @@ Future<void> setupServiceLocator() async {
     () => DiscardContextUseCase(sl<ChatBotRepository>()),
   );
   sl.registerLazySingleton<TripHistoryRepository>(
-    () => TripHistoryRepositoryImpl(dio: sl<Dio>()),
+    () => TripHistoryRepositoryImpl(api: sl<ApiConsumer>()),
   );
   sl.registerFactory<TripHistoryCubit>(
     () => TripHistoryCubit(repository: sl<TripHistoryRepository>()),
@@ -368,6 +370,67 @@ Future<void> setupServiceLocator() async {
       locationService: sl<LocationService>(),
     ),
   );
+
+}
+
+const String _installMarkerKey = 'install_marker_v1';
+
+/// The iOS Keychain survives uninstalling the app, but SharedPreferences
+/// doesn't. Without this, a reinstalled app would start with the previous
+/// owner's token. The marker lives in SharedPreferences, so it's missing
+/// exactly on a fresh install.
+///
+/// Existing installs (onboarding already completed) keep their session when
+/// they upgrade to this version.
+Future<void> _clearStaleKeychainOnFreshInstall(
+  SharedPreferences prefs,
+  FlutterSecureStorage secureStorage,
+) async {
+  if (prefs.getBool(_installMarkerKey) ?? false) return;
+
+  final isUpgrade = prefs.getBool('onboarding_done') ?? false;
+  if (!isUpgrade) {
+    try {
+      await secureStorage.deleteAll();
+    } catch (e, stackTrace) {
+      AppLogger.instance.w(
+        'Could not clear stale secure storage on fresh install',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+  await prefs.setBool(_installMarkerKey, true);
+}
+
+/// Builds the configured [Dio] for the main Rahhala API.
+@visibleForTesting
+Dio createApiDio({
+  required String baseUrl,
+  required String? Function() tokenProvider,
+}) {
+  final dio = Dio(BaseOptions(
+    baseUrl: baseUrl,
+    connectTimeout: AppConfig.connectTimeout,
+    receiveTimeout: AppConfig.receiveTimeout,
+    sendTimeout: AppConfig.sendTimeout,
+    responseType: ResponseType.json,
+    validateStatus: (code) => code != null && code < 400,
+    headers: const {'Accept': 'application/json'},
+  ));
+  dio.interceptors.addAll([
+    ApiInterceptors(tokenProvider: tokenProvider),
+    RetryInterceptor(dio: dio),
+    if (kDebugMode)
+      LogInterceptor(
+        requestHeader: false,
+        responseHeader: false,
+        requestBody: false,
+        responseBody: false,
+        logPrint: (line) => AppLogger.instance.d(line),
+      ),
+  ]);
+  return dio;
 }
 
 Future<bool> _initializeFirebaseObservability() async {

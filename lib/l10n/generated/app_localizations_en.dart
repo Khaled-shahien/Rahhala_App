@@ -812,8 +812,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not update your favourites. Please try again.';
 
   @override
-  String get reviewLoginRequired =>
-      'Login is required to add a rating and review.';
+  String get reviewLoginRequired => 'Please log in to share your review!';
 
   @override
   String get reviewSubmitTitle => 'Submit your review';
@@ -912,4 +911,280 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tripLoadingAlmostReady =>
       'Your AI-powered adventure is almost ready!';
+
+  @override
+  String get errorNetwork =>
+      'No internet connection. Check your network and try again.';
+
+  @override
+  String get errorTimeout => 'The request took too long. Please try again.';
+
+  @override
+  String get errorSessionExpired =>
+      'Your session has expired. Please log in again.';
+
+  @override
+  String get errorForbidden => 'You don\'t have permission to do this.';
+
+  @override
+  String get errorNotFound => 'We couldn\'t find what you were looking for.';
+
+  @override
+  String get errorServer =>
+      'Something went wrong on our side. Please try again later.';
+
+  @override
+  String get errorParsing =>
+      'We received an unexpected response. Please try again.';
+
+  @override
+  String get errorCancelled => 'The request was cancelled.';
+
+  @override
+  String get errorUnknown => 'Something went wrong. Please try again.';
+
+  @override
+  String get errorValidation => 'Please check the information you entered.';
+
+  @override
+  String get errorLoginMissingToken => 'Login failed. Please try again.';
+
+  @override
+  String get errorSessionSaveFailed =>
+      'You signed in, but the session couldn\'t be saved. Please try again.';
+
+  @override
+  String get errorImageSearchFailed =>
+      'Could not search with this image. Please try another photo.';
+
+  @override
+  String get errorCameraUnavailable =>
+      'Could not access the camera. Please try again.';
+
+  @override
+  String get errorGalleryUnavailable =>
+      'Could not access the gallery. Please try again.';
+
+  @override
+  String get errorProfileLoadFailed =>
+      'Could not load profile details. Please try again.';
+
+  @override
+  String get errorProfileSaveFailed =>
+      'Could not save profile. Please try again.';
+
+  @override
+  String get errorPhotoUploadFailed =>
+      'Failed to upload photo. Please try again.';
+
+  @override
+  String get errorTripsLoadFailed => 'Failed to load trips.';
+
+  @override
+  String get errorTripDetailsLoadFailed => 'Failed to load trip details.';
+
+  @override
+  String get errorTripRegenerateFailed => 'Failed to regenerate trip.';
+
+  @override
+  String get errorTripSaveFailed => 'Failed to save trip.';
+
+  @override
+  String get errorPlaceDetailsLoadFailed =>
+      'Failed to load place details. Please try again.';
+
+  @override
+  String get errorLocationServiceDisabled => 'Location services are disabled.';
+
+  @override
+  String get errorLocationUnavailable =>
+      'Unable to get your location. Please try again.';
+
+  @override
+  String get errorChatContextFailed =>
+      'Couldn\'t start a new conversation. Please try again.';
+
+  @override
+  String get validationNameRequired => 'Full name is required';
+
+  @override
+  String get validationNameTooShort => 'Name must be at least 3 characters';
+
+  @override
+  String get validationEmailRequired => 'Email is required';
+
+  @override
+  String get validationEmailInvalid => 'Invalid email format';
+
+  @override
+  String get validationPhoneRequired => 'Phone number is required';
+
+  @override
+  String get validationPhoneInvalid => 'Invalid phone number';
+
+  @override
+  String get validationPasswordTooShort =>
+      'Password must be at least 8 characters';
+
+  @override
+  String get validationPasswordUppercase =>
+      'Password must include at least one uppercase letter';
+
+  @override
+  String get validationPasswordLowercase =>
+      'Password must include at least one lowercase letter';
+
+  @override
+  String get validationPasswordNumber =>
+      'Password must include at least one number';
+
+  @override
+  String get validationPasswordSpecial =>
+      'Password must include at least one special character';
+
+  @override
+  String get validationConfirmPasswordRequired =>
+      'Please confirm your password';
+
+  @override
+  String get validationPasswordsMismatch => 'Passwords do not match';
+
+  @override
+  String validationSelectField(String field) {
+    return 'Please select a $field';
+  }
+
+  @override
+  String get favouritesLoginRequired =>
+      'Please log in to view your favourites.';
+
+  @override
+  String get favouritesRemoved => 'Removed from favourites.';
+
+  @override
+  String get favouritesRemoveFailed =>
+      'Unable to remove this place now. Please try again.';
+
+  @override
+  String get reviewSubmitted => 'Your review has been submitted successfully!';
+
+  @override
+  String get reviewUpdated => 'Your review has been updated successfully!';
+
+  @override
+  String get reviewDeleted => 'Your review has been deleted successfully!';
+
+  @override
+  String get reviewUpdateFailed => 'Unable to update review. Please try again.';
+
+  @override
+  String get reviewDeleteFailed => 'Unable to delete review. Please try again.';
+
+  @override
+  String get customTripSelectRegion => 'Please select a region';
+
+  @override
+  String get aiTripSelectDestination => 'Please select a destination.';
+
+  @override
+  String get aiTripSelectSeason => 'Please select a travel season.';
+
+  @override
+  String get aiTripSelectBudget => 'Please select a budget range.';
+
+  @override
+  String get aiTripSelectInterest => 'Please select at least one interest.';
+
+  @override
+  String aiTripDaysRange(int min, int max) {
+    return 'Trip length must be between $min and $max days.';
+  }
+
+  @override
+  String get tripNavGpsDisabled => 'GPS is disabled. Please enable it.';
+
+  @override
+  String get tripNavPermissionDenied => 'Location permission denied.';
+
+  @override
+  String get tripNavPermissionDeniedForever =>
+      'Location permission denied permanently.';
+
+  @override
+  String get tripNavLiveUpdatesFailed =>
+      'Unable to read live location updates.';
+
+  @override
+  String get tripNavNoDestination =>
+      'Cannot start navigation without destination.';
+
+  @override
+  String get tripNavNoRoute =>
+      'No valid route found. Check internet and try again.';
+
+  @override
+  String get tripNavLocationUnavailable =>
+      'Location is unavailable. Please enable GPS and permissions.';
+
+  @override
+  String get tripNavStartFailed => 'Could not start navigation.';
+
+  @override
+  String get tripNavArrived => 'You have reached your destination.';
+
+  @override
+  String get tripNavNextLegFailed =>
+      'Could not load next leg route. Please try again.';
+
+  @override
+  String tripNavReachedLeg(String from, String to) {
+    return 'Reached $from. Continuing to $to.';
+  }
+
+  @override
+  String get tripNavRouteRecalculated => 'Route recalculated.';
+
+  @override
+  String get commonRetry => 'Retry';
+
+  @override
+  String get offlineBanner => 'You\'re offline. Some features may not work.';
+
+  @override
+  String get updateRequiredTitle => 'Update required';
+
+  @override
+  String get updateRequiredMessage =>
+      'A new version of Rahhala is required to continue.';
+
+  @override
+  String get updateNow => 'Update now';
+
+  @override
+  String get maintenanceTitle => 'Under maintenance';
+
+  @override
+  String get maintenanceMessage =>
+      'We\'re making improvements. Please check back soon.';
+
+  @override
+  String get a11yNavHome => 'Home';
+
+  @override
+  String get a11yNavFavourites => 'Favourites';
+
+  @override
+  String get a11yNavNearby => 'Nearby places';
+
+  @override
+  String get a11yNavTrips => 'Plan a trip';
+
+  @override
+  String get a11yNavProfile => 'Profile';
+
+  @override
+  String get a11yOpenAssistant => 'Open ANIS travel assistant';
+
+  @override
+  String get a11yProfilePhoto => 'Profile photo';
 }

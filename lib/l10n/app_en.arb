@@ -384,5 +384,119 @@
   "tripLoadingHiddenGems": "Discovering hidden gems for your trip...",
   "tripLoadingItinerary": "Designing your personalized itinerary...",
   "tripLoadingExperiences": "Finding exclusive experiences...",
-  "tripLoadingAlmostReady": "Your AI-powered adventure is almost ready!"
+  "tripLoadingAlmostReady": "Your AI-powered adventure is almost ready!",
+
+  "errorNetwork": "No internet connection. Check your network and try again.",
+  "errorTimeout": "The request took too long. Please try again.",
+  "errorSessionExpired": "Your session has expired. Please log in again.",
+  "errorForbidden": "You don't have permission to do this.",
+  "errorNotFound": "We couldn't find what you were looking for.",
+  "errorServer": "Something went wrong on our side. Please try again later.",
+  "errorParsing": "We received an unexpected response. Please try again.",
+  "errorCancelled": "The request was cancelled.",
+  "errorUnknown": "Something went wrong. Please try again.",
+  "errorValidation": "Please check the information you entered.",
+  "errorLoginMissingToken": "Login failed. Please try again.",
+  "errorSessionSaveFailed": "You signed in, but the session couldn't be saved. Please try again.",
+  "errorImageSearchFailed": "Could not search with this image. Please try another photo.",
+  "errorCameraUnavailable": "Could not access the camera. Please try again.",
+  "errorGalleryUnavailable": "Could not access the gallery. Please try again.",
+  "errorProfileLoadFailed": "Could not load profile details. Please try again.",
+  "errorProfileSaveFailed": "Could not save profile. Please try again.",
+  "errorPhotoUploadFailed": "Failed to upload photo. Please try again.",
+  "errorTripsLoadFailed": "Failed to load trips.",
+  "errorTripDetailsLoadFailed": "Failed to load trip details.",
+  "errorTripRegenerateFailed": "Failed to regenerate trip.",
+  "errorTripSaveFailed": "Failed to save trip.",
+  "errorPlaceDetailsLoadFailed": "Failed to load place details. Please try again.",
+  "errorLocationServiceDisabled": "Location services are disabled.",
+  "errorLocationUnavailable": "Unable to get your location. Please try again.",
+  "errorChatContextFailed": "Couldn't start a new conversation. Please try again.",
+
+  "validationNameRequired": "Full name is required",
+  "validationNameTooShort": "Name must be at least 3 characters",
+  "validationEmailRequired": "Email is required",
+  "validationEmailInvalid": "Invalid email format",
+  "validationPhoneRequired": "Phone number is required",
+  "validationPhoneInvalid": "Invalid phone number",
+  "validationPasswordTooShort": "Password must be at least 8 characters",
+  "validationPasswordUppercase": "Password must include at least one uppercase letter",
+  "validationPasswordLowercase": "Password must include at least one lowercase letter",
+  "validationPasswordNumber": "Password must include at least one number",
+  "validationPasswordSpecial": "Password must include at least one special character",
+  "validationConfirmPasswordRequired": "Please confirm your password",
+  "validationPasswordsMismatch": "Passwords do not match",
+  "validationSelectField": "Please select a {field}",
+  "@validationSelectField": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+
+  "favouritesLoginRequired": "Please log in to view your favourites.",
+  "favouritesRemoved": "Removed from favourites.",
+  "favouritesRemoveFailed": "Unable to remove this place now. Please try again.",
+  "reviewSubmitted": "Your review has been submitted successfully!",
+  "reviewUpdated": "Your review has been updated successfully!",
+  "reviewDeleted": "Your review has been deleted successfully!",
+  "reviewLoginRequired": "Please log in to share your review!",
+  "reviewUpdateFailed": "Unable to update review. Please try again.",
+  "reviewDeleteFailed": "Unable to delete review. Please try again.",
+  "customTripSelectRegion": "Please select a region",
+  "aiTripSelectDestination": "Please select a destination.",
+  "aiTripSelectSeason": "Please select a travel season.",
+  "aiTripSelectBudget": "Please select a budget range.",
+  "aiTripSelectInterest": "Please select at least one interest.",
+  "aiTripDaysRange": "Trip length must be between {min} and {max} days.",
+  "@aiTripDaysRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+
+  "tripNavGpsDisabled": "GPS is disabled. Please enable it.",
+  "tripNavPermissionDenied": "Location permission denied.",
+  "tripNavPermissionDeniedForever": "Location permission denied permanently.",
+  "tripNavLiveUpdatesFailed": "Unable to read live location updates.",
+  "tripNavNoDestination": "Cannot start navigation without destination.",
+  "tripNavNoRoute": "No valid route found. Check internet and try again.",
+  "tripNavLocationUnavailable": "Location is unavailable. Please enable GPS and permissions.",
+  "tripNavStartFailed": "Could not start navigation.",
+  "tripNavArrived": "You have reached your destination.",
+  "tripNavNextLegFailed": "Could not load next leg route. Please try again.",
+  "tripNavReachedLeg": "Reached {from}. Continuing to {to}.",
+  "@tripNavReachedLeg": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "tripNavRouteRecalculated": "Route recalculated.",
+  "commonRetry": "Retry",
+
+  "offlineBanner": "You're offline. Some features may not work.",
+  "updateRequiredTitle": "Update required",
+  "updateRequiredMessage": "A new version of Rahhala is required to continue.",
+  "updateNow": "Update now",
+  "maintenanceTitle": "Under maintenance",
+  "maintenanceMessage": "We're making improvements. Please check back soon.",
+
+  "a11yNavHome": "Home",
+  "a11yNavFavourites": "Favourites",
+  "a11yNavNearby": "Nearby places",
+  "a11yNavTrips": "Plan a trip",
+  "a11yNavProfile": "Profile",
+  "a11yOpenAssistant": "Open ANIS travel assistant",
+  "a11yProfilePhoto": "Profile photo"
 }

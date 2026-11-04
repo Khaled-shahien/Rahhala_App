@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:rahhala_app/core/errors/exceptions.dart';
 import 'package:rahhala_app/core/errors/failures.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:rahhala_app/features/chatbot/data/sources/chat_bot_api_service.dart';
 import 'package:rahhala_app/features/chatbot/domain/entities/chat_context.dart';
 import 'package:rahhala_app/features/chatbot/domain/entities/chat_message.dart';
@@ -33,19 +34,18 @@ class ChatBotRepositoryImpl implements ChatBotRepository {
         if (result != null && result['response'] != null) {
           return Right(result['response'].toString());
         }
-        return Left(
-            ServerFailure(message: 'Invalid response format from server'));
+        return Left(ServerFailure(
+            message: AppMessages.current.errorParsing,
+            type: FailureType.parsing));
       } else {
         final errorMsg = response['message'] ??
             response['Message'] ??
             response['error'] ??
-            'Failed to get response';
+            AppMessages.current.errorUnknown;
         return Left(ServerFailure(message: errorMsg.toString()));
       }
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
-    } on Exception catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -78,13 +78,11 @@ class ChatBotRepositoryImpl implements ChatBotRepository {
         );
         return Right(context);
       } else {
-        return Left(ServerFailure(
-            message: 'Failed to create context: No context ID returned'));
+        return Left(
+            ServerFailure(message: AppMessages.current.errorChatContextFailed));
       }
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
-    } on Exception catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -105,13 +103,11 @@ class ChatBotRepositoryImpl implements ChatBotRepository {
         final errorMsg = response['message'] ??
             response['Message'] ??
             response['error'] ??
-            'Failed to update context items';
+            AppMessages.current.errorUnknown;
         return Left(ServerFailure(message: errorMsg.toString()));
       }
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
-    } on Exception catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -132,19 +128,18 @@ class ChatBotRepositoryImpl implements ChatBotRepository {
           );
           return Right(context);
         }
-        return Left(
-            ServerFailure(message: 'Invalid response format from server'));
+        return Left(ServerFailure(
+            message: AppMessages.current.errorParsing,
+            type: FailureType.parsing));
       } else {
         final errorMsg = response['message'] ??
             response['Message'] ??
             response['error'] ??
-            'Failed to get context';
+            AppMessages.current.errorUnknown;
         return Left(ServerFailure(message: errorMsg.toString()));
       }
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
-    } on Exception catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -161,13 +156,11 @@ class ChatBotRepositoryImpl implements ChatBotRepository {
         final errorMsg = response['message'] ??
             response['Message'] ??
             response['error'] ??
-            'Failed to discard context';
+            AppMessages.current.errorUnknown;
         return Left(ServerFailure(message: errorMsg.toString()));
       }
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
-    } on Exception catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 }

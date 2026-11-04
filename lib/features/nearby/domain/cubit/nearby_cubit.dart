@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rahhala_app/core/errors/exceptions.dart';
 import 'package:rahhala_app/features/nearby/domain/cubit/nearby_state.dart';
 import 'package:rahhala_app/features/nearby/domain/repositories/nearby_repository.dart';
 import 'package:rahhala_app/features/nearby/domain/services/location_service.dart';
@@ -46,7 +47,7 @@ class NearbyCubit extends Cubit<NearbyState> {
           break;
       }
     } catch (e) {
-      emit(NearbyError(message: e.toString()));
+      emit(NearbyError(message: failureFromError(e).message));
     }
   }
 

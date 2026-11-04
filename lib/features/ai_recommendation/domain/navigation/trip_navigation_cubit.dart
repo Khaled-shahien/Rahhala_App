@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:rahhala_app/core/crash/app_error_reporter.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/navigation/navigation_service.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/navigation/route_polling_service.dart';
@@ -65,8 +66,8 @@ class TripNavigationCubit extends Cubit<TripNavigationState> {
 
   Future<void> startNavigation(List<LatLng> waypoints) async {
     if (waypoints.length < 2) {
-      emit(const TripNavigationError(
-        'Cannot start navigation without destination.',
+      emit(TripNavigationError(
+        AppMessages.current.tripNavNoDestination,
       ));
       return;
     }
@@ -76,8 +77,8 @@ class TripNavigationCubit extends Cubit<TripNavigationState> {
     try {
       final currentLocation = await _navigationService.startNavigation();
       if (currentLocation == null) {
-        emit(const TripNavigationError(
-          'Location is unavailable. Please enable GPS and permissions.',
+        emit(TripNavigationError(
+          AppMessages.current.tripNavLocationUnavailable,
         ));
         return;
       }
@@ -87,8 +88,8 @@ class TripNavigationCubit extends Cubit<TripNavigationState> {
         to: waypoints.first,
       );
       if (routeData == null || routeData.polylinePoints.length < 2) {
-        emit(const TripNavigationError(
-          'No valid route found. Check internet and try again.',
+        emit(TripNavigationError(
+          AppMessages.current.tripNavNoRoute,
         ));
         return;
       }
@@ -104,8 +105,8 @@ class TripNavigationCubit extends Cubit<TripNavigationState> {
             error: error,
             stackTrace: stackTrace,
           );
-          emit(const TripNavigationError(
-            'Unable to read live location updates.',
+          emit(TripNavigationError(
+            AppMessages.current.tripNavLiveUpdatesFailed,
           ));
         },
       );
@@ -121,7 +122,7 @@ class TripNavigationCubit extends Cubit<TripNavigationState> {
         error: e,
         stackTrace: stackTrace,
       );
-      emit(const TripNavigationError('Could not start navigation.'));
+      emit(TripNavigationError(AppMessages.current.tripNavStartFailed));
     }
   }
 
@@ -149,7 +150,17 @@ class TripNavigationCubit extends Cubit<TripNavigationState> {
   Future<void> close() async {
     await _routeSubscription?.cancel();
     _routePollingService.stopPolling();
-    await _navigationService.stopNavigation();
+    try {
+      await _navigationService.stopNavigation();
+    } catch (e, stackTrace) {
+      // Closing must always succeed; a TTS or GPS shutdown error is only
+      // worth logging.
+      AppLogger.instance.w(
+        'TripNavigationCubit: stopNavigation failed on close',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
     return super.close();
   }
 }

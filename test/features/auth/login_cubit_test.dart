@@ -77,7 +77,7 @@ void main() {
           password: any(named: 'password'),
         ),
       ).thenAnswer(
-        (_) async => Left(ServerFailure(message: 'Invalid credentials')),
+        (_) async => const Left(ServerFailure(message: 'Invalid credentials')),
       );
       return cubit;
     },

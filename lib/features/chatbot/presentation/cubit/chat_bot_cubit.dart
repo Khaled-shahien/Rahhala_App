@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rahhala_app/core/errors/exceptions.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:rahhala_app/features/chatbot/domain/entities/chat_message.dart';
 import 'package:rahhala_app/features/chatbot/domain/usecases/send_message_usecase.dart';
 import 'package:rahhala_app/features/chatbot/domain/usecases/stream_message_usecase.dart';
@@ -57,7 +59,8 @@ class ChatBotCubit extends Cubit<ChatBotState> {
       result.fold(
         (failure) {
           // Continue without context on failure
-          emit(const ChatBotError(errorMessage: 'Failed to create context'));
+          emit(ChatBotError(
+              errorMessage: AppMessages.current.errorChatContextFailed));
         },
         (context) {
           _currentContextId = context.contextId;
@@ -65,7 +68,7 @@ class ChatBotCubit extends Cubit<ChatBotState> {
         },
       );
     } catch (e) {
-      emit(ChatBotError(errorMessage: e.toString()));
+      emit(ChatBotError(errorMessage: failureFromError(e).message));
     }
   }
 
@@ -104,7 +107,7 @@ class ChatBotCubit extends Cubit<ChatBotState> {
         },
       );
     } catch (e) {
-      emit(ChatBotError(errorMessage: e.toString()));
+      emit(ChatBotError(errorMessage: failureFromError(e).message));
       // Remove the failed message from history
       if (_conversationHistory.isNotEmpty &&
           _conversationHistory.last.role == 'user') {
@@ -174,7 +177,7 @@ class ChatBotCubit extends Cubit<ChatBotState> {
       _isStreaming = false;
       await _streamSubscription?.cancel();
       _streamSubscription = null;
-      emit(ChatBotError(errorMessage: e.toString()));
+      emit(ChatBotError(errorMessage: failureFromError(e).message));
       // Remove the failed message from history
       if (_conversationHistory.isNotEmpty &&
           _conversationHistory.last.role == 'user') {
@@ -199,7 +202,8 @@ class ChatBotCubit extends Cubit<ChatBotState> {
   /// Update items in the current context
   Future<void> updateContext(Map<String, dynamic> items) async {
     if (_currentContextId == null) {
-      emit(const ChatBotError(errorMessage: 'No active context'));
+      emit(ChatBotError(
+          errorMessage: AppMessages.current.errorChatContextFailed));
       return;
     }
 
@@ -219,14 +223,15 @@ class ChatBotCubit extends Cubit<ChatBotState> {
         },
       );
     } catch (e) {
-      emit(ChatBotError(errorMessage: e.toString()));
+      emit(ChatBotError(errorMessage: failureFromError(e).message));
     }
   }
 
   /// Retrieve and display current context data
   Future<void> loadContext() async {
     if (_currentContextId == null) {
-      emit(const ChatBotError(errorMessage: 'No active context'));
+      emit(ChatBotError(
+          errorMessage: AppMessages.current.errorChatContextFailed));
       return;
     }
 
@@ -243,7 +248,7 @@ class ChatBotCubit extends Cubit<ChatBotState> {
         },
       );
     } catch (e) {
-      emit(ChatBotError(errorMessage: e.toString()));
+      emit(ChatBotError(errorMessage: failureFromError(e).message));
     }
   }
 

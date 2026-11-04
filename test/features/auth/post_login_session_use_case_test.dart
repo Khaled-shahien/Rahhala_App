@@ -71,8 +71,7 @@ class _FakeUserRepo implements UserRepo {
   final Either<Failure, UserModelDetails> detailsResult;
 
   @override
-  Future<Either<Failure, UserModelDetails>> getDetails() async =>
-      detailsResult;
+  Future<Either<Failure, UserModelDetails>> getDetails() async => detailsResult;
 
   @override
   Future<Either<Failure, SuccessMessageModel>> changePassword({
@@ -143,7 +142,7 @@ void main() {
   test('patches display name from email when profile has no name', () async {
     final session = _RecordingAuthSessionService();
     final repo = _FakeUserRepo(
-      Left(ServerFailure(message: 'profile unavailable')),
+      const Left(ServerFailure(message: 'profile unavailable')),
     );
     final useCase = PostLoginSessionUseCase(
       authSessionService: session,

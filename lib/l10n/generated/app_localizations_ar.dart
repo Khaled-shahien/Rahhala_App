@@ -803,7 +803,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeFavouriteError => 'تعذر تحديث المفضلة. حاول مرة أخرى.';
 
   @override
-  String get reviewLoginRequired => 'يجب تسجيل الدخول لإضافة تقييم ومراجعة.';
+  String get reviewLoginRequired => 'يرجى تسجيل الدخول لمشاركة تقييمك!';
 
   @override
   String get reviewSubmitTitle => 'أرسل مراجعتك';
@@ -899,4 +899,267 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get tripLoadingAlmostReady =>
       'مغامرتك المدعومة بالذكاء الاصطناعي أوشكت على الاكتمال!';
+
+  @override
+  String get errorNetwork =>
+      'لا يوجد اتصال بالإنترنت. تحقق من الشبكة وحاول مرة أخرى.';
+
+  @override
+  String get errorTimeout => 'استغرق الطلب وقتاً طويلاً. حاول مرة أخرى.';
+
+  @override
+  String get errorSessionExpired =>
+      'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.';
+
+  @override
+  String get errorForbidden => 'ليس لديك صلاحية للقيام بذلك.';
+
+  @override
+  String get errorNotFound => 'لم نتمكن من العثور على ما تبحث عنه.';
+
+  @override
+  String get errorServer => 'حدث خطأ من جانبنا. حاول مرة أخرى لاحقاً.';
+
+  @override
+  String get errorParsing => 'تلقينا استجابة غير متوقعة. حاول مرة أخرى.';
+
+  @override
+  String get errorCancelled => 'تم إلغاء الطلب.';
+
+  @override
+  String get errorUnknown => 'حدث خطأ ما. حاول مرة أخرى.';
+
+  @override
+  String get errorValidation => 'يرجى مراجعة البيانات التي أدخلتها.';
+
+  @override
+  String get errorLoginMissingToken => 'تعذر تسجيل الدخول. حاول مرة أخرى.';
+
+  @override
+  String get errorSessionSaveFailed =>
+      'تم تسجيل الدخول، لكن تعذر حفظ الجلسة. حاول مرة أخرى.';
+
+  @override
+  String get errorImageSearchFailed =>
+      'تعذر البحث بهذه الصورة. جرّب صورة أخرى.';
+
+  @override
+  String get errorCameraUnavailable =>
+      'تعذر الوصول إلى الكاميرا. حاول مرة أخرى.';
+
+  @override
+  String get errorGalleryUnavailable =>
+      'تعذر الوصول إلى معرض الصور. حاول مرة أخرى.';
+
+  @override
+  String get errorProfileLoadFailed =>
+      'تعذر تحميل بيانات الملف الشخصي. حاول مرة أخرى.';
+
+  @override
+  String get errorProfileSaveFailed => 'تعذر حفظ الملف الشخصي. حاول مرة أخرى.';
+
+  @override
+  String get errorPhotoUploadFailed => 'فشل رفع الصورة. حاول مرة أخرى.';
+
+  @override
+  String get errorTripsLoadFailed => 'تعذر تحميل الرحلات.';
+
+  @override
+  String get errorTripDetailsLoadFailed => 'تعذر تحميل تفاصيل الرحلة.';
+
+  @override
+  String get errorTripRegenerateFailed => 'تعذر إعادة إنشاء الرحلة.';
+
+  @override
+  String get errorTripSaveFailed => 'تعذر حفظ الرحلة.';
+
+  @override
+  String get errorPlaceDetailsLoadFailed =>
+      'تعذر تحميل تفاصيل المكان. حاول مرة أخرى.';
+
+  @override
+  String get errorLocationServiceDisabled => 'خدمات الموقع معطلة.';
+
+  @override
+  String get errorLocationUnavailable => 'تعذر تحديد موقعك. حاول مرة أخرى.';
+
+  @override
+  String get errorChatContextFailed => 'تعذر بدء محادثة جديدة. حاول مرة أخرى.';
+
+  @override
+  String get validationNameRequired => 'الاسم الكامل مطلوب';
+
+  @override
+  String get validationNameTooShort => 'يجب أن يتكون الاسم من 3 أحرف على الأقل';
+
+  @override
+  String get validationEmailRequired => 'البريد الإلكتروني مطلوب';
+
+  @override
+  String get validationEmailInvalid => 'صيغة البريد الإلكتروني غير صحيحة';
+
+  @override
+  String get validationPhoneRequired => 'رقم الهاتف مطلوب';
+
+  @override
+  String get validationPhoneInvalid => 'رقم الهاتف غير صحيح';
+
+  @override
+  String get validationPasswordTooShort =>
+      'يجب أن تتكون كلمة المرور من 8 أحرف على الأقل';
+
+  @override
+  String get validationPasswordUppercase =>
+      'يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل';
+
+  @override
+  String get validationPasswordLowercase =>
+      'يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل';
+
+  @override
+  String get validationPasswordNumber =>
+      'يجب أن تحتوي كلمة المرور على رقم واحد على الأقل';
+
+  @override
+  String get validationPasswordSpecial =>
+      'يجب أن تحتوي كلمة المرور على رمز خاص واحد على الأقل';
+
+  @override
+  String get validationConfirmPasswordRequired => 'يرجى تأكيد كلمة المرور';
+
+  @override
+  String get validationPasswordsMismatch => 'كلمتا المرور غير متطابقتين';
+
+  @override
+  String validationSelectField(String field) {
+    return 'يرجى اختيار $field';
+  }
+
+  @override
+  String get favouritesLoginRequired => 'يرجى تسجيل الدخول لعرض المفضلة.';
+
+  @override
+  String get favouritesRemoved => 'تمت الإزالة من المفضلة.';
+
+  @override
+  String get favouritesRemoveFailed =>
+      'تعذر إزالة هذا المكان الآن. حاول مرة أخرى.';
+
+  @override
+  String get reviewSubmitted => 'تم إرسال تقييمك بنجاح!';
+
+  @override
+  String get reviewUpdated => 'تم تحديث تقييمك بنجاح!';
+
+  @override
+  String get reviewDeleted => 'تم حذف تقييمك بنجاح!';
+
+  @override
+  String get reviewUpdateFailed => 'تعذر تحديث التقييم. حاول مرة أخرى.';
+
+  @override
+  String get reviewDeleteFailed => 'تعذر حذف التقييم. حاول مرة أخرى.';
+
+  @override
+  String get customTripSelectRegion => 'يرجى اختيار المنطقة';
+
+  @override
+  String get aiTripSelectDestination => 'يرجى اختيار الوجهة.';
+
+  @override
+  String get aiTripSelectSeason => 'يرجى اختيار موسم السفر.';
+
+  @override
+  String get aiTripSelectBudget => 'يرجى اختيار نطاق الميزانية.';
+
+  @override
+  String get aiTripSelectInterest => 'يرجى اختيار اهتمام واحد على الأقل.';
+
+  @override
+  String aiTripDaysRange(int min, int max) {
+    return 'يجب أن تكون مدة الرحلة بين $min و$max أيام.';
+  }
+
+  @override
+  String get tripNavGpsDisabled => 'نظام تحديد المواقع معطل. يرجى تفعيله.';
+
+  @override
+  String get tripNavPermissionDenied => 'تم رفض إذن الموقع.';
+
+  @override
+  String get tripNavPermissionDeniedForever => 'تم رفض إذن الموقع بشكل دائم.';
+
+  @override
+  String get tripNavLiveUpdatesFailed => 'تعذر قراءة تحديثات الموقع المباشرة.';
+
+  @override
+  String get tripNavNoDestination => 'لا يمكن بدء الملاحة بدون وجهة.';
+
+  @override
+  String get tripNavNoRoute =>
+      'لم يتم العثور على مسار صالح. تحقق من الإنترنت وحاول مرة أخرى.';
+
+  @override
+  String get tripNavLocationUnavailable =>
+      'الموقع غير متاح. يرجى تفعيل GPS والأذونات.';
+
+  @override
+  String get tripNavStartFailed => 'تعذر بدء الملاحة.';
+
+  @override
+  String get tripNavArrived => 'لقد وصلت إلى وجهتك.';
+
+  @override
+  String get tripNavNextLegFailed => 'تعذر تحميل المسار التالي. حاول مرة أخرى.';
+
+  @override
+  String tripNavReachedLeg(String from, String to) {
+    return 'وصلت إلى $from. نتابع إلى $to.';
+  }
+
+  @override
+  String get tripNavRouteRecalculated => 'تمت إعادة حساب المسار.';
+
+  @override
+  String get commonRetry => 'إعادة المحاولة';
+
+  @override
+  String get offlineBanner => 'أنت غير متصل بالإنترنت. قد لا تعمل بعض الميزات.';
+
+  @override
+  String get updateRequiredTitle => 'التحديث مطلوب';
+
+  @override
+  String get updateRequiredMessage =>
+      'يلزم تثبيت إصدار جديد من رحّالة للمتابعة.';
+
+  @override
+  String get updateNow => 'حدّث الآن';
+
+  @override
+  String get maintenanceTitle => 'تحت الصيانة';
+
+  @override
+  String get maintenanceMessage => 'نقوم ببعض التحسينات. يرجى العودة قريباً.';
+
+  @override
+  String get a11yNavHome => 'الرئيسية';
+
+  @override
+  String get a11yNavFavourites => 'المفضلة';
+
+  @override
+  String get a11yNavNearby => 'الأماكن القريبة';
+
+  @override
+  String get a11yNavTrips => 'خطط لرحلة';
+
+  @override
+  String get a11yNavProfile => 'الملف الشخصي';
+
+  @override
+  String get a11yOpenAssistant => 'افتح مساعد السفر أنيس';
+
+  @override
+  String get a11yProfilePhoto => 'صورة الملف الشخصي';
 }

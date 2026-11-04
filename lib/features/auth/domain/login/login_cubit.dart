@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rahhala_app/core/crash/app_error_reporter.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:rahhala_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:rahhala_app/features/auth/domain/login/login_state.dart';
 import 'package:rahhala_app/features/auth/domain/usecases/post_login_session_use_case.dart';
@@ -39,9 +40,8 @@ class LoginCubit extends Cubit<LoginState> {
             error: e,
             stackTrace: stackTrace,
           );
-          emit(const LoginFailure(
-            errorMessage:
-                'Login succeeded, but the session could not be saved.',
+          emit(LoginFailure(
+            errorMessage: AppMessages.current.errorSessionSaveFailed,
           ));
         }
       },

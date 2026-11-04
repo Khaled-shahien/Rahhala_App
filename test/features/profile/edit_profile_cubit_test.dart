@@ -166,7 +166,7 @@ void main() {
         ),
       ).thenAnswer((_) async => File('avatar.jpg'));
       when(() => uploadUseCase(any())).thenAnswer(
-        (_) async => Left(ServerFailure(message: 'Upload failed')),
+        (_) async => const Left(ServerFailure(message: 'Upload failed')),
       );
       return buildCubit();
     },

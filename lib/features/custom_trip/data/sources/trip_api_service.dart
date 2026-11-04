@@ -1,6 +1,8 @@
-// lib/features/custom_trip/data/sources/trip_api_service.dart
-
 import 'package:dio/dio.dart';
+import 'package:rahhala_app/core/errors/error_model.dart';
+import 'package:rahhala_app/core/errors/exceptions.dart';
+import 'package:rahhala_app/core/errors/failures.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
 import '../models/trip_data_model.dart';
 
@@ -9,12 +11,14 @@ class TripApiService {
 
   TripApiService({required this.dio});
 
+  /// Generates a plan for [region]. Throws [ServerException] with a typed,
+  /// localized message on any failure.
   Future<TripDataModel> generateTripPlan({
     required String region,
     required int numberOfDays,
   }) async {
     try {
-      final response = await dio.post(
+      final response = await dio.post<dynamic>(
         EndPoints.generateSpecificPlan,
         data: {
           'region': region,
@@ -22,48 +26,29 @@ class TripApiService {
         },
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = response.data;
-
-        // Handle the response structure
-        if (responseData is Map<String, dynamic>) {
-          if (responseData['success'] == true &&
-              responseData['tripData'] != null) {
-            return TripDataModel.fromJson(responseData['tripData']);
-          } else {
-            throw Exception(
-                responseData['message'] ?? 'Failed to generate trip plan');
-          }
-        } else {
-          throw Exception('Invalid response format');
-        }
-      } else {
-        throw Exception(
-            'API Error: ${response.statusCode} - ${response.statusMessage}');
+      final responseData = response.data;
+      if (responseData is! Map<String, dynamic>) {
+        throw ServerException(
+          errorModel: ErrorModel(
+            message: AppMessages.current.errorParsing,
+            type: FailureType.parsing,
+          ),
+        );
       }
-    } on DioException catch (e) {
-      throw _handleDioError(e);
-    } catch (e) {
-      rethrow;
-    }
-  }
 
-  Exception _handleDioError(DioException error) {
-    switch (error.type) {
-      case DioExceptionType.connectionTimeout:
-        return Exception('Connection timeout. Please check your internet.');
-      case DioExceptionType.sendTimeout:
-        return Exception('Request timeout. Please try again.');
-      case DioExceptionType.receiveTimeout:
-        return Exception('Response timeout. Please try again.');
-      case DioExceptionType.badResponse:
-        return Exception('Server error: ${error.response?.statusCode}');
-      case DioExceptionType.connectionError:
-        return Exception('No internet connection');
-      case DioExceptionType.cancel:
-        return Exception('Request cancelled');
-      default:
-        return Exception('Network error occurred');
+      final tripData = responseData['tripData'];
+      if (responseData['success'] == true && tripData is Map<String, dynamic>) {
+        return TripDataModel.fromJson(tripData);
+      }
+
+      throw ServerException(
+        errorModel: ErrorModel(
+          message: ErrorModel.extractServerMessage(responseData) ??
+              AppMessages.current.errorServer,
+        ),
+      );
+    } on DioException catch (e) {
+      handleDioException(e);
     }
   }
 }

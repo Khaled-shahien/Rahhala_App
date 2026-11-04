@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:rahhala_app/features/ai_recommendation/data/repositories/gemini_repository.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/ai_trip_state.dart';
 import 'package:rahhala_app/features/ai_recommendation/domain/repositories/trip_options_repository.dart';
@@ -127,31 +128,31 @@ class AiTripCubit extends Cubit<AiTripState> {
 
     // Validate all required fields
     if (currentState.destination == null || currentState.destination!.isEmpty) {
-      emit(
-          AiTripFailure(currentState, message: "Please select a destination."));
+      emit(AiTripFailure(currentState,
+          message: AppMessages.current.aiTripSelectDestination));
       return;
     }
     if (currentState.selectedMonth == null ||
         currentState.selectedMonth!.isEmpty) {
       emit(AiTripFailure(currentState,
-          message: "Please select a travel season."));
+          message: AppMessages.current.aiTripSelectSeason));
       return;
     }
     if (currentState.selectedRange == null) {
       emit(AiTripFailure(currentState,
-          message: "Please select a budget range."));
+          message: AppMessages.current.aiTripSelectBudget));
       return;
     }
     if (currentState.selectedInterests.isEmpty) {
       emit(AiTripFailure(currentState,
-          message: "Please select at least one interest."));
+          message: AppMessages.current.aiTripSelectInterest));
       return;
     }
     final minDays = currentState.tripOptions.minDays;
     final maxDays = currentState.tripOptions.maxDays;
     if (currentState.totalDays < minDays || currentState.totalDays > maxDays) {
       emit(AiTripFailure(currentState,
-          message: "Trip length must be between $minDays and $maxDays days."));
+          message: AppMessages.current.aiTripDaysRange(minDays, maxDays)));
       return;
     }
 
@@ -193,7 +194,7 @@ class AiTripCubit extends Cubit<AiTripState> {
       );
     } catch (e) {
       emit(AiTripFailure(currentState,
-          message: "An unexpected error occurred. Please try again."));
+          message: AppMessages.current.errorUnknown));
     }
   }
 }

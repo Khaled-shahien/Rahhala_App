@@ -6,29 +6,43 @@ class Login extends Equatable {
 
   const Login({this.token, this.username});
 
+  /// Parses the login response. Accepts the token and display name either at
+  /// the top level or nested under `data`. Values of unexpected types are
+  /// ignored instead of throwing.
   factory Login.fromJson(Map<String, dynamic> json) {
     final data = json['data'];
-    String? tok = json['token'] as String?;
-    tok ??= json['accessToken'] as String?;
-    if (tok == null && data is Map<String, dynamic>) {
-      tok = (data['token'] ??
-          data['accessToken'] ??
-          data['jwt'] ??
-          data['jwtToken']) as String?;
-    }
+    final nested =
+        data is Map<String, dynamic> ? data : const <String, dynamic>{};
 
-    String? name = (json['fullName'] ??
-        json['username'] ??
-        json['userName'] ??
-        json['name']) as String?;
-    if (name == null && data is Map<String, dynamic>) {
-      name = (data['fullName'] ??
-          data['username'] ??
-          data['userName'] ??
-          data['name']) as String?;
-    }
+    final token = _firstString([
+      json['token'],
+      json['accessToken'],
+      nested['token'],
+      nested['accessToken'],
+      nested['jwt'],
+      nested['jwtToken'],
+    ]);
+    final name = _firstString([
+      json['fullName'],
+      json['username'],
+      json['userName'],
+      json['name'],
+      nested['fullName'],
+      nested['username'],
+      nested['userName'],
+      nested['name'],
+    ]);
 
-    return Login(token: tok, username: name);
+    return Login(token: token, username: name);
+  }
+
+  static String? _firstString(List<Object?> candidates) {
+    for (final candidate in candidates) {
+      if (candidate is String && candidate.trim().isNotEmpty) {
+        return candidate.trim();
+      }
+    }
+    return null;
   }
 
   Map<String, dynamic> toJson() => {

@@ -1,70 +1,55 @@
+import 'package:rahhala_app/core/errors/failures.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
 
+/// Error details extracted from a failed API call.
 class ErrorModel {
+  const ErrorModel({
+    required this.message,
+    this.statusCode,
+    this.type = FailureType.server,
+  });
+
+  /// Safe, user-facing message.
   final String message;
   final int? statusCode;
+  final FailureType type;
 
-  ErrorModel({required this.message, this.statusCode});
-
-  factory ErrorModel.fromJson(
-    Map<String, dynamic> json, {
-    int? statusCode,
-  }) {
-    // Handle ASP.NET Core validation errors
-    if (json['errors'] != null && json['errors'] is Map<String, dynamic>) {
-      final errors = json['errors'] as Map<String, dynamic>;
-      String msg = 'Validation error';
-
-      // Extract the first error message from the errors map
-      if (errors.isNotEmpty) {
-        final firstKey = errors.keys.first;
-        final firstValue = errors[firstKey];
-
-        if (firstValue is List && firstValue.isNotEmpty) {
-          msg = firstValue.first.toString();
-        } else if (firstValue != null) {
-          msg = firstValue.toString();
-        } else {
-          msg = json['title']?.toString() ?? 'Validation error';
-        }
+  /// Extracts the most specific human-readable message from an API error
+  /// body. Handles ASP.NET Core `ProblemDetails` / validation responses and
+  /// the backend's `{ message | Message | error | detail | title }` shapes.
+  /// Returns `null` when the body contains no usable message.
+  static String? extractServerMessage(Map<String, dynamic> json) {
+    final errors = json['errors'];
+    if (errors is Map && errors.isNotEmpty) {
+      final firstValue = errors.values.first;
+      if (firstValue is List && firstValue.isNotEmpty) {
+        return _nonEmpty(firstValue.first);
       }
-
-      int? code = statusCode;
-      final s = json['status'];
-      if (code == null && s is int) {
-        code = s;
+      final fromValue = _nonEmpty(firstValue);
+      if (fromValue != null) return fromValue;
+    } else if (errors is List && errors.isNotEmpty) {
+      final first = errors.first;
+      if (first is Map) {
+        return _nonEmpty(first['description'] ?? first['message']);
       }
-
-      return ErrorModel(
-        message: msg,
-        statusCode: code,
-      );
+      return _nonEmpty(first);
     }
 
-    // Fallback for normal error responses
-    final String? m = json[ApiKey.message] ??
-        json[ApiKey.Message] ??
-        json[ApiKey.error] ??
-        json['error_description'] ??
-        json[ApiKey.detail] ??
-        json['title'] ??
-        (json[ApiKey.data] is Map<String, dynamic>
-            ? (json[ApiKey.data][ApiKey.message] ??
-                json[ApiKey.data][ApiKey.detail])
-            : null) ??
-        'Something went wrong';
+    final data = json[ApiKey.data];
+    return _nonEmpty(json[ApiKey.message]) ??
+        _nonEmpty(json[ApiKey.Message]) ??
+        _nonEmpty(json[ApiKey.error]) ??
+        _nonEmpty(json['error_description']) ??
+        _nonEmpty(json[ApiKey.detail]) ??
+        _nonEmpty(json['title']) ??
+        (data is Map
+            ? _nonEmpty(data[ApiKey.message]) ?? _nonEmpty(data[ApiKey.detail])
+            : null);
+  }
 
-    int? code = statusCode;
-    final s = json['status'];
-    if (code == null && s is int) {
-      code = s;
-    }
-
-    return ErrorModel(
-      message: (m?.toString().isNotEmpty ?? false)
-          ? m.toString()
-          : 'An unknown error occurred.',
-      statusCode: code,
-    );
+  static String? _nonEmpty(Object? value) {
+    if (value is! String) return null;
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rahhala_app/core/crash/app_error_reporter.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_repository.dart';
 import 'package:rahhala_app/features/image_search/domain/image_search_state.dart';
 import 'package:rahhala_app/features/image_search/domain/services/image_acquisition_service.dart';
@@ -27,7 +28,7 @@ class ImageSearchCubit extends Cubit<ImageSearchState> {
     } catch (e) {
       AppErrorReporter.record('Image search failed', error: e);
       emit(ImageSearchFailure(
-        'Could not process the selected image. Please try another photo.',
+        AppMessages.current.errorImageSearchFailed,
       ));
     }
   }
@@ -42,7 +43,7 @@ class ImageSearchCubit extends Cubit<ImageSearchState> {
     } catch (e) {
       AppErrorReporter.record('Camera pick failed', error: e);
       emit(ImageSearchFailure(
-        'Could not access the camera. Please try again.',
+        AppMessages.current.errorCameraUnavailable,
       ));
     }
   }
@@ -57,7 +58,7 @@ class ImageSearchCubit extends Cubit<ImageSearchState> {
     } catch (e) {
       AppErrorReporter.record('Gallery pick failed', error: e);
       emit(ImageSearchFailure(
-        'Could not access the gallery. Please try again.',
+        AppMessages.current.errorGalleryUnavailable,
       ));
     }
   }

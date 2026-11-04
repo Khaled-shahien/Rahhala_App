@@ -1,6 +1,8 @@
 // lib/features/custom_trip/presentation/cubit/custom_trip_cubit.dart
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rahhala_app/core/errors/exceptions.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:equatable/equatable.dart';
 import '../../domain/entities/trip_data_entity.dart';
 import '../../domain/usecases/generate_trip_plan_usecase.dart';
@@ -34,7 +36,7 @@ class CustomTripCubit extends Cubit<CustomTripState> {
   Future<void> generateTripPlan() async {
     if (_selectedRegion == null || _selectedRegion!.isEmpty) {
       emit(CustomTripFailure(
-        message: 'Please select a region',
+        message: AppMessages.current.customTripSelectRegion,
         selectedRegion: _selectedRegion,
         numberOfDays: _numberOfDays,
       ));
@@ -70,7 +72,7 @@ class CustomTripCubit extends Cubit<CustomTripState> {
       );
     } catch (e) {
       emit(CustomTripFailure(
-        message: e.toString(),
+        message: failureFromError(e).message,
         selectedRegion: _selectedRegion,
         numberOfDays: _numberOfDays,
       ));

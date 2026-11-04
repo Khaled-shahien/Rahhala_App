@@ -1595,7 +1595,7 @@ abstract class AppLocalizations {
   /// No description provided for @reviewLoginRequired.
   ///
   /// In en, this message translates to:
-  /// **'Login is required to add a rating and review.'**
+  /// **'Please log in to share your review!'**
   String get reviewLoginRequired;
 
   /// No description provided for @reviewSubmitTitle.
@@ -1783,6 +1783,486 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your AI-powered adventure is almost ready!'**
   String get tripLoadingAlmostReady;
+
+  /// No description provided for @errorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Check your network and try again.'**
+  String get errorNetwork;
+
+  /// No description provided for @errorTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'The request took too long. Please try again.'**
+  String get errorTimeout;
+
+  /// No description provided for @errorSessionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session has expired. Please log in again.'**
+  String get errorSessionExpired;
+
+  /// No description provided for @errorForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to do this.'**
+  String get errorForbidden;
+
+  /// No description provided for @errorNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t find what you were looking for.'**
+  String get errorNotFound;
+
+  /// No description provided for @errorServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong on our side. Please try again later.'**
+  String get errorServer;
+
+  /// No description provided for @errorParsing.
+  ///
+  /// In en, this message translates to:
+  /// **'We received an unexpected response. Please try again.'**
+  String get errorParsing;
+
+  /// No description provided for @errorCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'The request was cancelled.'**
+  String get errorCancelled;
+
+  /// No description provided for @errorUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get errorUnknown;
+
+  /// No description provided for @errorValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check the information you entered.'**
+  String get errorValidation;
+
+  /// No description provided for @errorLoginMissingToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed. Please try again.'**
+  String get errorLoginMissingToken;
+
+  /// No description provided for @errorSessionSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'You signed in, but the session couldn\'t be saved. Please try again.'**
+  String get errorSessionSaveFailed;
+
+  /// No description provided for @errorImageSearchFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not search with this image. Please try another photo.'**
+  String get errorImageSearchFailed;
+
+  /// No description provided for @errorCameraUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not access the camera. Please try again.'**
+  String get errorCameraUnavailable;
+
+  /// No description provided for @errorGalleryUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not access the gallery. Please try again.'**
+  String get errorGalleryUnavailable;
+
+  /// No description provided for @errorProfileLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load profile details. Please try again.'**
+  String get errorProfileLoadFailed;
+
+  /// No description provided for @errorProfileSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save profile. Please try again.'**
+  String get errorProfileSaveFailed;
+
+  /// No description provided for @errorPhotoUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to upload photo. Please try again.'**
+  String get errorPhotoUploadFailed;
+
+  /// No description provided for @errorTripsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load trips.'**
+  String get errorTripsLoadFailed;
+
+  /// No description provided for @errorTripDetailsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load trip details.'**
+  String get errorTripDetailsLoadFailed;
+
+  /// No description provided for @errorTripRegenerateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to regenerate trip.'**
+  String get errorTripRegenerateFailed;
+
+  /// No description provided for @errorTripSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save trip.'**
+  String get errorTripSaveFailed;
+
+  /// No description provided for @errorPlaceDetailsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load place details. Please try again.'**
+  String get errorPlaceDetailsLoadFailed;
+
+  /// No description provided for @errorLocationServiceDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Location services are disabled.'**
+  String get errorLocationServiceDisabled;
+
+  /// No description provided for @errorLocationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to get your location. Please try again.'**
+  String get errorLocationUnavailable;
+
+  /// No description provided for @errorChatContextFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t start a new conversation. Please try again.'**
+  String get errorChatContextFailed;
+
+  /// No description provided for @validationNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name is required'**
+  String get validationNameRequired;
+
+  /// No description provided for @validationNameTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Name must be at least 3 characters'**
+  String get validationNameTooShort;
+
+  /// No description provided for @validationEmailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get validationEmailRequired;
+
+  /// No description provided for @validationEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email format'**
+  String get validationEmailInvalid;
+
+  /// No description provided for @validationPhoneRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number is required'**
+  String get validationPhoneRequired;
+
+  /// No description provided for @validationPhoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid phone number'**
+  String get validationPhoneInvalid;
+
+  /// No description provided for @validationPasswordTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters'**
+  String get validationPasswordTooShort;
+
+  /// No description provided for @validationPasswordUppercase.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must include at least one uppercase letter'**
+  String get validationPasswordUppercase;
+
+  /// No description provided for @validationPasswordLowercase.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must include at least one lowercase letter'**
+  String get validationPasswordLowercase;
+
+  /// No description provided for @validationPasswordNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must include at least one number'**
+  String get validationPasswordNumber;
+
+  /// No description provided for @validationPasswordSpecial.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must include at least one special character'**
+  String get validationPasswordSpecial;
+
+  /// No description provided for @validationConfirmPasswordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your password'**
+  String get validationConfirmPasswordRequired;
+
+  /// No description provided for @validationPasswordsMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get validationPasswordsMismatch;
+
+  /// No description provided for @validationSelectField.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a {field}'**
+  String validationSelectField(String field);
+
+  /// No description provided for @favouritesLoginRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in to view your favourites.'**
+  String get favouritesLoginRequired;
+
+  /// No description provided for @favouritesRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from favourites.'**
+  String get favouritesRemoved;
+
+  /// No description provided for @favouritesRemoveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to remove this place now. Please try again.'**
+  String get favouritesRemoveFailed;
+
+  /// No description provided for @reviewSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review has been submitted successfully!'**
+  String get reviewSubmitted;
+
+  /// No description provided for @reviewUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review has been updated successfully!'**
+  String get reviewUpdated;
+
+  /// No description provided for @reviewDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review has been deleted successfully!'**
+  String get reviewDeleted;
+
+  /// No description provided for @reviewUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to update review. Please try again.'**
+  String get reviewUpdateFailed;
+
+  /// No description provided for @reviewDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to delete review. Please try again.'**
+  String get reviewDeleteFailed;
+
+  /// No description provided for @customTripSelectRegion.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a region'**
+  String get customTripSelectRegion;
+
+  /// No description provided for @aiTripSelectDestination.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a destination.'**
+  String get aiTripSelectDestination;
+
+  /// No description provided for @aiTripSelectSeason.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a travel season.'**
+  String get aiTripSelectSeason;
+
+  /// No description provided for @aiTripSelectBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a budget range.'**
+  String get aiTripSelectBudget;
+
+  /// No description provided for @aiTripSelectInterest.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select at least one interest.'**
+  String get aiTripSelectInterest;
+
+  /// No description provided for @aiTripDaysRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip length must be between {min} and {max} days.'**
+  String aiTripDaysRange(int min, int max);
+
+  /// No description provided for @tripNavGpsDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS is disabled. Please enable it.'**
+  String get tripNavGpsDisabled;
+
+  /// No description provided for @tripNavPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission denied.'**
+  String get tripNavPermissionDenied;
+
+  /// No description provided for @tripNavPermissionDeniedForever.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission denied permanently.'**
+  String get tripNavPermissionDeniedForever;
+
+  /// No description provided for @tripNavLiveUpdatesFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to read live location updates.'**
+  String get tripNavLiveUpdatesFailed;
+
+  /// No description provided for @tripNavNoDestination.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot start navigation without destination.'**
+  String get tripNavNoDestination;
+
+  /// No description provided for @tripNavNoRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'No valid route found. Check internet and try again.'**
+  String get tripNavNoRoute;
+
+  /// No description provided for @tripNavLocationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is unavailable. Please enable GPS and permissions.'**
+  String get tripNavLocationUnavailable;
+
+  /// No description provided for @tripNavStartFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not start navigation.'**
+  String get tripNavStartFailed;
+
+  /// No description provided for @tripNavArrived.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your destination.'**
+  String get tripNavArrived;
+
+  /// No description provided for @tripNavNextLegFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load next leg route. Please try again.'**
+  String get tripNavNextLegFailed;
+
+  /// No description provided for @tripNavReachedLeg.
+  ///
+  /// In en, this message translates to:
+  /// **'Reached {from}. Continuing to {to}.'**
+  String tripNavReachedLeg(String from, String to);
+
+  /// No description provided for @tripNavRouteRecalculated.
+  ///
+  /// In en, this message translates to:
+  /// **'Route recalculated.'**
+  String get tripNavRouteRecalculated;
+
+  /// No description provided for @commonRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get commonRetry;
+
+  /// No description provided for @offlineBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re offline. Some features may not work.'**
+  String get offlineBanner;
+
+  /// No description provided for @updateRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update required'**
+  String get updateRequiredTitle;
+
+  /// No description provided for @updateRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A new version of Rahhala is required to continue.'**
+  String get updateRequiredMessage;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Update now'**
+  String get updateNow;
+
+  /// No description provided for @maintenanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Under maintenance'**
+  String get maintenanceTitle;
+
+  /// No description provided for @maintenanceMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'re making improvements. Please check back soon.'**
+  String get maintenanceMessage;
+
+  /// No description provided for @a11yNavHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get a11yNavHome;
+
+  /// No description provided for @a11yNavFavourites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourites'**
+  String get a11yNavFavourites;
+
+  /// No description provided for @a11yNavNearby.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby places'**
+  String get a11yNavNearby;
+
+  /// No description provided for @a11yNavTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan a trip'**
+  String get a11yNavTrips;
+
+  /// No description provided for @a11yNavProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get a11yNavProfile;
+
+  /// No description provided for @a11yOpenAssistant.
+  ///
+  /// In en, this message translates to:
+  /// **'Open ANIS travel assistant'**
+  String get a11yOpenAssistant;
+
+  /// No description provided for @a11yProfilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo'**
+  String get a11yProfilePhoto;
 }
 
 class _AppLocalizationsDelegate

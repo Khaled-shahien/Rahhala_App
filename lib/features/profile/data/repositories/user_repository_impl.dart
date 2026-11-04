@@ -73,8 +73,8 @@ class UserRepoImpl implements UserRepo {
       final map = _ensureMap(res);
       final pl = _payload(map);
       return Right(UserModelDetails.fromJson(pl));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -112,8 +112,8 @@ class UserRepoImpl implements UserRepo {
         },
       );
       return Right(SuccessMessageModel.fromJson(_ensureMap(res)));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -122,8 +122,8 @@ class UserRepoImpl implements UserRepo {
     try {
       final res = await api.delete(EndPoints.deleteProfile);
       return Right(SuccessMessageModel.fromJson(_ensureMap(res)));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -143,8 +143,8 @@ class UserRepoImpl implements UserRepo {
         },
       );
       return Right(SuccessMessageModel.fromJson(_ensureMap(res)));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -160,8 +160,8 @@ class UserRepoImpl implements UserRepo {
       });
       final res = await api.put(EndPoints.editPhoto, data: form);
       return Right(SuccessMessageModel.fromJson(_ensureMap(res)));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 }

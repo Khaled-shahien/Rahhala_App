@@ -1,4 +1,5 @@
 import 'package:geolocator/geolocator.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:rahhala_app/features/nearby/domain/services/location_service.dart';
 
 class GeolocatorLocationService implements LocationService {
@@ -6,9 +7,9 @@ class GeolocatorLocationService implements LocationService {
   Future<LocationPoint> getCurrentLocation() async {
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      throw const LocationServiceException(
+      throw LocationServiceException(
         reason: LocationFailureReason.serviceDisabled,
-        message: 'Location services are disabled.',
+        message: AppMessages.current.errorLocationServiceDisabled,
       );
     }
 
@@ -41,9 +42,9 @@ class GeolocatorLocationService implements LocationService {
         longitude: position.longitude,
       );
     } catch (error) {
-      throw const LocationServiceException(
+      throw LocationServiceException(
         reason: LocationFailureReason.unavailable,
-        message: 'Unable to get your location. Please try again.',
+        message: AppMessages.current.errorLocationUnavailable,
       );
     }
   }

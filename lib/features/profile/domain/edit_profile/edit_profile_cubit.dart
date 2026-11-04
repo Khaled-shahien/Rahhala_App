@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rahhala_app/core/auth/auth_session_service.dart';
 import 'package:rahhala_app/core/crash/app_error_reporter.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:rahhala_app/core/services/image_picker_service.dart';
 import 'package:rahhala_app/features/profile/domain/entities/user_details.dart';
 import 'package:rahhala_app/features/profile/domain/repositories/user_repository.dart';
@@ -47,7 +48,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
         stackTrace: stackTrace,
       );
       emit(EditProfileError(
-        'Could not load profile details. Please try again.',
+        AppMessages.current.errorProfileLoadFailed,
         formData: _formData,
       ));
     }
@@ -89,7 +90,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
         stackTrace: stackTrace,
       );
       emit(EditProfileError(
-        'Failed to upload photo. Please try again.',
+        AppMessages.current.errorPhotoUploadFailed,
         formData: _formData,
       ));
     }
@@ -141,7 +142,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
         stackTrace: stackTrace,
       );
       emit(EditProfileError(
-        'Could not save profile. Please try again.',
+        AppMessages.current.errorProfileSaveFailed,
         formData: _formData,
       ));
     }

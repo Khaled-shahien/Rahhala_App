@@ -1,4 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rahhala_app/core/errors/exceptions.dart';
+import 'package:rahhala_app/core/errors/failures.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/features/home/data/models/home_model.dart';
 import 'package:rahhala_app/features/home/domain/repositories/home_repository.dart';
@@ -18,7 +21,12 @@ class FavouritesSuccess extends FavouritesState {
 
 class FavouritesError extends FavouritesState {
   final String message;
-  FavouritesError(this.message);
+
+  /// True when the user must sign in to see favourites (guest or expired
+  /// session), so the UI can offer a login action instead of "retry".
+  final bool requiresLogin;
+
+  FavouritesError(this.message, {this.requiresLogin = false});
 }
 
 class FavouritesCubit extends Cubit<FavouritesState> {
@@ -31,11 +39,22 @@ class FavouritesCubit extends Cubit<FavouritesState> {
     emit(FavouritesLoading());
     try {
       final data = await repository.getFavourites();
+      if (isClosed) return;
       _cache = data;
       emit(FavouritesSuccess(List<FavouriteModel>.from(_cache)));
     } catch (e) {
-      AppLogger.instance.w('FavouritesCubit: Failed to load favourites', error: e);
-      emit(FavouritesError('Please log in to view your favourites.'));
+      AppLogger.instance
+          .w('FavouritesCubit: Failed to load favourites', error: e);
+      if (isClosed) return;
+      final failure = failureFromError(e);
+      if (failure.type == FailureType.unauthorized) {
+        emit(FavouritesError(
+          AppMessages.current.favouritesLoginRequired,
+          requiresLogin: true,
+        ));
+      } else {
+        emit(FavouritesError(failure.message));
+      }
     }
   }
 
@@ -46,16 +65,19 @@ class FavouritesCubit extends Cubit<FavouritesState> {
 
     try {
       await repository.removeFavourite(placeId);
+      if (isClosed) return;
       emit(FavouritesSuccess(
         List<FavouriteModel>.from(_cache),
-        message: 'Removed from favourites.',
+        message: AppMessages.current.favouritesRemoved,
       ));
     } catch (e) {
-      AppLogger.instance.w('FavouritesCubit: Failed to remove favourite', error: e);
+      AppLogger.instance
+          .w('FavouritesCubit: Failed to remove favourite', error: e);
+      if (isClosed) return;
       _cache = previous;
       emit(FavouritesSuccess(
         List<FavouriteModel>.from(_cache),
-        message: 'Unable to remove this place now. Please try again.',
+        message: AppMessages.current.favouritesRemoveFailed,
       ));
     }
   }

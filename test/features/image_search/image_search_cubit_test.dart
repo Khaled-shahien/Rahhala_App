@@ -48,8 +48,8 @@ void main() {
     act: (cubit) => cubit.searchByPath('photo.jpg'),
     expect: () => [
       isA<ImageSearchLoading>(),
-      isA<ImageSearchSuccess>().having((state) => state.result, 'result',
-          same(response)),
+      isA<ImageSearchSuccess>()
+          .having((state) => state.result, 'result', same(response)),
     ],
   );
 
@@ -95,7 +95,7 @@ void main() {
     'searchByPath emits repository failure message',
     build: () {
       when(() => repository.searchByImage('bad.jpg')).thenAnswer(
-        (_) async => Left(ServerFailure(message: 'backend is down')),
+        (_) async => const Left(ServerFailure(message: 'backend is down')),
       );
       return buildCubit();
     },

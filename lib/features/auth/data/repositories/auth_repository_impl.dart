@@ -4,6 +4,7 @@ import 'package:rahhala_app/core/network/api_consumer.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/core/errors/exceptions.dart';
 import 'package:rahhala_app/core/errors/failures.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/features/auth/data/models/login_model.dart';
 import 'package:rahhala_app/features/auth/data/models/success_message_model.dart';
@@ -122,9 +123,18 @@ class AuthRepoImpl extends AuthRepo {
         return Left(ServerFailure(message: _readMessage(map)));
       }
       final loginModel = Login.fromJson(map);
+      final token = loginModel.token;
+      if (token == null || token.trim().isEmpty) {
+        // A "successful" response without a token would leave the user
+        // signed out on the next route guard. Treat it as a failure.
+        return Left(ServerFailure(
+          message: AppMessages.current.errorLoginMissingToken,
+          type: FailureType.parsing,
+        ));
+      }
       return Right(loginModel);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -158,8 +168,8 @@ class AuthRepoImpl extends AuthRepo {
         return Left(ServerFailure(message: msg));
       }
       return Right(SuccessMessageModel.fromJson(map));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -181,8 +191,8 @@ class AuthRepoImpl extends AuthRepo {
         return Left(ServerFailure(message: msg));
       }
       return Right(SuccessMessageModel.fromJson(map));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -208,8 +218,8 @@ class AuthRepoImpl extends AuthRepo {
         return Left(ServerFailure(message: msg));
       }
       return Right(SuccessMessageModel.fromJson(map));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 
@@ -237,8 +247,8 @@ class AuthRepoImpl extends AuthRepo {
         return Left(ServerFailure(message: msg));
       }
       return Right(SuccessMessageModel.fromJson(map));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
+    } catch (e) {
+      return Left(failureFromError(e));
     }
   }
 }

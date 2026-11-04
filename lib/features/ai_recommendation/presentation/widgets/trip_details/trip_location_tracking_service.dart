@@ -51,8 +51,7 @@ class TripLocationTrackingService {
     }
 
     final position = await Geolocator.getCurrentPosition(
-      locationSettings:
-          const LocationSettings(accuracy: LocationAccuracy.best),
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.best),
     );
     _lastKnownPosition = position;
     return position;

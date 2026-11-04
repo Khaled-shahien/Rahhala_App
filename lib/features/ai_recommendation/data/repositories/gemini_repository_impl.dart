@@ -3,6 +3,7 @@ import 'package:dartz/dartz.dart';
 import 'package:rahhala_app/core/crash/app_error_reporter.dart';
 import 'package:rahhala_app/core/errors/exceptions.dart';
 import 'package:rahhala_app/core/errors/failures.dart';
+import 'package:rahhala_app/core/localization/app_messages.dart';
 import 'package:rahhala_app/core/network/api_consumer.dart';
 import 'package:rahhala_app/core/network/end_points.dart';
 import 'package:rahhala_app/features/ai_recommendation/data/models/trip_plan_model.dart';
@@ -42,7 +43,7 @@ class GeminiRepositoryImpl implements GeminiRepository {
         try {
           // Attempt to parse the JSON response
           jsonResponse = jsonDecode(response);
-        } on FormatException catch (e) {
+        } on FormatException {
           // Handle potentially malformed JSON by attempting to fix common issues
           String cleanResponse = response.trim();
 
@@ -82,32 +83,39 @@ class GeminiRepositoryImpl implements GeminiRepository {
                 error: parseError,
               );
               return Left(ServerFailure(
-                  message:
-                      "Failed to parse server response: ${parseError.toString()}"));
+                  message: AppMessages.current.errorParsing,
+                  type: FailureType.parsing));
             }
           } else {
             return Left(ServerFailure(
-                message: "Error parsing server response: ${e.message}"));
+                message: AppMessages.current.errorParsing,
+                type: FailureType.parsing));
           }
         }
       } else if (response is Map<String, dynamic>) {
         jsonResponse = response;
       } else {
-        return Left(ServerFailure(message: "Unexpected response format"));
+        return Left(ServerFailure(
+            message: AppMessages.current.errorParsing,
+            type: FailureType.parsing));
       }
 
       final tripResponse = TripPlanResponse.fromJson(jsonResponse);
       return Right(tripResponse);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
-    } on FormatException catch (e) {
+      return Left(failureFromError(e));
+    } on FormatException {
       return Left(ServerFailure(
-          message: "Error parsing server response: ${e.message}"));
-    } on TypeError catch (e) {
-      return Left(ServerFailure(message: "Error interpreting server data: $e"));
+          message: AppMessages.current.errorParsing,
+          type: FailureType.parsing));
+    } on TypeError {
+      return Left(ServerFailure(
+          message: AppMessages.current.errorParsing,
+          type: FailureType.parsing));
     } catch (e) {
-      return Left(
-          ServerFailure(message: "An unknown error occurred: ${e.toString()}"));
+      return Left(ServerFailure(
+          message: AppMessages.current.errorUnknown,
+          type: FailureType.unknown));
     }
   }
 
@@ -166,7 +174,9 @@ class GeminiRepositoryImpl implements GeminiRepository {
       } else if (response is Map<String, dynamic>) {
         jsonResponse = response;
       } else {
-        return Left(ServerFailure(message: "Unexpected response format"));
+        return Left(ServerFailure(
+            message: AppMessages.current.errorParsing,
+            type: FailureType.parsing));
       }
 
       // Validate the response structure
@@ -174,19 +184,24 @@ class GeminiRepositoryImpl implements GeminiRepository {
         return Right(jsonResponse);
       } else {
         return Left(ServerFailure(
-          message: jsonResponse['message']?.toString() ?? 'Failed to save trip',
+          message: jsonResponse['message']?.toString() ??
+              AppMessages.current.errorTripSaveFailed,
         ));
       }
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
-    } on FormatException catch (e) {
+      return Left(failureFromError(e));
+    } on FormatException {
       return Left(ServerFailure(
-          message: "Error parsing server response: ${e.message}"));
-    } on TypeError catch (e) {
-      return Left(ServerFailure(message: "Error interpreting server data: $e"));
+          message: AppMessages.current.errorParsing,
+          type: FailureType.parsing));
+    } on TypeError {
+      return Left(ServerFailure(
+          message: AppMessages.current.errorParsing,
+          type: FailureType.parsing));
     } catch (e) {
-      return Left(
-          ServerFailure(message: "An unknown error occurred: ${e.toString()}"));
+      return Left(ServerFailure(
+          message: AppMessages.current.errorUnknown,
+          type: FailureType.unknown));
     }
   }
 
@@ -206,7 +221,9 @@ class GeminiRepositoryImpl implements GeminiRepository {
       } else if (response is Map<String, dynamic>) {
         jsonResponse = response;
       } else {
-        return Left(ServerFailure(message: "Unexpected response format"));
+        return Left(ServerFailure(
+            message: AppMessages.current.errorParsing,
+            type: FailureType.parsing));
       }
 
       // Validate the response structure
@@ -215,19 +232,23 @@ class GeminiRepositoryImpl implements GeminiRepository {
       } else {
         return Left(ServerFailure(
           message: jsonResponse['message']?.toString() ??
-              'Failed to regenerate trip',
+              AppMessages.current.errorTripRegenerateFailed,
         ));
       }
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.errorModel.message));
-    } on FormatException catch (e) {
+      return Left(failureFromError(e));
+    } on FormatException {
       return Left(ServerFailure(
-          message: "Error parsing server response: ${e.message}"));
-    } on TypeError catch (e) {
-      return Left(ServerFailure(message: "Error interpreting server data: $e"));
+          message: AppMessages.current.errorParsing,
+          type: FailureType.parsing));
+    } on TypeError {
+      return Left(ServerFailure(
+          message: AppMessages.current.errorParsing,
+          type: FailureType.parsing));
     } catch (e) {
-      return Left(
-          ServerFailure(message: "An unknown error occurred: ${e.toString()}"));
+      return Left(ServerFailure(
+          message: AppMessages.current.errorUnknown,
+          type: FailureType.unknown));
     }
   }
 }

@@ -194,4 +194,3 @@ String formatDurationDisplay(Duration d) {
 
 /// Generate a waypoint label from an index (0 → "A", 1 → "B", etc.).
 String waypointLabel(int index) => String.fromCharCode(65 + index);
-
