@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/auth/auth_session_service.dart';
+import 'package:rahhala_app/core/auth/session_manager.dart';
+import 'package:rahhala_app/core/utils/app_notifications.dart';
 import 'package:rahhala_app/core/constants/app_assets.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/features/auth/presentation/pages/home_page.dart';
@@ -8,8 +10,32 @@ import 'package:rahhala_app/features/auth/presentation/pages/login_page.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/widgets/background_decorator.dart';
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
+
+  @override
+  State<WelcomePage> createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _showSessionEndNotice());
+  }
+
+  void _showSessionEndNotice() {
+    if (!mounted) return;
+    final reason = sl<SessionManager>().consumeEndReason();
+    if (reason != SessionEndReason.expired) return;
+    showAppNotification(
+      context: context,
+      title: context.l10n.commonError,
+      message: context.l10n.errorSessionExpired,
+      isError: true,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

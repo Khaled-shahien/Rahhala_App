@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:rahhala_app/core/auth/auth_session_service.dart';
+import 'package:rahhala_app/core/auth/session_manager.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
 import 'package:rahhala_app/core/startup/app_bootstrap_cubit.dart';
@@ -25,6 +26,8 @@ class AppRouter {
   static final router = GoRouter(
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: kDebugMode,
+    // Re-run the guards whenever the session ends (logout, deletion, 401).
+    refreshListenable: sl<SessionManager>(),
     redirect: _redirect,
     routes: [
       GoRoute(
@@ -301,20 +304,4 @@ class AppRouteNames {
   static const String tripPlanner = 'tripPlanner';
   static const String destinations = 'destinations';
   static const String destinationDetails = 'destinationDetails';
-}
-
-extension NavigationExtension on BuildContext {
-  void navigateTo(String path) => go(path);
-
-  void navigateToNamed(String name,
-      {Map<String, String>? params, Map<String, dynamic>? queryParams}) {
-    goNamed(name,
-        pathParameters: params ?? {}, queryParameters: queryParams ?? {});
-  }
-
-  void navigateBack() => pop();
-
-  void navigateReplace(String path) => pushReplacement(path);
-
-  void navigateAndRemoveUntil(String path) => go(path);
 }

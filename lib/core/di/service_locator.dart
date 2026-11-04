@@ -11,8 +11,11 @@ import 'package:rahhala_app/core/crash/crash_reporting_service.dart';
 import 'package:rahhala_app/core/crash/firebase_crash_reporting_service.dart';
 import 'package:rahhala_app/core/logging/app_logger.dart';
 import 'package:rahhala_app/core/config/app_config.dart';
+import 'package:rahhala_app/core/auth/session_manager.dart';
 import 'package:rahhala_app/core/localization/app_messages.dart';
+import 'package:rahhala_app/core/network/unauthorized_interceptor.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart';
 import 'package:rahhala_app/core/services/image_picker_service.dart';
 import 'package:rahhala_app/core/services/image_picker_service_impl.dart';
 import 'package:rahhala_app/core/theme/theme_controller.dart';
@@ -155,12 +158,17 @@ Future<void> setupServiceLocator() async {
   );
   AppErrorReporter.configure(sl<CrashReportingService>());
 
+  sl.registerLazySingleton<SessionManager>(
+    () => SessionManager(authSessionService: sl<AuthSessionService>()),
+  );
+
   // The main API client is configured once, here. DioConsumer and the
   // repositories that use Dio directly share this instance, so base URL,
   // timeouts and interceptors are identical for every request.
   final dio = createApiDio(
     baseUrl: AppConfig.apiBaseUrl,
     tokenProvider: () => sl<TokenStorage>().token,
+    onSessionExpired: () => sl<SessionManager>().expireSession(),
   );
   sl.registerLazySingleton<Dio>(() => dio);
   sl.registerLazySingleton<ApiConsumer>(() => DioConsumer(dio: sl<Dio>()));
@@ -371,6 +379,7 @@ Future<void> setupServiceLocator() async {
     ),
   );
 
+  _registerSessionResetCallbacks();
 }
 
 const String _installMarkerKey = 'install_marker_v1';
@@ -403,11 +412,21 @@ Future<void> _clearStaleKeychainOnFreshInstall(
   await prefs.setBool(_installMarkerKey, true);
 }
 
+/// User-scoped state that must not survive logout, account deletion or
+/// session expiry.
+void _registerSessionResetCallbacks() {
+  sl<SessionManager>()
+    ..registerResetCallback(() => sl<ChatBotCubit>().clearConversation())
+    ..registerResetCallback(() => PaintingBinding.instance.imageCache.clear())
+    ..registerResetCallback(() => sl<AnalyticsService>().setUser(null));
+}
+
 /// Builds the configured [Dio] for the main Rahhala API.
 @visibleForTesting
 Dio createApiDio({
   required String baseUrl,
   required String? Function() tokenProvider,
+  required void Function() onSessionExpired,
 }) {
   final dio = Dio(BaseOptions(
     baseUrl: baseUrl,
@@ -420,6 +439,7 @@ Dio createApiDio({
   ));
   dio.interceptors.addAll([
     ApiInterceptors(tokenProvider: tokenProvider),
+    UnauthorizedInterceptor(onSessionExpired: onSessionExpired),
     RetryInterceptor(dio: dio),
     if (kDebugMode)
       LogInterceptor(
