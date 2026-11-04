@@ -89,7 +89,7 @@ void main() {
   test('messages follow the app language', () {
     AppMessages.localeResolver = () => const Locale('ar');
     expect(AppValidators.validateEmail(''), ar.validationEmailRequired);
-    expect(AppValidators.validatePassword('short'),
-        ar.validationPasswordTooShort);
+    expect(
+        AppValidators.validatePassword('short'), ar.validationPasswordTooShort);
   });
 }
