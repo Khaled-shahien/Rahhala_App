@@ -37,18 +37,26 @@ class AppBootstrapError extends AppBootstrapState {
 }
 
 class AppBootstrapCubit extends Cubit<AppBootstrapState> {
-  AppBootstrapCubit({required AppBootstrapService service})
-      : _service = service,
+  AppBootstrapCubit({
+    required AppBootstrapService service,
+    this.minimumSplashDuration = const Duration(milliseconds: 1200),
+  })  : _service = service,
         super(const AppBootstrapInitial());
 
   final AppBootstrapService _service;
 
+  /// Shortest time the splash stays visible, so it doesn't just flash.
+  /// It runs at the same time as initialization rather than adding to it.
+  final Duration minimumSplashDuration;
+
   Future<void> initialize() async {
     emit(const AppBootstrapLoading());
-    await Future.delayed(const Duration(seconds: 3));
 
+    final minimumDisplay = Future<void>.delayed(minimumSplashDuration);
     try {
       final result = await _service.initialize();
+      await minimumDisplay;
+      if (isClosed) return;
       emit(AppBootstrapReady(result));
     } catch (e, stackTrace) {
       AppErrorReporter.record(
@@ -56,6 +64,8 @@ class AppBootstrapCubit extends Cubit<AppBootstrapState> {
         error: e,
         stackTrace: stackTrace,
       );
+      await minimumDisplay;
+      if (isClosed) return;
       emit(const AppBootstrapError('Startup failed'));
     }
   }
