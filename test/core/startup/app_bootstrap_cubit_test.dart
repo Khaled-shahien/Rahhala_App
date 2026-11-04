@@ -115,10 +115,12 @@ void main() {
           isAuthenticated: true,
         ),
       );
-      return AppBootstrapCubit(service: service);
+      return AppBootstrapCubit(
+        service: service,
+        minimumSplashDuration: Duration.zero,
+      );
     },
     act: (cubit) => cubit.initialize(),
-    wait: const Duration(seconds: 4),
     expect: () => [
       const AppBootstrapLoading(),
       isA<AppBootstrapReady>().having(
@@ -126,6 +128,49 @@ void main() {
         'destination',
         BootstrapDestination.home,
       ),
+    ],
+  );
+
+  test('the minimum splash time runs alongside initialization', () async {
+    final service = _MockAppBootstrapService();
+    when(() => service.initialize()).thenAnswer((_) async {
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      return const BootstrapResult(
+        destination: BootstrapDestination.welcome,
+        hasCompletedOnboarding: true,
+        isAuthenticated: false,
+      );
+    });
+    final cubit = AppBootstrapCubit(
+      service: service,
+      minimumSplashDuration: const Duration(milliseconds: 400),
+    );
+
+    final stopwatch = Stopwatch()..start();
+    await cubit.initialize();
+    stopwatch.stop();
+
+    expect(cubit.state, isA<AppBootstrapReady>());
+    // Waiting one after the other would take at least 700 ms.
+    expect(stopwatch.elapsedMilliseconds, greaterThanOrEqualTo(390));
+    expect(stopwatch.elapsedMilliseconds, lessThan(650));
+    await cubit.close();
+  });
+
+  blocTest<AppBootstrapCubit, AppBootstrapState>(
+    'emits an error state when initialization throws',
+    build: () {
+      final service = _MockAppBootstrapService();
+      when(() => service.initialize()).thenThrow(StateError('prefs broken'));
+      return AppBootstrapCubit(
+        service: service,
+        minimumSplashDuration: Duration.zero,
+      );
+    },
+    act: (cubit) => cubit.initialize(),
+    expect: () => [
+      const AppBootstrapLoading(),
+      isA<AppBootstrapError>(),
     ],
   );
 }

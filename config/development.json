@@ -1,0 +1,8 @@
+{
+  "APP_FLAVOR": "development",
+  "API_BASE_URL": "https://rahhallaweb2026.runasp.net",
+  "CHATBOT_BASE_URL": "https://express-js-on-vercel-ten-roan-21.vercel.app",
+  "APP_CONFIG_URL": "",
+  "ENABLE_ANALYTICS": false,
+  "ENABLE_CRASH_REPORTING": false
+}

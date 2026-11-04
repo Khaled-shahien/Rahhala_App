@@ -30,7 +30,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.auth_app"
+    namespace = "com.rahhala.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -45,7 +45,7 @@ android {
 
     defaultConfig {
         
-        applicationId = "com.example.auth_app"
+        applicationId = "com.rahhala.app"
 
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
@@ -96,10 +96,19 @@ android {
 
     buildTypes {
         release {
+            // R8 code shrinking and obfuscation (Flutter enables it for release
+            // by default; stated explicitly so it can't be switched off silently).
+            isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig =
                 if (hasReleaseSigningProperties) {
                     signingConfigs.getByName("release")
                 } else {
+                    logger.warn(
+                        "WARNING: key.properties is missing or incomplete. The release " +
+                            "build is signed with the DEBUG key and will be rejected by " +
+                            "Google Play. See docs/android_release_signing.md.",
+                    )
                     signingConfigs.getByName("debug")
                 }
         }

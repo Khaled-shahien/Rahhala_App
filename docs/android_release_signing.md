@@ -36,22 +36,22 @@ Then edit `android/key.properties` with your real credentials:
 storePassword=REAL_STORE_PASSWORD
 keyPassword=REAL_KEY_PASSWORD
 keyAlias=rahhala
-storeFile=rahhala-release-key.jks
+storeFile=app/rahhala-release-key.jks
 ```
 
-> **Note:** `storeFile` is relative to `android/app/`. If you placed your `.jks` file in `android/app/`, just use the filename.
+> **Note:** a relative `storeFile` is resolved from the folder that contains `key.properties`. With `android/key.properties` and the keystore in `android/app/`, use `app/rahhala-release-key.jks`. An absolute path also works.
 
-## Step 3: Build Release APK
+## Step 3: Build the Release Bundle
+
+Always build the `production` flavor with obfuscation, and keep the symbols for crash de-obfuscation:
 
 ```bash
-flutter build apk --release
+flutter build appbundle --flavor production --release \
+  --obfuscate --split-debug-info=build/symbols \
+  --dart-define-from-file=config/production.json
 ```
 
-Or for an App Bundle (recommended for Play Store):
-
-```bash
-flutter build appbundle --release
-```
+If `key.properties` is missing, Gradle prints a warning and signs with the debug key. Google Play rejects such bundles.
 
 ## Security Rules
 
@@ -77,22 +77,21 @@ The following files are already in `.gitignore` and must stay ignored:
 
 The `android/app/build.gradle.kts` file:
 
-1. Loads `android/key.properties` if it exists
+1. Loads `key.properties` from the repository root or `android/` if it exists
 2. Configures a `release` signing config from those properties
-3. **Blocks the release build** with a clear error if `key.properties` is missing
+3. If the file is missing or incomplete, prints a **WARNING** and signs the release build with the debug key, so local release builds and CI still work
 
 This means:
-- **Debug builds** always work (use the default debug keystore)
-- **Release builds** require real credentials — this is intentional and production-safe
-- There is **no fallback** from release to debug signing
+- **Debug builds** always work (default debug keystore)
+- **Release builds without credentials** succeed but are debug-signed, and **Google Play rejects them**
+- **Store uploads** need the real upload key
 
 ## Expected Behavior
 
 | Command | Without `key.properties` | With `key.properties` |
 |---|---|---|
-| `flutter build apk --debug` | ✅ Passes | ✅ Passes |
-| `flutter build apk --release` | ❌ Fails with clear error | ✅ Passes |
-| `flutter build appbundle --release` | ❌ Fails with clear error | ✅ Passes |
+| `flutter build apk --flavor production --debug` | ✅ Passes | ✅ Passes |
+| `flutter build appbundle --flavor production --release` | ⚠️ Passes, debug-signed (not uploadable) | ✅ Passes, upload-signed |
 
 ## CI/CD Setup
 
@@ -113,7 +112,7 @@ Example (GitHub Actions):
     echo "storePassword=${{ secrets.STORE_PASSWORD }}" > android/key.properties
     echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
     echo "keyAlias=rahhala" >> android/key.properties
-    echo "storeFile=rahhala-release-key.jks" >> android/key.properties
+    echo "storeFile=app/rahhala-release-key.jks" >> android/key.properties
 ```
 
 ## Troubleshooting

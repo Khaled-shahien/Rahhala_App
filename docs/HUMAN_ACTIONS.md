@@ -19,6 +19,12 @@ These steps can't be done from the codebase: they need console access, credentia
 5. **Google Play Data Safety form.** Declare: email, name, phone, country, birth date, gender, profile photo (account management); approximate and precise location (app functionality, not stored per the client, so verify on the backend); photos (image search, sent to the server); chat messages (sent to the chatbot backend); crash logs (if Crashlytics is enabled). Data is encrypted in transit (HTTPS). In-app account deletion exists (Profile → Delete account).
 6. **App Store privacy "nutrition label"** with the same data. `ios/Runner/PrivacyInfo.xcprivacy` has been added; re-check it with Xcode's privacy report after `pod install`.
 7. **iOS signing:** set the Development Team in Xcode, register the bundle ID `com.rahhala.app`, and create provisioning profiles. This can't be done on Windows. Build on a Mac with `flutter build ipa --obfuscate --split-debug-info=build/symbols`.
+7a. **iOS: add new files to the Runner target (Xcode, about 2 minutes).** Open `ios/Runner.xcworkspace`, then drag into the Runner group with "Add to target: Runner" ticked:
+   - `ios/Runner/PrivacyInfo.xcprivacy`
+   - `ios/Runner/en.lproj/InfoPlist.strings` and `ios/Runner/ar.lproj/InfoPlist.strings`. Select the file and use *Localize…* in the File inspector so both languages appear as one localized resource.
+
+   These files were created on a Windows machine, where the Xcode project can't be safely edited.
+7b. **iOS flavors.** `pubspec.yaml` sets `default-flavor: production`, which Android uses, but the iOS project has only the default `Runner` scheme. Either create Xcode schemes and build configurations named `development`, `staging` and `production` (see https://docs.flutter.dev/deployment/flavors-ios), or remove `default-flavor` before building iOS. Until then the CI iOS job is marked informational (`continue-on-error`).
 
 ## Backend (API owner)
 

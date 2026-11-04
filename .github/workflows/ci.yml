@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, Developer, production-readiness]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Release builds and CI use the stable channel (docs/HUMAN_ACTIONS.md #14).
+  FLUTTER_CHANNEL: stable
+
+jobs:
+  quality:
+    name: Format, analyze, test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Check generated localizations are up to date
+        run: |
+          flutter gen-l10n
+          git diff --exit-code -- lib/l10n/generated
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Analyze (warnings and infos fail the build)
+        run: flutter analyze --fatal-infos --fatal-warnings
+
+      - name: Run tests with coverage
+        run: flutter test --coverage --reporter=expanded
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: coverage/lcov.info
+          if-no-files-found: error
+
+  android:
+    name: Android release bundle
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Without key.properties the bundle is signed with the debug key. That's
+      # enough to prove the release build works; store uploads need the real
+      # upload key (docs/android_release_signing.md).
+      - name: Build production app bundle (obfuscated)
+        run: >
+          flutter build appbundle
+          --flavor production
+          --release
+          --obfuscate
+          --split-debug-info=build/symbols
+          --dart-define-from-file=config/production.json
+
+      - name: Upload bundle and symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-production-release
+          path: |
+            build/app/outputs/bundle/productionRelease/*.aab
+            build/symbols/**
+
+  ios:
+    name: iOS build (no codesign)
+    needs: quality
+    runs-on: macos-latest
+    timeout-minutes: 60
+    # The iOS project has no Xcode schemes for the Android-style flavors yet
+    # (docs/HUMAN_ACTIONS.md). Until they exist this job is informational.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build iOS
+        run: >
+          flutter build ios
+          --release
+          --no-codesign
+          --obfuscate
+          --split-debug-info=build/symbols
+          --dart-define-from-file=config/production.json

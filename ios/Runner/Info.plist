@@ -3,13 +3,20 @@
 <plist version="1.0">
 <dict>
     <key>NSCameraUsageDescription</key>
-    <string>We need camera access to search places by photo</string>
+    <string>Rahhala uses the camera so you can search for places by taking a photo.</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>We need photo library access to search places by photo</string>
+    <string>Rahhala needs access to your photos so you can search for places with an existing picture or set a profile photo.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Rahhala uses your location to show nearby places and travel recommendations around you.</string>
+    <string>Rahhala uses your location to show nearby places and guide you during your trip.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>ar</string>
+	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>CFBundleDisplayName</key>
 	<string>Rahhala</string>
 	<key>CFBundleExecutable</key>

@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "Rahhala uses the camera so you can search for places by taking a photo.";
+"NSPhotoLibraryUsageDescription" = "Rahhala needs access to your photos so you can search for places with an existing picture or set a profile photo.";
+"NSLocationWhenInUseUsageDescription" = "Rahhala uses your location to show nearby places and guide you during your trip.";
