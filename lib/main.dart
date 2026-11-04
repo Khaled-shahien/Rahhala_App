@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:rahhala_app/core/crash/app_error_reporter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
@@ -13,6 +15,27 @@ import 'package:rahhala_app/l10n/generated/app_localizations.dart';
 void main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Route every uncaught error to the logger and crash reporter. These are
+  // installed first so failures during startup are captured too.
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    AppErrorReporter.record(
+      'Uncaught Flutter framework error',
+      error: details.exception,
+      stackTrace: details.stack,
+      fatal: true,
+    );
+  };
+  PlatformDispatcher.instance.onError = (error, stackTrace) {
+    AppErrorReporter.record(
+      'Uncaught asynchronous error',
+      error: error,
+      stackTrace: stackTrace,
+      fatal: true,
+    );
+    return true;
+  };
 
   // Initialize dependency injection
   await setupServiceLocator();
