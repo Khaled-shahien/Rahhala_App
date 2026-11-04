@@ -1,62 +1,71 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rahhala_app/core/auth/auth_session_service.dart';
-import 'package:rahhala_app/core/di/service_locator.dart';
+import 'package:rahhala_app/core/errors/exceptions.dart';
+import 'package:rahhala_app/core/errors/failures.dart';
 import 'package:rahhala_app/features/profile/domain/repositories/user_repository.dart';
 import 'package:rahhala_app/features/profile/domain/profile/profile_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
+  ProfileCubit({
+    required this.repo,
+    required AuthSessionService authSessionService,
+  })  : _authSessionService = authSessionService,
+        super(ProfileInitial());
+
   final UserRepo repo;
-  ProfileCubit({required this.repo}) : super(ProfileInitial());
+  final AuthSessionService _authSessionService;
 
   Future<void> fetch() async {
+    if (!_authSessionService.hasToken) {
+      emit(const ProfileGuest());
+      return;
+    }
     emit(ProfileLoading());
-    final res = await repo.getDetails();
+    final res = await _guard(repo.getDetails);
+    if (isClosed) return;
     await res.fold(
       (failure) async => emit(ProfileFailure(failure.message)),
       (details) async {
-        await sl<AuthSessionService>().saveSession(
+        await _authSessionService.saveSession(
           fullName: details.fullName.trim(),
           email: details.email.trim().toLowerCase(),
           profileImageUrl: details.profileImageUrl,
         );
-        emit(ProfileLoaded(details));
+        if (!isClosed) emit(ProfileLoaded(details));
       },
     );
   }
 
   Future<void> deleteAccount() async {
     emit(ProfileActionLoading());
-    final res = await repo.deleteProfile();
+    final res = await _guard(repo.deleteProfile);
+    if (isClosed) return;
     res.fold(
       (failure) => emit(ProfileFailure(failure.message)),
-      (success) => emit(ProfileActionSuccess(success)),
+      (success) => emit(ProfileAccountDeleted(success)),
     );
   }
 
   Future<void> uploadPhoto(String filePath) async {
     emit(ProfileActionLoading());
-    final res = await repo.uploadPhoto(filePath: filePath);
+    final res = await _guard(() => repo.uploadPhoto(filePath: filePath));
+    if (isClosed) return;
     await res.fold(
-      (failure) async {
-        emit(ProfileFailure(failure.message));
-      },
+      (failure) async => emit(ProfileFailure(failure.message)),
       (success) async {
-        final detailsRes = await repo.getDetails();
+        final detailsRes = await _guard(repo.getDetails);
+        if (isClosed) return;
         await detailsRes.fold(
-          (failure) async {
-            emit(ProfileActionSuccess(success));
-          },
+          (_) async => emit(ProfileActionSuccess(success)),
           (details) async {
-            if (details.profileImageUrl != null &&
-                details.profileImageUrl!.isNotEmpty) {
-              await sl<AuthSessionService>().saveSession(
-                profileImageUrl: details.profileImageUrl!,
-              );
-            }
-            await sl<AuthSessionService>().saveSession(
+            final imageUrl = details.profileImageUrl;
+            await _authSessionService.saveSession(
               fullName: details.fullName.trim(),
+              profileImageUrl:
+                  (imageUrl != null && imageUrl.isNotEmpty) ? imageUrl : null,
             );
-
+            if (isClosed) return;
             emit(ProfileActionSuccess(success));
             emit(ProfileLoaded(details));
           },
@@ -73,17 +82,21 @@ class ProfileCubit extends Cubit<ProfileState> {
     String? gender,
   }) async {
     emit(ProfileActionLoading());
-    final res = await repo.editProfile(
-      fullName: fullName,
-      phoneNumber: phoneNumber,
-      country: country,
-      birthDate: birthDate,
-      gender: gender,
+    final res = await _guard(
+      () => repo.editProfile(
+        fullName: fullName,
+        phoneNumber: phoneNumber,
+        country: country,
+        birthDate: birthDate,
+        gender: gender,
+      ),
     );
+    if (isClosed) return;
     await res.fold(
       (failure) async => emit(ProfileFailure(failure.message)),
       (success) async {
-        await sl<AuthSessionService>().saveSession(fullName: fullName);
+        await _authSessionService.saveSession(fullName: fullName);
+        if (isClosed) return;
         emit(ProfileActionSuccess(success));
         await fetch();
       },
@@ -96,14 +109,29 @@ class ProfileCubit extends Cubit<ProfileState> {
     required String confirmPassword,
   }) async {
     emit(ProfileActionLoading());
-    final res = await repo.changePassword(
-      oldPassword: oldPassword,
-      newPassword: newPassword,
-      confirmPassword: confirmPassword,
+    final res = await _guard(
+      () => repo.changePassword(
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+        confirmPassword: confirmPassword,
+      ),
     );
+    if (isClosed) return;
     res.fold(
       (failure) => emit(ProfileFailure(failure.message)),
       (success) => emit(ProfileActionSuccess(success)),
     );
+  }
+
+  /// Turns unexpected exceptions (parsing, platform) into failures so the UI
+  /// never stays stuck in a loading state.
+  Future<Either<Failure, T>> _guard<T>(
+    Future<Either<Failure, T>> Function() call,
+  ) async {
+    try {
+      return await call();
+    } catch (e) {
+      return Left(failureFromError(e));
+    }
   }
 }

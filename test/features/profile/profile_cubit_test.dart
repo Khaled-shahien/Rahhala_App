@@ -34,6 +34,7 @@ void main() {
       ),
     );
 
+    when(() => tokenStorage.hasToken).thenReturn(true);
     when(() => tokenStorage.setFullName(any())).thenAnswer((_) async {});
     when(() => tokenStorage.setEmail(any())).thenAnswer((_) async {});
     when(() => tokenStorage.setProfileImageUrl(any())).thenAnswer((_) async {});
@@ -58,7 +59,10 @@ void main() {
           ),
         ),
       );
-      return ProfileCubit(repo: userRepo);
+      return ProfileCubit(
+        repo: userRepo,
+        authSessionService: sl<AuthSessionService>(),
+      );
     },
     act: (cubit) => cubit.fetch(),
     expect: () => <ProfileState>[
@@ -87,9 +91,13 @@ void main() {
     'emits [ProfileLoading, ProfileFailure] when repository fails',
     build: () {
       when(() => userRepo.getDetails()).thenAnswer(
-        (_) async => Left(ServerFailure(message: 'Unable to load profile')),
+        (_) async =>
+            const Left(ServerFailure(message: 'Unable to load profile')),
       );
-      return ProfileCubit(repo: userRepo);
+      return ProfileCubit(
+        repo: userRepo,
+        authSessionService: sl<AuthSessionService>(),
+      );
     },
     act: (cubit) => cubit.fetch(),
     expect: () => <ProfileState>[

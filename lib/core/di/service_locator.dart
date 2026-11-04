@@ -213,7 +213,12 @@ Future<void> setupServiceLocator() async {
 
   sl.registerLazySingleton<UserRepo>(
       () => UserRepoImpl(api: sl<ApiConsumer>()));
-  sl.registerFactory<ProfileCubit>(() => ProfileCubit(repo: sl<UserRepo>()));
+  sl.registerFactory<ProfileCubit>(
+    () => ProfileCubit(
+      repo: sl<UserRepo>(),
+      authSessionService: sl<AuthSessionService>(),
+    ),
+  );
   sl.registerLazySingleton<ProfilePhotoUploadUseCase>(
     () => ProfilePhotoUploadUseCase(
       repo: sl<UserRepo>(),

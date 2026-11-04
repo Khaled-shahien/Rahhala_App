@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rahhala_app/core/auth/auth_session_service.dart';
+import 'package:rahhala_app/core/auth/session_manager.dart';
 import 'package:rahhala_app/core/di/service_locator.dart';
 import 'package:rahhala_app/core/localization/app_locale_controller.dart';
 import 'package:rahhala_app/core/localization/app_localization_extensions.dart';
@@ -45,6 +46,12 @@ class _ProfilePageState extends State<ProfilePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _profileCubit.fetch();
     });
+  }
+
+  @override
+  void dispose() {
+    _profileCubit.close();
+    super.dispose();
   }
 
   void _showComingSoon(String featureName) {
@@ -175,7 +182,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     if (confirm != true) return;
 
-    await sl<AuthSessionService>().logout();
+    await sl<SessionManager>().endSession(SessionEndReason.logout);
     if (!mounted) return;
 
     context.go(AppRoutes.welcome);
@@ -547,15 +554,6 @@ class _ProfilePageState extends State<ProfilePage> {
       value: _profileCubit,
       child: BlocConsumer<ProfileCubit, ProfileState>(
         listener: (context, state) async {
-          if (state is! ProfileLoading && state is! ProfileActionLoading) {
-            if (Navigator.canPop(context)) {
-              final route = ModalRoute.of(context);
-              if (route != null && !route.isCurrent) {
-                Navigator.pop(context);
-              }
-            }
-          }
-
           if (state is ProfileFailure) {
             HapticFeedback.mediumImpact();
             showAppNotification(
@@ -564,21 +562,24 @@ class _ProfilePageState extends State<ProfilePage> {
               message: state.message,
               isError: true,
             );
+          } else if (state is ProfileAccountDeleted) {
+            showAppNotification(
+              context: context,
+              title: context.l10n.commonSuccess,
+              message: state.model.message,
+            );
+            await sl<SessionManager>().endSession(
+              SessionEndReason.accountDeleted,
+            );
+            if (!context.mounted) return;
+            context.go(AppRoutes.welcome);
           } else if (state is ProfileActionSuccess) {
             showAppNotification(
               context: context,
               title: context.l10n.commonSuccess,
               message: state.model.message,
             );
-
-            final msg = state.model.message.toLowerCase();
-            if (msg.contains('delete')) {
-              await sl<AuthSessionService>().clearSession();
-              if (!context.mounted) return;
-              context.go(AppRoutes.login);
-            } else {
-              if (mounted) setState(() {});
-            }
+            if (mounted) setState(() {});
           } else if (state is ProfileLoaded) {
             if (mounted) setState(() {});
           }

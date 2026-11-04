@@ -34,3 +34,16 @@ class ProfileActionSuccess extends ProfileState {
   @override
   List<Object?> get props => [model];
 }
+
+/// The account was deleted on the server. The UI must end the session.
+class ProfileAccountDeleted extends ProfileState {
+  final SuccessMessageModel model;
+  const ProfileAccountDeleted(this.model);
+  @override
+  List<Object?> get props => [model];
+}
+
+/// There's no signed-in user (guest mode), so no profile is fetched.
+class ProfileGuest extends ProfileState {
+  const ProfileGuest();
+}
