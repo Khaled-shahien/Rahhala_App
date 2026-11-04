@@ -49,3 +49,8 @@ key.properties
 android/key.properties
 *.jks
 *.keystore
+
+# Gradle build output inside platform folders
+/android/build/
+/android/.gradle/
+/android/app/.cxx/
